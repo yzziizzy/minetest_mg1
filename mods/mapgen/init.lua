@@ -429,8 +429,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				]]
 				
 				if y < continents then
-					
-					data[vi] = c_pumice
+					if y < -2 then
+						if y < -math.pow(math.abs(continents), 1.8) then
+							data[vi] = c_pumice
+						else
+							data[vi] = c_s_water
+						end
+					else
+						data[vi] = c_pumice
+					end
 				elseif y <= 0 then
 					data[vi] = c_s_water
 				end
