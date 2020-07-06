@@ -136,12 +136,39 @@ local np_river2 = {
 
 local np_plains1 = {
 	offset = 4,
-	scale = 60,
+	scale = 30,
 	spread = {x=1000, y=1000, z=1000},
 	seed = 82341,
 	octaves = 3,
-	persist = 0.6
+	persist = 0.5
 }
+
+local np_plains2 = {
+	offset = 4,
+	scale = 30,
+	spread = {x=1500, y=1500, z=1500},
+	seed = 67824,
+	octaves = 3,
+	persist = 0.4
+}
+local np_continents = {
+	offset = -2,
+	scale = 20,
+	spread = {x=350, y=350, z=350},
+	seed = 67824,
+	octaves = 3,
+	persist = 0.2
+}
+
+local np_hills = {
+	offset = 0,
+	scale = 10,
+	spread = {x=150, y=150, z=150},
+	seed = 345346,
+	octaves = 4,
+	persist = 0.4
+}
+
 local np_mtns1 = {
 	offset = 4,
 	scale = 120,
@@ -224,6 +251,12 @@ mgv7_np_mount_height    = 400,  700,  (500, 500, 500), 72449, 4, 0.6
 local function logb(b, x)
 	return math.log(x) / math.log(b)
 end
+local function nclamp(x)
+	return math.min(1, math.max(x, 0))
+end
+local function clamp(l, x, h)
+	return math.min(h, math.max(x, l))
+end
 
 -- minetest.register_on_respawnplayer(function(player)
 --     player:setpos({x=571, y=50, z=70})
@@ -302,31 +335,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_tin = minetest.get_content_id("moreores:mineral_tin")
 	local c_mithril = minetest.get_content_id("moreores:mineral_mithril")
 	]]
-	
-	--[[
-	-- geologic
-	local c_obglass = minetest.get_content_id("default:obsidian_glass")
-	local c_sandstone = minetest.get_content_id("default:sandstone")
-	local c_gravel = minetest.get_content_id("default:gravel")
-	local c_desstone = minetest.get_content_id("default:desert_stone")
-	local c_granite = minetest.get_content_id("geology:granite")
-	local c_marble = minetest.get_content_id("geology:marble")
-	local c_slate = minetest.get_content_id("geology:slate")
-	local c_gneiss = minetest.get_content_id("geology:gneiss")
-	local c_basalt = minetest.get_content_id("geology:basalt")
-	local c_schist = minetest.get_content_id("geology:schist")
-	local c_chalk = minetest.get_content_id("geology:chalk")
-	local c_shale = minetest.get_content_id("geology:shale")
-	local c_ors = minetest.get_content_id("geology:ors")
-	local c_jade = minetest.get_content_id("geology:jade")
-	local c_serpentine = minetest.get_content_id("geology:serpentine")
-	local c_anthracite = minetest.get_content_id("geology:anthracite")
-	local c_clay = minetest.get_content_id("default:clay")
-
-	local c_torch = minetest.get_content_id("default:torch")
-	local c_shroom = minetest.get_content_id("mapgen:glowshroom")
---     local c_lava = minetest.get_content_id("default:lava_source")
-]]
 
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
@@ -335,16 +343,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 --    local nvals_caves = minetest.get_perlin_map(np_caves, chulens):get3dMap_flat(minposxyz)
 --    local nvals_caves2 = minetest.get_perlin_map(np_caves2, chulens):get3dMap_flat(minposxyz)
-	local nvals_terrain_s = minetest.get_perlin_map(np_stone, chulens):get3dMap_flat(minposxyz)
-	local nvals_terrain1 = minetest.get_perlin_map(np_terrain1, chulens):get3dMap_flat(minposxyz)
-	local nvals_terrain2 = minetest.get_perlin_map(np_terrain2, chulens):get3dMap_flat(minposxyz)
-	local nvals_terrain3 = minetest.get_perlin_map(np_terrain3, chulens):get3dMap_flat(minposxyz)
-	local nvals_terrain4 = minetest.get_perlin_map(np_terrain4, chulens):get3dMap_flat(minposxyz)
-	local nvals_terrain5 = minetest.get_perlin_map(np_terrain5, chulens):get3dMap_flat(minposxyz)
-	
+-- 	local nvals_terrain_s = minetest.get_perlin_map(np_stone, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_terrain1 = minetest.get_perlin_map(np_terrain1, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_terrain2 = minetest.get_perlin_map(np_terrain2, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_terrain3 = minetest.get_perlin_map(np_terrain3, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_terrain4 = minetest.get_perlin_map(np_terrain4, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_terrain5 = minetest.get_perlin_map(np_terrain5, chulens):get3dMap_flat(minposxyz)
+	--[[
 	local nvals_river1 = minetest.get_perlin_map(np_river1, chulens):get2dMap_flat(minposxz)
 	local nvals_river2 = minetest.get_perlin_map(np_river2, chulens):get2dMap_flat(minposxz)
 	local nvals_plains = minetest.get_perlin_map(np_plains1, chulens):get2dMap_flat(minposxz)
+	local nvals_plains2 = minetest.get_perlin_map(np_plains2, chulens):get2dMap_flat(minposxz)
+	]]
+	local nvals_continents = minetest.get_perlin_map(np_continents, chulens):get2dMap_flat(minposxz)
+	local nvals_hills = minetest.get_perlin_map(np_hills, chulens):get2dMap_flat(minposxz)
+	
 	local nvals_mountains = minetest.get_perlin_map(np_mtns3, chulens):get2dMap_flat(minposxz)
 	local nvals_vulcanism = minetest.get_perlin_map(np_mtns2, chulens):get2dMap_flat(minposxz)
 	local nvals_squiggle = minetest.get_perlin_map(np_sq1, chulens):get3dMap_flat(minposxyz)
@@ -381,21 +394,65 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				--print("nixz: "..nixz..", lz: ".. lz..", zz: "..zz..", lx: "..lx..", xx: "..xx)
 				
 -- 				local ht = math.abs(nvals_mountains[nixz])
-				local test = nvals_plains[nixz]
+				--local plains1 = nvals_plains[nixz]
+				--local plains2 = nvals_plains2[nixz]
+				local continents = nvals_continents[nixz]
+				local hills = nvals_hills[nixz]
 				local ht = math.abs(nvals_mountains[nixz])
-				local vu = nvals_vulcanism[nixz]
-				local dn = nvals_squiggle[nixyz]
-				local dn2 = nvals_squiggle2[nixyz]
+				--local vu = nvals_vulcanism[nixz]
+				--local dn = nvals_squiggle[nixyz]
+				--local dn2 = nvals_squiggle2[nixyz]
 				
-				local r_tmp1 = nvals_river1[nixz]
-				local r_tmp2 = nvals_river2[nixz]
-				local rv = math.abs(r_tmp1 - r_tmp2)
+				--local r_tmp1 = nvals_river1[nixz]
+				--local r_tmp2 = nvals_river2[nixz]
+				--local rv = math.abs(r_tmp1 - r_tmp2)
 				
 				-- 				print(dn)
--- 				print(dump(ht))
--- 				if y > 250 and dn2 > 10 then
--- 					data[vi] = c_pumice
-
+--				print(dump(ht))
+				--local q = plains2 / plains1
+				--local r = q * plains1 + (1-q) * ht * math.abs(plains2 / plains1)
+				--[[
+				if y < r then
+					if q > 0.5 then
+						data[vi] = c_pumice
+					else
+						data[vi] = c_granite
+					end
+				elseif y <= 0 then
+					data[vi] = c_water
+				end
+				]]
+				--[[
+				if y < hills then
+					data[vi] = c_granite
+				end
+				]]
+				
+				if y < continents then
+					
+					data[vi] = c_pumice
+				elseif y <= 0 then
+					data[vi] = c_s_water
+				end
+				
+				if continents > 2 then
+					local m = continents - 2
+					local p = m / 4
+					local q = hills / 8
+					local n = math.pow(clamp(0, m, 6) / 7, 2)
+					local o = 2 + m  --[[+ n*ht*q]] + hills * p
+					
+					local r = clamp(0, hills - 5, 6) / 5
+					local s = 1 / (1 + math.exp(-p)) 
+					
+					o = o + s * ht * r
+					
+					if y < o then
+						data[vi] = c_pumice
+					end
+				end
+				
+				
 				--[[
 				if y < 2 and rv < .28 then -- rivers
 					 local a = .1
@@ -406,7 +463,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					 end
 				end
 				]]
-				
+				--[[
 				if y > ht then -- where land meets sky
 					 data[vi] = c_air
 				else
@@ -437,7 +494,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				
 				end
-			
+				]]
 --                 -- cave stuff
 --                local cave_density = math.abs(nvals_caves[nixyz])
 --                local cave_density2 = math.abs(nvals_caves2[nixyz])

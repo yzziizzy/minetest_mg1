@@ -9,6 +9,7 @@ minetest.register_on_joinplayer(function(player)
 	privs.noclip = true
 	minetest.set_player_privs(name, privs)
 	
+	player:set_physics_override({speed = 5.0})
 -- 	local p = player:get_pos()
 -- 	if p.y > -100 then
 -- 		player:set_pos({x=0, y=-20000, z= 0})
