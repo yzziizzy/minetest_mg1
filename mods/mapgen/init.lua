@@ -399,9 +399,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local continents = nvals_continents[nixz]
 				local hills = nvals_hills[nixz]
 				local ht = math.abs(nvals_mountains[nixz])
-				--local vu = nvals_vulcanism[nixz]
-				--local dn = nvals_squiggle[nixyz]
-				--local dn2 = nvals_squiggle2[nixyz]
+				local vu = nvals_vulcanism[nixz]
+-- 				local dn = nvals_squiggle[nixyz]
+				local dn2 = nvals_squiggle2[nixyz]
 				
 				--local r_tmp1 = nvals_river1[nixz]
 				--local r_tmp2 = nvals_river2[nixz]
@@ -455,7 +455,37 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					o = o + s * ht * r
 					
 					if y < o then
-						data[vi] = c_pumice
+-- 						data[vi] = c_pumice
+						
+						local ht2 = o + dn2 * 0.1
+						if vu > -1000 and ht2 > 100 + hills then -- volcanos
+							
+							if y <= 95 + hills and (ht2 > 106 + hills or y > (100 + hills - (math.pow((ht2 - 106 + hills) / 15, 12) / 30))) then
+								data[vi] = c_lava
+	--							data[vi] = c_air
+								
+							elseif y > (100 + hills - ((ht2 - 100 - hills) / 2.5)) then
+								
+								data[vi] = c_air
+							else
+								if data[bi] ~= c_air then
+									
+									data[vi] = c_basalt
+								else 
+									data[vi] = c_air
+								end
+							end
+						else
+							if data[bi] ~= c_air then
+								data[vi] = c_granite
+							else 
+								data[vi] = c_air
+							end
+						end
+						
+						
+						
+						
 					end
 				end
 				
