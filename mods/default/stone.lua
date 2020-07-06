@@ -26,6 +26,10 @@ metamorphic
 	slate
 	schist
 	serpentine
+	
+	
+native metals vs ores
+grades of coal
 ]]
 
 

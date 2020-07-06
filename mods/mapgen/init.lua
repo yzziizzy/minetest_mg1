@@ -254,8 +254,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_air = minetest.get_content_id("air")
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_s_water = minetest.get_content_id("default:water_source")
-	local c_r_water = minetest.get_content_id("default:river_source")
-	local c_g_water = minetest.get_content_id("default:glacial_source")
+	local c_r_water = minetest.get_content_id("default:river_water_source")
+	local c_g_water = minetest.get_content_id("default:glacial_water_source")
 	
 	-- igneous
 	local c_granite = minetest.get_content_id("default:granite")
@@ -360,6 +360,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local thickness_normal = .0020*scaler
 	local thickness_scarce = .0016*scaler
 	local thickness_rare = .0011*scaler
+	
+	local lx = x1 - x0 + 1
 
 	local nixyz = 1 -- 3D noise index
 	local nixz = 1 -- 3D noise index
@@ -371,7 +373,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				local xx = lx - (x1 - x) - 1
 				local yy = lx - (y1 - y) - 1
-				local zz = lz - (z1 - z) - 1
+				local zz = lx - (z1 - z) - 1
 				
 				local nixz = zz * lx + xx + 1
 				local nixyz = zz * lx * lx + yy * lx + xx + 1
@@ -394,8 +396,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 -- 				if y > 250 and dn2 > 10 then
 -- 					data[vi] = c_pumice
 
-				
-				if y < 2 and rv < .28 then -- where land meets sky
+				--[[
+				if y < 2 and rv < .28 then -- rivers
 					 local a = .1
 					 local b = 1 - math.exp(-math.pow(rv / a, 2))
 -- 					 print(b)
@@ -403,17 +405,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						data[vi] = c_basalt
 					 end
 				end
+				]]
 				
-				--[[
 				if y > ht then -- where land meets sky
 					 data[vi] = c_air
 				else
 					local ht2 = ht + dn2 * 0.1
 					if vu > -1000 and ht2 > 100 then -- volcanos
 						
-						if ht2 > 106 and y <= 94 and y > (100 - (math.pow((ht2 - 106) / 15, 12) / 30)) then
--- 							data[vi] = c_lava
-							data[vi] = c_air
+						if y <= 95 and (ht2 > 106 or y > (100 - (math.pow((ht2 - 106) / 15, 12) / 30))) then
+							data[vi] = c_lava
+--							data[vi] = c_air
 							
 						elseif y > (100 - ((ht2 - 100) / 2.5)) then
 							
@@ -435,7 +437,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				
 				end
-				]]
+			
 --                 -- cave stuff
 --                local cave_density = math.abs(nvals_caves[nixyz])
 --                local cave_density2 = math.abs(nvals_caves2[nixyz])
