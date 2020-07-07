@@ -49,6 +49,14 @@ wood chips
 
 ]]
 
+minetest.register_node("default:mg_stone", {
+	description = "Mapgen Stone Placeholder (You should not see this)",
+-- 	tiles = {"default_"..def.n.."_cobble.png"},
+	tiles = {"default_stone.png^[colorize:red:230"},
+	groups = {cracky = 1, stone = 1,},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 
 local stonedefs = {
 	{n="granite", d="Granite", t="i"},

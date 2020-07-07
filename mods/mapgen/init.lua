@@ -51,7 +51,7 @@ local vc2 = 64
 local np_caves = {
 	offset = 0,
 	scale = 1,
-	spread = {x=64, y=64, z=64}, --squash the layers a bit
+	spread = {x=300, y=300, z=300}, 
 	seed = 54333,
 	octaves = 3,
 	persist = 0.67
@@ -59,10 +59,19 @@ local np_caves = {
 local np_caves2 = {
 	offset = 0,
 	scale = 1,
-	spread = {x=64, y=64, z=64}, --squash the layers a bit
+	spread = {x=300, y=300, z=300},
 	seed = 453467,
-	octaves = 5,
+	octaves = 3,
 	persist = 0.67
+}
+
+local np_cave_size = {
+	offset = .02,
+	scale = .04,
+	spread = {x=200, y=200, z=200},
+	seed = 4746,
+	octaves = 4,
+	persist = 0.7
 }
 
 
@@ -120,7 +129,7 @@ local np_terrain5 = {
 local np_river1 = {
 	offset = 0,
 	scale = 10,
-	spread = {x=1500, y=1500, z=1500},
+	spread = {x=150, y=150, z=150},
 	seed = 7843,
 	octaves = 4,
 	persist = 0.65
@@ -128,11 +137,38 @@ local np_river1 = {
 local np_river2 = {
 	offset = 0,
 	scale = 10,
-	spread = {x=1700, y=1700, z=1700},
+	spread = {x=170, y=170, z=170},
 	seed = 45346,
 	octaves = 4,
 	persist = 0.65
 }
+
+
+local np_heat = {
+	offset = 50,
+	scale = 50,
+	spread = {x=500, y=500, z=500},
+	seed = 76783,
+	octaves = 3,
+	persist = 0.3
+}
+local np_humidity = {
+	offset = 50,
+	scale = 50,
+	spread = {x=700, y=700, z=700},
+	seed = 23567,
+	octaves = 3,
+	persist = 0.3
+}
+local np_magic = {
+	offset = 50,
+	scale = 50,
+	spread = {x=400, y=400, z=400},
+	seed = 226426,
+	octaves = 3,
+	persist = 0.5
+}
+
 
 local np_plains1 = {
 	offset = 4,
@@ -258,6 +294,95 @@ local function clamp(l, x, h)
 	return math.min(h, math.max(x, l))
 end
 
+
+
+
+local function get_stone(x,y,z, nixyz, biomedef, noise, stones)
+	local density1 = math.abs(noise[1][nixyz])
+	local density2 = math.abs(noise[2][nixyz])
+	local density3 = math.abs(noise[3][nixyz])
+	local density4 = math.abs(noise[4][nixyz])
+	local density5 = math.abs(noise[5][nixyz])
+	local density_s = noise[6][nixyz]
+	local density1_f = noise[7][nixyz]
+
+	
+	-- ore veins first
+	if     density1 < thickness_normal and density2 < thickness_normal then
+		return c_mese
+	elseif density1 < thickness_abundant and density3 < thickness_abundant then
+		return c_iron
+	elseif density1 < thickness_normal and density4 < thickness_normal then
+		return c_copper
+	elseif density1 < thickness_rare and density5 < thickness_rare then
+		return c_mithril
+	elseif density2 < thickness_rare and density3 < thickness_rare then
+		return c_diamond
+	elseif density2 < thickness_scarce and density4 < thickness_scarce then
+		return c_silver
+	elseif density2 < thickness_normal and density5 < thickness_normal then
+		return c_tin
+	elseif density3 < thickness_scarce and density4 < thickness_scarce then
+		return c_gold
+	elseif density3 < thickness_normal and density5 < thickness_normal then
+		return c_chromium
+	elseif density4 < thickness_normal and density5 < thickness_normal then
+		return c_zinc
+
+
+	-- then ore pockets
+	elseif density1_f > 1.4 then
+		return c_uranium
+
+
+	-- normal rocks
+	elseif density_s > 1.25 then
+		return c_jade
+	elseif density_s > 1.10 then
+		return c_serpentine
+	elseif density_s > 1.00 then
+		return c_shale
+	elseif density_s > 0.90 then
+		return c_granite
+	elseif density_s > 0.80 then
+		return c_basalt
+	elseif density_s > 0.708 then
+		return c_slate
+	elseif density_s > 0.70 then
+		return c_anthracite
+	elseif density_s > 0.60 then
+		return c_marble
+	elseif density_s > 0.50 then
+		return c_gneiss
+	elseif density_s > 0.40 then
+		return c_desstone
+	elseif density_s > 0.30 then
+		return c_sandstone
+	elseif density_s > 0.202 then
+		return c_schist
+
+	elseif density_s > 0.20 then
+		return c_gravel
+	elseif density_s > 0.19 then
+		return c_coalblock
+	elseif density_s > 0.188 then
+		return c_gravel
+
+	elseif density_s > 0.10 then
+		return c_chalk
+	elseif density_s > 0.00 then
+		return c_clay
+	elseif density_s > -0.10 then
+		return c_ors
+	else
+		return c_stone
+
+	end
+
+
+end
+
+
 -- minetest.register_on_respawnplayer(function(player)
 --     player:setpos({x=571, y=50, z=70})
 --     return true
@@ -270,7 +395,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 --      if maxp.y > 0 then
 --          return
 --      end
-
+	local chunk_flatness_lookup = {}
+	local biome_immune = {}
 
 	local x1 = maxp.x
 	local y1 = maxp.y
@@ -286,6 +412,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- general
 	local c_air = minetest.get_content_id("air")
 	local c_lava = minetest.get_content_id("default:lava_source")
+	local c_stone = minetest.get_content_id("default:mg_stone")
 	local c_s_water = minetest.get_content_id("default:water_source")
 	local c_r_water = minetest.get_content_id("default:river_water_source")
 	local c_g_water = minetest.get_content_id("default:glacial_water_source")
@@ -313,7 +440,19 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_gneiss = minetest.get_content_id("default:gneiss")
 	local c_slate = minetest.get_content_id("default:slate")
 	local c_schist = minetest.get_content_id("default:schist")
-	local c_serpentine = minetest.get_content_id("default:serpentine")
+	
+	local grasses = {
+		minetest.get_content_id("default:dirt_with_grass_"..0),
+		minetest.get_content_id("default:dirt_with_grass_"..1),
+		minetest.get_content_id("default:dirt_with_grass_"..2),
+		minetest.get_content_id("default:dirt_with_grass_"..3),
+		minetest.get_content_id("default:dirt_with_grass_"..4),
+		minetest.get_content_id("default:dirt_with_grass_"..5),
+		minetest.get_content_id("default:dirt_with_grass_"..6),
+		minetest.get_content_id("default:dirt_with_grass_"..7),
+		minetest.get_content_id("default:dirt_with_grass_"..8),
+		minetest.get_content_id("default:dirt_with_grass_"..9),
+	}
 	
 -- 	local c_wood = minetest.get_content_id("default:wood")
 -- 	local c_glass = minetest.get_content_id("default:glass")
@@ -341,22 +480,28 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local minposxyz = {x=x0, y=y0, z=z0}
 	local minposxz = {x=x0, y=z0}
 
---    local nvals_caves = minetest.get_perlin_map(np_caves, chulens):get3dMap_flat(minposxyz)
---    local nvals_caves2 = minetest.get_perlin_map(np_caves2, chulens):get3dMap_flat(minposxyz)
+	local nvals_caves = minetest.get_perlin_map(np_caves, chulens):get3dMap_flat(minposxyz)
+	local nvals_caves2 = minetest.get_perlin_map(np_caves2, chulens):get3dMap_flat(minposxyz)
+	local nvals_cave_size = minetest.get_perlin_map(np_cave_size, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_terrain_s = minetest.get_perlin_map(np_stone, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_terrain1 = minetest.get_perlin_map(np_terrain1, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_terrain2 = minetest.get_perlin_map(np_terrain2, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_terrain3 = minetest.get_perlin_map(np_terrain3, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_terrain4 = minetest.get_perlin_map(np_terrain4, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_terrain5 = minetest.get_perlin_map(np_terrain5, chulens):get3dMap_flat(minposxyz)
-	--[[
+	
 	local nvals_river1 = minetest.get_perlin_map(np_river1, chulens):get2dMap_flat(minposxz)
 	local nvals_river2 = minetest.get_perlin_map(np_river2, chulens):get2dMap_flat(minposxz)
+	--[[
 	local nvals_plains = minetest.get_perlin_map(np_plains1, chulens):get2dMap_flat(minposxz)
 	local nvals_plains2 = minetest.get_perlin_map(np_plains2, chulens):get2dMap_flat(minposxz)
 	]]
 	local nvals_continents = minetest.get_perlin_map(np_continents, chulens):get2dMap_flat(minposxz)
 	local nvals_hills = minetest.get_perlin_map(np_hills, chulens):get2dMap_flat(minposxz)
+	
+	local nvals_heat = minetest.get_perlin_map(np_heat, chulens):get2dMap_flat(minposxz)
+	local nvals_humidity = minetest.get_perlin_map(np_humidity, chulens):get2dMap_flat(minposxz)
+	local nvals_magic = minetest.get_perlin_map(np_magic, chulens):get2dMap_flat(minposxz)
 	
 	local nvals_mountains = minetest.get_perlin_map(np_mtns3, chulens):get2dMap_flat(minposxz)
 	local nvals_vulcanism = minetest.get_perlin_map(np_mtns2, chulens):get2dMap_flat(minposxz)
@@ -378,9 +523,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local nixyz = 1 -- 3D noise index
 	local nixz = 1 -- 3D noise index
-	for x = x0, x1 do -- for each node do
-		for z = z0, z1 do -- for each xy plane progressing northwards
-			for y = y0, y1 do -- for each x row progressing upwards
+	for x = x0, x1 do 
+		for z = z0, z1 do 
+			for y = y0, y1 do 
 				local vi = area:index(x, y, z)
 				local bi = area:index(x, y-1, z)
 				
@@ -403,9 +548,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 -- 				local dn = nvals_squiggle[nixyz]
 				local dn2 = nvals_squiggle2[nixyz]
 				
-				--local r_tmp1 = nvals_river1[nixz]
-				--local r_tmp2 = nvals_river2[nixz]
-				--local rv = math.abs(r_tmp1 - r_tmp2)
+				local r_tmp1 = nvals_river1[nixz]
+				local r_tmp2 = nvals_river2[nixz]
+				local rv = math.abs(r_tmp1 - r_tmp2)
 				
 				-- 				print(dn)
 --				print(dump(ht))
@@ -429,25 +574,28 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				]]
 				
 				if y < continents then
-					if y < -2 then
+					if continents < -2 then
 						if y < -math.pow(math.abs(continents), 1.8) then
 							data[vi] = c_pumice
 						else
 							data[vi] = c_s_water
 						end
-					else
+					else 
 						data[vi] = c_pumice
 					end
 				elseif y <= 0 then
 					data[vi] = c_s_water
 				end
 				
+				
+				local o = continents
+				
 				if continents > 2 then
 					local m = continents - 2
 					local p = m / 4
 					local q = hills / 8
 					local n = math.pow(clamp(0, m, 6) / 7, 2)
-					local o = 2 + m  --[[+ n*ht*q]] + hills * p
+					o = 2 + m  --[[+ n*ht*q]] + hills * p
 					
 					local r = clamp(0, hills - 5, 6) / 5
 					local s = 1 / (1 + math.exp(-p)) 
@@ -460,9 +608,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						local ht2 = o + dn2 * 0.1
 						if vu > -1000 and ht2 > 100 + hills then -- volcanos
 							
-							if y <= 95 + hills and (ht2 > 106 + hills or y > (100 + hills - (math.pow((ht2 - 106 + hills) / 15, 12) / 30))) then
+							if y <= 97 + hills and (ht2 > 106 + hills or y > (100 + hills - (math.pow((ht2 - 106 + hills) / 15, 12) / 30))) then
 								data[vi] = c_lava
 	--							data[vi] = c_air
+								biome_immune[nixz] = 1
 								
 							elseif y > (100 + hills - ((ht2 - 100 - hills) / 2.5)) then
 								
@@ -471,6 +620,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								if data[bi] ~= c_air then
 									
 									data[vi] = c_basalt
+									biome_immune[nixz] = 1
 								else 
 									data[vi] = c_air
 								end
@@ -487,19 +637,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						
 						
 					end
+					
+					
 				end
 				
+				o = math.max(o, continents)
 				
-				--[[
-				if y < 2 and rv < .28 then -- rivers
-					 local a = .1
-					 local b = 1 - math.exp(-math.pow(rv / a, 2))
+				if o > 0 and (y > o - 5) and (y < o + 0) and (rv < .38) then -- rivers
+-- 					 local a = .8
+-- 					 local b = 1 - math.exp(-math.pow(rv / a, 2))
 -- 					 print(b)
-					 if y > b * 3 then
-						data[vi] = c_basalt
-					 end
+-- 					 if y > b * 3 then
+						data[vi] = c_r_water
+-- 					 end
 				end
-				]]
+				
+				
+				
+				
 				--[[
 				if y > ht then -- where land meets sky
 					 data[vi] = c_air
@@ -532,18 +687,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				end
 				]]
---                 -- cave stuff
---                local cave_density = math.abs(nvals_caves[nixyz])
---                local cave_density2 = math.abs(nvals_caves2[nixyz])
---                local cave_density = nvals_caves[nixyz]
---                --local cave_density2 = nvals_caves2[nixyz]
---
---                 if data[vi] == c_air
---                     and cave_density > .7
---                     and cave_density2 > .7
---                     then
---                     data[vi] = c_schist
---                 end
+                -- cave stuff
+-- 				local cave_density = math.abs(nvals_caves[nixyz])
+-- 				local cave_density2 = math.abs(nvals_caves2[nixyz])
+			
 
 
 --[[
@@ -557,89 +704,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 
 				if data[vi] == c_stone then
-					local density_s = nvals_terrain_s[nixyz]
-					local density1_f = nvals_terrain1[nixyz]
-					local density1 = math.abs(nvals_terrain1[nixyz])
-					local density2 = math.abs(nvals_terrain2[nixyz])
-					local density3 = math.abs(nvals_terrain3[nixyz])
-					local density4 = math.abs(nvals_terrain4[nixyz])
-					local density5 = math.abs(nvals_terrain5[nixyz])
-
-					-- ore veins first
-					if     density1 < thickness_normal and density2 < thickness_normal then
-						data[vi] = c_mese
-					elseif density1 < thickness_abundant and density3 < thickness_abundant then
-						data[vi] = c_iron
-					elseif density1 < thickness_normal and density4 < thickness_normal then
-						data[vi] = c_copper
-					elseif density1 < thickness_rare and density5 < thickness_rare then
-						data[vi] = c_mithril
-					elseif density2 < thickness_rare and density3 < thickness_rare then
-						data[vi] = c_diamond
-					elseif density2 < thickness_scarce and density4 < thickness_scarce then
-						data[vi] = c_silver
-					elseif density2 < thickness_normal and density5 < thickness_normal then
-						data[vi] = c_tin
-					elseif density3 < thickness_scarce and density4 < thickness_scarce then
-						data[vi] = c_gold
-					elseif density3 < thickness_normal and density5 < thickness_normal then
-						data[vi] = c_chromium
-					elseif density4 < thickness_normal and density5 < thickness_normal then
-						data[vi] = c_zinc
 				
---                     end
---                 end
---                 if data[vi] == c_stone then
---                     if false then
-					-- then ore pockets
-					elseif density1_f > 1.4 then
-						data[vi] = c_uranium
-
-
-					-- normal rocks
-					elseif density_s > 1.25 then
-						data[vi] = c_jade
-					elseif density_s > 1.10 then
-						data[vi] = c_serpentine
-					elseif density_s > 1.00 then
-						data[vi] = c_shale
-					elseif density_s > 0.90 then
-						data[vi] = c_granite
-					elseif density_s > 0.80 then
-						data[vi] = c_basalt
-					elseif density_s > 0.708 then
-						data[vi] = c_slate
-					elseif density_s > 0.70 then
-						data[vi] = c_anthracite
-					elseif density_s > 0.60 then
-						data[vi] = c_marble
-					elseif density_s > 0.50 then
-						data[vi] = c_gneiss
-					elseif density_s > 0.40 then
-						data[vi] = c_desstone
-					elseif density_s > 0.30 then
-						data[vi] = c_sandstone
-					elseif density_s > 0.202 then
-						data[vi] = c_schist
-
-					elseif density_s > 0.20 then
-						data[vi] = c_gravel
-					elseif density_s > 0.19 then
-						data[vi] = c_coalblock
-					elseif density_s > 0.188 then
-						data[vi] = c_gravel
-
-					elseif density_s > 0.10 then
-						data[vi] = c_chalk
-					elseif density_s > 0.00 then
-						data[vi] = c_clay
-					elseif density_s > -0.10 then
-						data[vi] = c_ors
-					else
-						data[vi] = c_stone
-
-					end
-
 
 				end
 ]]
@@ -653,8 +718,101 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 
+	
+	
+	for x = x0, x1 do 
+		for z = z0, z1 do 
+			
+			local top_y = -9999999999
+			for y = y1, y0, -1 do 
+				local vi = area:index(x, y, z)
+				if top_y < y and data[vi] ~= c_air and data[vi] ~= c_s_water and data[vi] ~= c_r_water then
+					top_y = y
+					break
+				end
+				
+-- 				if data[vi] == c_stone then
+-- 					local nixyz = zz * lx * lx + yy * lx + xx + 1
+-- 					data[vi] = get_stone(x,y,z, nixyz) 
+-- 				end
+			end
+		
+			if biome_immune[nixz] ~= 1 then
+				
+-- 				for y = y1, y0, -1 do 
+					
+				
+				if top_y ~= y1 then
+					
+					if top_y > -999999999 then
+						local xx = lx - (x1 - x) - 1
+						local yy = lx - (y1 - top_y) - 1
+						local zz = lx - (z1 - z) - 1
+						
+						local nixz = zz * lx + xx + 1
+						local nixyz = zz * lx * lx + yy * lx + xx + 1
+						
+						local heat = nvals_heat[nixz]
+						local humidity = nvals_humidity[nixz]
+						local magic = nvals_magic[nixz]
+						local flatness = chunk_flatness_lookup[nixz] or 0
+						
+						local bio = default.select_biome(x,top_y,z, heat, humidity, magic, flatness)
+						local depth = math.random(bio.fill_min, bio.fill_max)
+		-- 				print(dump(bio))
+						for y = top_y, top_y - depth, -1 do 
+							local vi = area:index(x, y, z)
+							local ai = area:index(x, y+1, z)
+							
+
+							if y == top_y then
+								data[vi] = bio.cids.cover[math.random(#bio.cids.cover)]
+							else
+								data[vi] = bio.cids.fill[math.random(#bio.cids.fill)]
+							end
+							
+							
+						end
+					end
+				end
+				
+				-- slices cut into the terrain for debugging
+				if x < x0 + 3 or z < z0 + 3 then 
+					for y = y1, y0, -1 do 
+						local vi = area:index(x, y, z)
+						data[vi] = c_air
+					end
+				end
+				
+			end
+		end
+	end
 
 
+	--- caves
+	for x = x0, x1 do 
+		for z = z0, z1 do 
+			for y = y0, y1 do 
+				
+				local xx = lx - (x1 - x) - 1
+				local yy = lx - (y1 - y) - 1
+				local zz = lx - (z1 - z) - 1
+				
+				local nixz = zz * lx + xx + 1
+				local nixyz = zz * lx * lx + yy * lx + xx + 1
+				local cave_density = math.abs(nvals_caves[nixyz])
+				local cave_density2 = math.abs(nvals_caves2[nixyz])
+				local cave_size = 0.007 + math.abs(nvals_cave_size[nixyz])
+
+				if cave_density < cave_size and cave_density2 < cave_size then
+					data[area:index(x, y, z)] = c_air
+				end
+			end
+		end
+	end
+	
+	
+	
 	vm:set_data(data)
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
