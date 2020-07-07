@@ -63,7 +63,7 @@ minetest.register_on_mods_loaded(function()
 -- 	print("mapgen init")
 	for _,def in pairs(default.biomes) do
 		
-		print(dump(def))
+-- 		print(dump(def))
 		def.cids = {
 			cover = {},
 			fill = {},
@@ -76,13 +76,30 @@ minetest.register_on_mods_loaded(function()
 			def.cids.fill[i] = minetest.get_content_id(v)
 		end
 	end
+	
+	local def = default.failsafe_biome
+	def.cids = {
+		cover = {},
+		fill = {},
+	}
+	
+	for i,v in ipairs(def.cover) do
+		def.cids.cover[i] = minetest.get_content_id(v)
+	end
+	for i,v in ipairs(def.fill) do
+		def.cids.fill[i] = minetest.get_content_id(v)
+	end
 
 end)
 
 
 default.register_biome = function(def)
 -- 	print("registering biome")
-	default.biomes[def.name] = def
+	if def.name == "failsafe" then
+		default.failsafe_biome = def
+	else
+		default.biomes[def.name] = def
+	end
 end
 
 
@@ -111,7 +128,7 @@ default.select_biome = function(x, y, z, heat, humidity, magic, flatness)
 		end
 	end
 	
-	local b = best or default.biomes["failsafe"]
+	local b = best or default.failsafe_biome
 -- 	print("  "..b.name)
 	return b
 end

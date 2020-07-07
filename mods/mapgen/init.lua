@@ -44,6 +44,11 @@ minetest.register_decoration({
 --dofile(minetest.get_modpath("mapgen").."/simple_biomes.lua")
 --dofile(minetest.get_modpath("mapgen").."/trees.lua")
 
+local function round(x)
+	return math.floor(x + 0.5)
+end
+
+
 local vc = 64
 local vc2 = 64
 
@@ -240,6 +245,16 @@ local np_sq1 = {
 	persist = 0.65
 }
 
+
+local np_fill_depth = {
+	offset = 0.5,
+	scale = 1,
+	spread = {x=32, y=32, z=32},
+	seed = 3546,
+	octaves = 6,
+	persist = 0.9
+}
+
 --[[ large v7 mountains
 local np_sq2 = {
 	offset = 0,
@@ -397,6 +412,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 --      end
 	local chunk_flatness_lookup = {}
 	local biome_immune = {}
+	local ground_surface = {}
+	local rock_surface = {}
+	local surface_biome = {}
+	local biome_cache = {}
 
 	local x1 = maxp.x
 	local y1 = maxp.y
@@ -413,6 +432,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_air = minetest.get_content_id("air")
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_stone = minetest.get_content_id("default:mg_stone")
+	local c_glass = minetest.get_content_id("default:mg_glass")
 	local c_s_water = minetest.get_content_id("default:water_source")
 	local c_r_water = minetest.get_content_id("default:river_water_source")
 	local c_g_water = minetest.get_content_id("default:glacial_water_source")
@@ -507,6 +527,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nvals_vulcanism = minetest.get_perlin_map(np_mtns2, chulens):get2dMap_flat(minposxz)
 	local nvals_squiggle = minetest.get_perlin_map(np_sq1, chulens):get3dMap_flat(minposxyz)
 	local nvals_squiggle2 = minetest.get_perlin_map(np_sq2, chulens):get3dMap_flat(minposxyz)
+	
+	-- todo: only calculate if on the surface
+	local nvals_fill_depth = minetest.get_perlin_map(np_fill_depth, chulens):get2dMap_flat(minposxz)
+	
 	--[[
 	.008 # holy fuck way too much
 	.005 # thick consistent vein a few nodes in diameter
@@ -520,275 +544,158 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local thickness_rare = .0011*scaler
 	
 	local lx = x1 - x0 + 1
+	
+	-- skip some expensive calculations otherwise
+	local chunk_has_surface = false
+-- 	local block_fully_underground = true
+-- 	local block_fully_in_sky = true
 
-	local nixyz = 1 -- 3D noise index
-	local nixz = 1 -- 3D noise index
+	-- first calculate the general ground height
 	for x = x0, x1 do 
 		for z = z0, z1 do 
-			for y = y0, y1 do 
-				local vi = area:index(x, y, z)
-				local bi = area:index(x, y-1, z)
+			
+			local xx = lx - (x1 - x) - 1
+			local zz = lx - (z1 - z) - 1
+			
+			local nixz = zz * lx + xx + 1
+			
+			local continents = nvals_continents[nixz]
+			local hills = nvals_hills[nixz]
+			local ht = math.abs(nvals_mountains[nixz])
+			local vu = nvals_vulcanism[nixz]
+-- 				local dn = nvals_squiggle[nixyz]
+-- 			local dn2 = nvals_squiggle2[nixyz]
+		
+			local o = continents
+		
+-- 				if y < continents then
+			if continents < -2 then
+				o = -math.pow(math.abs(continents), 1.8)
+			end
+			
+			if continents > 2 then
+				local m = continents - 2
+				local p = m / 4
+				local q = hills / 8
+				local n = math.pow(clamp(0, m, 6) / 7, 2)
+				o = 2 + m  --[[+ n*ht*q]] + hills * p
 				
+				local r = clamp(0, hills - 5, 6) / 5
+				local s = 1 / (1 + math.exp(-p)) 
+				
+				o = o + s * ht * r
+			end
+			
+			-- this rounding is VERY important
+			-- you get all sorts of random noise errors from
+			--   calculations done later if it is omitted
+			o = round(o)
+-- 			print("y0: "..y0.."o: "..o.." y1: "..y1)
+			
+			-- ground_surface is the highest non-air node of the terrain
+			-- g_s+1 is the first air node above the ground
+			ground_surface[nixz] = o
+			
+			if y0 <= o and o <= y1 then
+				chunk_has_surface = true
+			end
+			
+			-- fill in basic nodes and stone debugging placeholders
+			for y = y0, y1 do
+				if y < o then
+					data[area:index(x, y, z)] = c_stone
+				else 
+					if y > 0 then
+						data[area:index(x, y, z)] = c_air
+					else
+						data[area:index(x, y, z)] = c_s_water
+					end
+				end
+			end
+			
+			
+			
+			
+			-- calculate and cache the surface biome
+			if chunk_has_surface then
+				
+				
+				
+			end
+	
+	
+		end
+	end
+	
+	-- surface biome calculation and filling
+	if chunk_has_surface then
+		for x = x0, x1 do 
+			for z = z0, z1 do
 				local xx = lx - (x1 - x) - 1
-				local yy = lx - (y1 - y) - 1
 				local zz = lx - (z1 - z) - 1
 				
 				local nixz = zz * lx + xx + 1
-				local nixyz = zz * lx * lx + yy * lx + xx + 1
 				
-				--print("nixz: "..nixz..", lz: ".. lz..", zz: "..zz..", lx: "..lx..", xx: "..xx)
 				
--- 				local ht = math.abs(nvals_mountains[nixz])
-				--local plains1 = nvals_plains[nixz]
-				--local plains2 = nvals_plains2[nixz]
-				local continents = nvals_continents[nixz]
-				local hills = nvals_hills[nixz]
-				local ht = math.abs(nvals_mountains[nixz])
-				local vu = nvals_vulcanism[nixz]
--- 				local dn = nvals_squiggle[nixyz]
-				local dn2 = nvals_squiggle2[nixyz]
+				local surf = ground_surface[nixz]
 				
-				local r_tmp1 = nvals_river1[nixz]
-				local r_tmp2 = nvals_river2[nixz]
-				local rv = math.abs(r_tmp1 - r_tmp2)
+				local heat = nvals_heat[nixz]
+				local humidity = nvals_humidity[nixz]
+				local magic = nvals_magic[nixz]
+				local flatness = chunk_flatness_lookup[nixz] or 0
 				
-				-- 				print(dn)
---				print(dump(ht))
-				--local q = plains2 / plains1
-				--local r = q * plains1 + (1-q) * ht * math.abs(plains2 / plains1)
-				--[[
-				if y < r then
-					if q > 0.5 then
-						data[vi] = c_pumice
-					else
-						data[vi] = c_granite
-					end
-				elseif y <= 0 then
-					data[vi] = c_water
-				end
-				]]
-				--[[
-				if y < hills then
-					data[vi] = c_granite
-				end
-				]]
+				local bio = default.select_biome(x,surf,z, heat, humidity, magic, flatness)
 				
-				if y < continents then
-					if continents < -2 then
-						if y < -math.pow(math.abs(continents), 1.8) then
-							data[vi] = c_pumice
-						else
-							data[vi] = c_s_water
-						end
-					else 
-						data[vi] = c_pumice
-					end
-				elseif y <= 0 then
-					data[vi] = c_s_water
+				surface_biome[nixz] = bio 
+				if not biome_cache[bio.name] then
+					biome_cache[bio.name] = {
+						def = bio,
+-- 						node_count = 1,
+					}
+-- 				else
+-- 					biome_cache[bio.name].node_count = biome_cache[bio.name].node_count + 1
 				end
 				
+				local depth = bio.fill_min + nclamp(nvals_fill_depth[nixz]) * (bio.fill_max - bio.fill_min)
+				depth = round(depth)
 				
-				local o = continents
+				-- the highest node below the cover and fill
+				rock_surface[nixz] = surf - depth - 2
 				
-				if continents > 2 then
-					local m = continents - 2
-					local p = m / 4
-					local q = hills / 8
-					local n = math.pow(clamp(0, m, 6) / 7, 2)
-					o = 2 + m  --[[+ n*ht*q]] + hills * p
-					
-					local r = clamp(0, hills - 5, 6) / 5
-					local s = 1 / (1 + math.exp(-p)) 
-					
-					o = o + s * ht * r
-					
-					if y < o then
--- 						data[vi] = c_pumice
-						
-						local ht2 = o + dn2 * 0.1
-						if vu > -1000 and ht2 > 100 + hills then -- volcanos
-							
-							if y <= 97 + hills and (ht2 > 106 + hills or y > (100 + hills - (math.pow((ht2 - 106 + hills) / 15, 12) / 30))) then
-								data[vi] = c_lava
-	--							data[vi] = c_air
-								biome_immune[nixz] = 1
-								
-							elseif y > (100 + hills - ((ht2 - 100 - hills) / 2.5)) then
-								
-								data[vi] = c_air
-							else
-								if data[bi] ~= c_air then
-									
-									data[vi] = c_basalt
-									biome_immune[nixz] = 1
-								else 
-									data[vi] = c_air
-								end
-							end
-						else
-							if data[bi] ~= c_air then
-								data[vi] = c_granite
-							else 
-								data[vi] = c_air
-							end
-						end
-						
-						
-						
-						
+				local yd = math.max(y0, surf-1-depth)
+	-- 			for y = surf, y0, -1 do
+				if surf <= y1 then
+					if y0 <= surf then
+						data[area:index(x, surf, z)] = bio.cids.cover[math.random(#bio.cids.cover)]
 					end
 					
-					
-				end
-				
-				o = math.max(o, continents)
-				
-				if o > 0 and (y > o - 5) and (y < o + 0) and (rv < .38) then -- rivers
--- 					 local a = .8
--- 					 local b = 1 - math.exp(-math.pow(rv / a, 2))
--- 					 print(b)
--- 					 if y > b * 3 then
-						data[vi] = c_r_water
--- 					 end
-				end
-				
-				
-				
-				
-				--[[
-				if y > ht then -- where land meets sky
-					 data[vi] = c_air
-				else
-					local ht2 = ht + dn2 * 0.1
-					if vu > -1000 and ht2 > 100 then -- volcanos
-						
-						if y <= 95 and (ht2 > 106 or y > (100 - (math.pow((ht2 - 106) / 15, 12) / 30))) then
-							data[vi] = c_lava
---							data[vi] = c_air
-							
-						elseif y > (100 - ((ht2 - 100) / 2.5)) then
-							
-							data[vi] = c_air
-						else
-							if data[bi] ~= c_air then
-								
-								data[vi] = c_basalt
-							else 
-								data[vi] = c_air
-							end
-						end
-					else
-						if data[bi] ~= c_air then
-							data[vi] = c_granite
-						else 
-							data[vi] = c_air
+					if y0 <= surf - 1 then
+						for y = surf-1, yd, -1 do
+							data[area:index(x, y, z)] = bio.cids.fill[math.random(#bio.cids.fill)]
 						end
 					end
-				
 				end
-				]]
-                -- cave stuff
--- 				local cave_density = math.abs(nvals_caves[nixyz])
--- 				local cave_density2 = math.abs(nvals_caves2[nixyz])
-			
-
-
---[[
-
-				if data[vi] == c_air and y < 0 then
-					if math.random() < 0.1 and (data[vi+1] ~= c_air or data[vi-1] ~= c_air)  then
-						data[vi] = c_shroom
-					end
-				end
-
-
-
-				if data[vi] == c_stone then
-				
-
-				end
-]]
-
-
-				nixyz = nixyz + 1 -- increment 3D noise index
 			end
-			
--- 			nixz = nixz + 1 -- increment 3D noise index
 		end
-	end
-
-
-	
-	
-	for x = x0, x1 do 
-		for z = z0, z1 do 
-			
-			local top_y = -9999999999
-			for y = y1, y0, -1 do 
-				local vi = area:index(x, y, z)
-				if top_y < y and data[vi] ~= c_air and data[vi] ~= c_s_water and data[vi] ~= c_r_water then
-					top_y = y
-					break
-				end
-				
--- 				if data[vi] == c_stone then
--- 					local nixyz = zz * lx * lx + yy * lx + xx + 1
--- 					data[vi] = get_stone(x,y,z, nixyz) 
--- 				end
-			end
 		
-			if biome_immune[nixz] ~= 1 then
+		-- test the rock surface value
+		for x = x0, x1 do 
+			for z = z0, z1 do
+				local xx = lx - (x1 - x) - 1
+				local zz = lx - (z1 - z) - 1
 				
--- 				for y = y1, y0, -1 do 
-					
+				local nixz = zz * lx + xx + 1
 				
-				if top_y ~= y1 then
-					
-					if top_y > -999999999 then
-						local xx = lx - (x1 - x) - 1
-						local yy = lx - (y1 - top_y) - 1
-						local zz = lx - (z1 - z) - 1
-						
-						local nixz = zz * lx + xx + 1
-						local nixyz = zz * lx * lx + yy * lx + xx + 1
-						
-						local heat = nvals_heat[nixz]
-						local humidity = nvals_humidity[nixz]
-						local magic = nvals_magic[nixz]
-						local flatness = chunk_flatness_lookup[nixz] or 0
-						
-						local bio = default.select_biome(x,top_y,z, heat, humidity, magic, flatness)
-						local depth = math.random(bio.fill_min, bio.fill_max)
-		-- 				print(dump(bio))
-						for y = top_y, top_y - depth, -1 do 
-							local vi = area:index(x, y, z)
-							local ai = area:index(x, y+1, z)
-							
-
-							if y == top_y then
-								data[vi] = bio.cids.cover[math.random(#bio.cids.cover)]
-							else
-								data[vi] = bio.cids.fill[math.random(#bio.cids.fill)]
-							end
-							
-							
-						end
-					end
-				end
-				
-				-- slices cut into the terrain for debugging
-				if x < x0 + 3 or z < z0 + 3 then 
-					for y = y1, y0, -1 do 
-						local vi = area:index(x, y, z)
-						data[vi] = c_air
-					end
+				local rs = rock_surface[nixz]
+				if y0 <= rs and rs <= y1 then
+					data[area:index(x,rs,z)] = c_basalt
 				end
 				
 			end
 		end
 	end
-
-
+	
+--[[
 	--- caves
 	for x = x0, x1 do 
 		for z = z0, z1 do 
@@ -810,6 +717,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 	end
+	]]
+	
+	-- slices cut into the terrain for debugging
+	for x = x0, x1 do 
+		for z = z0, z1 do 
+	
+			if x < x0 + 3 or z < z0 + 3 then 
+				for y = y1, y0, -1 do 
+					data[area:index(x, y, z)] = c_air
+				end
+			end
+			
+		end
+	end
 	
 	
 	
@@ -820,3 +741,39 @@ minetest.register_on_generated(function(minp, maxp, seed)
 end)
 
 
+
+
+
+--[[ --  volcano code, pre-optimization 
+
+if y < o then
+	
+	local ht2 = o + dn2 * 0.1
+	if vu > -1000 and ht2 > 100 + hills then -- volcanos
+		
+		if y <= 97 + hills and (ht2 > 106 + hills or y > (100 + hills - (math.pow((ht2 - 106 + hills) / 15, 12) / 30))) then
+			data[vi] = c_lava
+			--data[vi] = c_air
+			biome_immune[nixz] = 1
+			
+		elseif y > (100 + hills - ((ht2 - 100 - hills) / 2.5)) then
+			
+			data[vi] = c_air
+		else
+			if data[bi] ~= c_air then
+				
+				data[vi] = c_basalt
+				biome_immune[nixz] = 1
+			else 
+				data[vi] = c_air
+			end
+		end
+	else
+		if data[bi] ~= c_air then
+			data[vi] = c_granite
+		else 
+			data[vi] = c_air
+		end
+	end
+end
+]]

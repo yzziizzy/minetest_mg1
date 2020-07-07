@@ -57,6 +57,18 @@ minetest.register_node("default:mg_stone", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+minetest.register_node("default:mg_glass", {
+	description = "Mapgen Glass",
+	drawtype = "glasslike_framed_optional",
+	tiles = {"default_glass.png", "default_glass_detail.png"},
+	paramtype = "light",
+	paramtype2 = "glasslikeliquidlevel",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	groups = {cracky = 3, oddly_breakable_by_hand = 3},
+	sounds = default.node_sound_glass_defaults(),
+})
+
 
 local stonedefs = {
 	{n="granite", d="Granite", t="i"},
