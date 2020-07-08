@@ -305,6 +305,9 @@ dofile(modpath.."/functions.lua")
 dofile(modpath.."/biomes.lua")
 dofile(modpath.."/surface_deco.lua")
 dofile(modpath.."/ores.lua")
+dofile(modpath.."/trees.lua")
+dofile(modpath.."/trees/aspen.lua")
+dofile(modpath.."/trees/birch.lua")
 
 --[[
 dofile(default_path.."/trees.lua")

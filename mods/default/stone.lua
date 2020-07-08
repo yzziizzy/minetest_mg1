@@ -48,7 +48,7 @@ wood chips
 
 
 ]]
-
+--[[
 minetest.register_node("default:mg_aspen_sapling", {
 	description = "Mapgen Aspen Placeholder (You should not see this)",
 -- 	tiles = {"default_"..def.n.."_cobble.png"},
@@ -56,7 +56,7 @@ minetest.register_node("default:mg_aspen_sapling", {
 	groups = {cracky = 1, stone = 1,},
 	sounds = default.node_sound_stone_defaults(),
 })
-
+]]
 minetest.register_node("default:mg_oak_sapling", {
 	description = "Mapgen Oak Placeholder (You should not see this)",
 -- 	tiles = {"default_"..def.n.."_cobble.png"},

@@ -26,7 +26,7 @@ default.register_surface_deco({
 		                   -- lower values = less area.
 	},
 	
-	place = {"default:mg_aspen_sapling"}, -- randomly chosen list of nodes to place
+	place = {"default:mg_rand_aspen_sapling"}, -- randomly chosen list of nodes to place
 	y_offset = 0, -- directly on top of the soil
 })
 

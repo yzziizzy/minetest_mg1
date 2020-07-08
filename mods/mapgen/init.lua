@@ -715,12 +715,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									end
 									
 								elseif deco.chance then
-									if 0 == math.random(deco.chance) then
+									if 1 == math.random(deco.chance) then
 										data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
 									end
 								end
 								
 							elseif deco.type == "density" then
+								-- deco.noise is required in "density" types
 								if not noise_cache[deco.name] then
 	-- 								print(minposxz.x .. " " ..minposxz.y)
 									noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
