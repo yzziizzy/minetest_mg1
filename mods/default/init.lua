@@ -9,6 +9,8 @@ local S = minetest.get_translator("default")
 -- Definitions made by this mod that other mods can use too
 default = {
 	biomes = {},
+	failsafe_biome = nil,
+	surface_decorations = {},
 }
 
 default.LIGHT_MAX = 14
@@ -63,6 +65,8 @@ minetest.register_on_mods_loaded(function()
 -- 	print("mapgen init")
 	for _,def in pairs(default.biomes) do
 		
+		def.surface_decos = {}
+		
 -- 		print(dump(def))
 		def.cids = {
 			cover = {},
@@ -75,9 +79,11 @@ minetest.register_on_mods_loaded(function()
 		for i,v in ipairs(def.fill) do
 			def.cids.fill[i] = minetest.get_content_id(v)
 		end
+		
 	end
 	
 	local def = default.failsafe_biome
+	def.surface_decos = {}
 	def.cids = {
 		cover = {},
 		fill = {},
@@ -89,7 +95,32 @@ minetest.register_on_mods_loaded(function()
 	for i,v in ipairs(def.fill) do
 		def.cids.fill[i] = minetest.get_content_id(v)
 	end
-
+	
+	-- pre-process surface decorations
+	for k,deco in pairs(default.surface_decorations) do
+		
+		-- cache content id's
+		deco.cids = {
+			place = {},
+		}
+		
+		for i,v in ipairs(deco.place) do
+			deco.cids.place[i] = minetest.get_content_id(v)
+		end
+		
+		
+		-- fill decorations into biomes
+		for _,biome_name in ipairs(deco.biomes) do
+			local bio = default.biomes[biome_name]
+			if not bio then
+				print("Unknown biome '"..biome_name.."' in decoration '"..deco.name.."'.")
+			else
+				bio.surface_decos[deco.name] = deco
+			end
+		end
+	end
+	
+	
 end)
 
 
@@ -135,10 +166,24 @@ end
 
 
 
+default.register_surface_deco = function(def)
+	
+	-- todo: fill in missing defaults
+	-- TODO: warnings for invalid data
+	
+	if def.noise then
+		def.noise.offset = 0.4
+		def.noise.scale = 0.4
+	end
+	
+	default.surface_decorations[def.name] = def
+end
+
 
 
 
 dofile(modpath.."/biomes.lua")
+dofile(modpath.."/surface_deco.lua")
 dofile(modpath.."/functions.lua")
 
 --[[

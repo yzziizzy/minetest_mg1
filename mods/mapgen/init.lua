@@ -416,7 +416,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local rock_surface = {}
 	local surface_biome = {}
 	local biome_cache = {}
-
+	
+	local noise_cache = {}
+	
 	local x1 = maxp.x
 	local y1 = maxp.y
 	local z1 = maxp.z
@@ -568,7 +570,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		
 			local o = continents
 		
--- 				if y < continents then
 			if continents < -2 then
 				o = -math.pow(math.abs(continents), 1.8)
 			end
@@ -614,16 +615,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 			
 			
-			
-			
-			-- calculate and cache the surface biome
-			if chunk_has_surface then
-				
-				
-				
-			end
-	
-	
 		end
 	end
 	
@@ -675,6 +666,58 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					end
 				end
+				
+				
+				
+				-- place decorations
+				for dname,deco in pairs(bio.surface_decos) do
+					local y_feather = math.random(deco.y_rand) - (deco.y_rand / 2)
+					local min_y = deco.y_min + y_feather
+					local max_y = deco.y_max + y_feather
+					
+					local lat_feather = math.random(deco.lat_rand) - (deco.lat_rand / 2)
+					local min_lat = deco.lat_min + lat_feather
+					local max_lat = deco.lat_max + lat_feather
+					local lat_z = z
+					
+					if deco.lat_abs then
+						min_lat = math.abs(min_lat)
+						max_lat = math.abs(max_lat)
+						lat_z = math.abs(lat_z)
+					end
+					
+					if (min_y <= surf and surf <= max_y) and (min_lat <= lat_z and lat_z <= max_lat) then
+						local py = surf + 1 + deco.y_offset
+						
+						if y0 <= py and py <= y1 then
+							
+							if deco.noise then
+								-- initialize and cache the noise values 
+								if not noise_cache[deco.name] then
+	-- 								print(minposxz.x .. " " ..minposxz.y)
+									noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
+								end
+								
+								-- sample and place nodes
+								local n = nclamp(noise_cache[deco.name][nixz])
+	-- 							print(n)
+								if n <= deco.noise.threshold then
+									if 1 == math.random(deco.chance) then
+										data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+									end
+								end
+								
+							elseif deco.chance then
+								if 0 == math.random(deco.chance) then
+									data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+								end
+							end
+							
+						end
+					end
+				end
+				
+				
 			end
 		end
 		
