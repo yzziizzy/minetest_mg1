@@ -150,8 +150,8 @@ local np_river2 = {
 
 
 local np_heat = {
-	offset = 50,
-	scale = 50,
+	offset = 0,
+	scale = 30,
 	spread = {x=500, y=500, z=500},
 	seed = 76783,
 	octaves = 3,
@@ -398,6 +398,21 @@ local function get_stone(x,y,z, nixyz, biomedef, noise, stones)
 end
 
 
+local function calc_heat(y, lat, nval)
+	local h_equator = 50
+	local y_rate = 1
+-- 	local y_min = 50
+	local y_max = 150
+	
+	-- 1 at lat = 0, 0 at lat = 32000
+	local lat_factor = math.cos(6.283185 * (math.abs(lat) / 32000))
+	
+	local alt_factor = (1 - (clamp(0, y, y_max) / y_max)) * y_rate
+	
+	return nval - alt_factor + (lat_factor * h_equator)
+end
+
+
 -- minetest.register_on_respawnplayer(function(player)
 --     player:setpos({x=571, y=50, z=70})
 --     return true
@@ -632,7 +647,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				local surf = ground_surface[nixz]
 				
-				local heat = nvals_heat[nixz]
+				local heat = calc_heat(surf, z, nvals_heat[nixz])
 				local humidity = nvals_humidity[nixz]
 				local magic = nvals_magic[nixz]
 				local flatness = chunk_flatness_lookup[nixz] or 0
@@ -771,7 +786,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					for y = rs, y0, -1 do
 						
 						-- stone biome selection
-						local heat = nvals_heat[nixz]
+						local heat = calc_heat(y, z, nvals_heat[nixz])
 						local humidity = nvals_humidity[nixz]
 						local magic = nvals_magic[nixz]
 						local vulcanism = nvals_vulcanism[nixz]

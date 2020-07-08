@@ -139,10 +139,22 @@ end
 
 
 for i = 1,3 do
-	minetest.register_node("default:birch_leaves_"..i, {
+	default.register_node_seasons("default:birch_leaves_"..i, {
 		description = "Birch Tree Leaves",
 		drawtype = "allfaces_optional",
-		tiles = {"default_aspen_leaves.png^[colorize:green:"..((i-1)*30)},
+		spring = {
+			tiles = {"default_aspen_leaves_spring.png^[colorize:green:"..((i)*30)},
+		},
+		summer = {
+			tiles = {"default_aspen_leaves.png^[colorize:green:"..((i)*30)},
+		},
+		fall = {
+			tiles = {"default_aspen_leaves_fall.png^[colorize:red:"..((i-1)*10)},
+		},
+		winter = {
+			tiles = {"default_aspen_leaves_winter.png"},
+			drop = "default:aspen_stick"
+		},
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,

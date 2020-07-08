@@ -1,4 +1,6 @@
 
+local S = default.get_translator
+
 
 local aspen_speed = {
 	retry = 30,
@@ -74,6 +76,11 @@ local aspen_stage_data = {
 
 
 
+minetest.register_craftitem("default:aspen_stick", {
+	description = S("Aspen Stick"),
+	inventory_image = "default_stick.png^[colorize:white:180",
+	groups = {stick = 1, flammable = 2},
+})
 
 for sz = 1,6 do
 	local q = sz * 1
@@ -139,15 +146,26 @@ end
 
 
 for i = 1,3 do
-	minetest.register_node("default:aspen_leaves_"..i, {
+	default.register_node_seasons("default:aspen_leaves_"..i, {
 		description = "Aspen Tree Leaves",
 		drawtype = "allfaces_optional",
-		tiles = {"default_aspen_leaves.png^[colorize:yellow:"..((i-1)*20)},
+		spring = {
+			tiles = {"default_aspen_leaves_spring.png^[colorize:yellow:"..((i-1)*20)},
+		},
+		summer = {
+			tiles = {"default_aspen_leaves.png^[colorize:yellow:"..((i-1)*20)},
+		},
+		fall = {
+			tiles = {"default_aspen_leaves_fall.png^[colorize:orange:"..((i-1)*30)},
+		},
+		winter = {
+			tiles = {"default_aspen_leaves_winter.png^[colorize:yellow:"..((i-1)*20)},
+			drop = "default:aspen_stick"
+		},
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,
 		groups = {snappy = 3, leaf_rot = 1, flammable = 2, leaves = 1},
-		drop = "default:aspen_leaves_"..i,
 		sounds = default.node_sound_leaves_defaults(),
 	})
 end

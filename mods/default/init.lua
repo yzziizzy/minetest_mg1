@@ -301,6 +301,7 @@ end
 
 
 dofile(modpath.."/functions.lua")
+dofile(modpath.."/seasons.lua")
 
 dofile(modpath.."/biomes.lua")
 dofile(modpath.."/surface_deco.lua")
