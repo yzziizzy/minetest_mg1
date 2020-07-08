@@ -1,7 +1,7 @@
 
 default.register_surface_deco({
 	name = "aspen_trees",
-	description = "Apen Tree Groves",
+	description = "Aspen Tree Groves",
 	
 	y_min = 5,
 	y_max = 100,
@@ -12,6 +12,7 @@ default.register_surface_deco({
 	lat_rand = 200, -- feather the edges of the lat limits
 	lat_abs = true, -- appears in northern and southern hemicubes
 	
+	type = "blob",
 	chance = 20, -- once every 20 nodes, using math.random()
 	noise = { -- filter with these noise params
 		-- offset = 0.4, -- offset and scale are set internally to this.

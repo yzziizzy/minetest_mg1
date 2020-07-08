@@ -730,6 +730,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	
 	local stone_noise_cache = {}
+	local ore_noise_cache = {}
+	
 	-- underground stone biomes
 	if chunk_has_underground then
 		for x = x0, x1 do 
@@ -742,12 +744,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				if not rs then
 					rs = y1
 				end
-			
+				
 				rs = math.min(y1, rs)
--- 				print(rs)
+				
 				if rs and rs >= y0 then
 					
 					for y = rs, y0, -1 do
+						
+						-- stone biome selection
 						local heat = nvals_heat[nixz]
 						local humidity = nvals_humidity[nixz]
 						local magic = nvals_magic[nixz]
@@ -756,34 +760,111 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 						local sbio = default.select_stone_biome(x,y,z, heat, humidity, magic, flatness, vulcanism)
 						
+						local yy = lx - (y1 - y) - 1
+						local nixyz = zz * lx * lx + yy * lx + xx + 1
+						
+						-- determine base stone
+						local base_stone = nil
+						
 						if sbio.solid then
-							data[area:index(x, y, z)] = minetest.get_content_id(sbio.solid)
+							base_stone = sbio.solid
 							
 						elseif sbio.noise then
 							if not stone_noise_cache[sbio.name] then
 								stone_noise_cache[sbio.name] = minetest.get_perlin_map(sbio.noise, chulens):get3dMap_flat(minposxyz)
 							end
 							
-							local yy = lx - (y1 - y) - 1
-							local nixyz = zz * lx * lx + yy * lx + xx + 1
 							
 							local n = math.abs(stone_noise_cache[sbio.name][nixyz])
 							
 							for _,sp in pairs(sbio.layers) do
 								if n < sp[1] then
-									data[area:index(x, y, z)] = minetest.get_content_id(sp[2])
+									base_stone = sp[2]
 									break
 								end
 							end
 						end
-					end
-				end
+					
+						
+						-- check for ore
+						for oname,ore in pairs(sbio.ores) do
+							
+							-- check if there is an ore node for the base stone
+							local choices = ore.place_in[base_stone]
+							if not choices then
+								choices = ore.place_in["*"]
+							end
+							
+							if choices then
+								-- TODO: optimize early bail on y
+								local lat_z = z
+								
+								if ore.lat_abs then
+									lat_z = math.abs(lat_z)
+								end
+								
+								if (ore.y_min <= y and y <= ore.y_max) and (ore.lat_min <= lat_z and lat_z <= ore.lat_max) then
+									
+									-- winding veins of ore made from the intersection
+									--   of two 3d noise sets
+									if ore.type == "vein" then
+-- 										
+										-- initialize and cache the noise values 
+										if not ore_noise_cache[ore.name] then
+											ore_noise_cache[ore.name] = {
+												minetest.get_perlin_map(ore.noise_1, chulens):get3dMap_flat(minposxyz),
+												minetest.get_perlin_map(ore.noise_2, chulens):get3dMap_flat(minposxyz),
+											}
+										end
+										
+										-- sample and place nodes
+										local n1 = math.abs(ore_noise_cache[ore.name][1][nixyz])
+										local n2 = math.abs(ore_noise_cache[ore.name][2][nixyz])
+										
+										if n1 <= ore.threshold and n2 <= ore.threshold then
+											base_stone = choices[math.random(#choices)]
+										end
+										
+									-- huge noise-generated ore blobs
+									elseif ore.type == "blob" then
+										if not ore_noise_cache[ore.name] then
+											ore_noise_cache[ore.name] = minetest.get_perlin_map(ore.noise, chulens):get3dMap_flat(minposxyz)
+										end
+										
+										-- sample and place nodes
+										local n = math.abs(ore_noise_cache[ore.name][nixyz])
+										
+										if n >= ore.threshold then
+											base_stone = choices[math.random(#choices)]
+										end
+										
+									elseif ore.type == "random" then
+										if 0 == math.random(ore.chance) then
+											base_stone = choices[math.random(#choices)]
+										end
+									end
+									
+								end -- if y/lat
+								
+							end -- if choices
+						end -- for sbio.ores
+						
+						
+						-- filling in the chosen stone node
+						if base_stone then
+							data[area:index(x, y, z)] = minetest.get_content_id(base_stone)
+						end
+						
+					end -- y loop
+				end -- if rs
 				
 			
 				
-			end
-		end
-	end
+			end -- z loop
+		end -- x loop
+	end -- if chunk_has_underground
+	
+	
 --[[
 	--- caves
 	for x = x0, x1 do 

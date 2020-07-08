@@ -9,9 +9,10 @@ local S = minetest.get_translator("default")
 -- Definitions made by this mod that other mods can use too
 default = {
 	biomes = {},
-	stone_biomes = {},
 	failsafe_biome = nil,
 	failsafe_stone_biome = nil,
+	ores = {},
+	stone_biomes = {},
 	surface_decorations = {},
 }
 
@@ -123,6 +124,54 @@ minetest.register_on_mods_loaded(function()
 	end
 	
 	
+	
+	--
+	-- stone biomes
+	--
+	
+	for _,def in pairs(default.stone_biomes) do
+		
+		def.ores = {}
+		--[[
+-- 		print(dump(def))
+		def.cids = {
+			cover = {},
+			fill = {},
+		}
+		
+		for i,v in ipairs(def.cover) do
+			def.cids.cover[i] = minetest.get_content_id(v)
+		end
+		for i,v in ipairs(def.fill) do
+			def.cids.fill[i] = minetest.get_content_id(v)
+		end
+		]]
+	end
+	
+	default.failsafe_stone_biome.ores = {}
+	
+	-- pre-process ore registratoins
+	for k,ore in pairs(default.ores) do
+		
+		-- fill ores into biomes
+		if ore.stone_biomes == "*" then
+		print("all is all: ".. ore.name)
+			for _,bio in pairs(default.stone_biomes) do
+				print(" sbio: "..bio.name) 
+				bio.ores[ore.name] = ore
+			end
+		else
+			
+			for _,biome_name in ipairs(ore.stone_biomes) do
+				local bio = default.stone_biomes[biome_name]
+				if not bio then
+					print("Unknown stone biome '"..biome_name.."' in ore '"..ore.name.."'.")
+				else
+					bio.ores[ore.name] = ore
+				end
+			end
+		end
+	end
 end)
 
 
@@ -230,10 +279,32 @@ end
 
 
 
+default.register_ore = function(def)
+-- 	print("registering ore")
+	if def.noise then
+		def.noise.offset = 0
+		def.noise.scale = 1
+	end
+	if def.noise_1 then
+		def.noise_1.offset = 0
+		def.noise_1.scale = 1
+	end
+	if def.noise_2 then
+		def.noise_2.offset = 0
+		def.noise_2.scale = 1
+	end
+
+	default.ores[def.name] = def
+end
+
+
+
+
+dofile(modpath.."/functions.lua")
 
 dofile(modpath.."/biomes.lua")
 dofile(modpath.."/surface_deco.lua")
-dofile(modpath.."/functions.lua")
+dofile(modpath.."/ores.lua")
 
 --[[
 dofile(default_path.."/trees.lua")

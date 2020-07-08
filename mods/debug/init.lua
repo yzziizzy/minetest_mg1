@@ -7,6 +7,7 @@ minetest.register_on_joinplayer(function(player)
 	privs.fast = true
 	privs.teleport = true
 	privs.noclip = true
+	privs.settime = true
 	minetest.set_player_privs(name, privs)
 	
 	player:set_physics_override({speed = 5.0})
