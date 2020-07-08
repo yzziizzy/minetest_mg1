@@ -57,6 +57,14 @@ minetest.register_node("default:mg_aspen_sapling", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+minetest.register_node("default:mg_oak_sapling", {
+	description = "Mapgen Oak Placeholder (You should not see this)",
+-- 	tiles = {"default_"..def.n.."_cobble.png"},
+	tiles = {"default_stone.png^[colorize:pink:200"},
+	groups = {cracky = 1, stone = 1,},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 minetest.register_node("default:mg_stone", {
 	description = "Mapgen Stone Placeholder (You should not see this)",
 -- 	tiles = {"default_"..def.n.."_cobble.png"},

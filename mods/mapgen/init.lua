@@ -696,28 +696,46 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						
 						if y0 <= py and py <= y1 then
 							
-							if deco.noise then
-								-- initialize and cache the noise values 
+							-- even filling inside a noise-defined 2d blob
+							if deco.type == "blob" then
+								if deco.noise then
+									-- initialize and cache the noise values 
+									if not noise_cache[deco.name] then
+		-- 								print(minposxz.x .. " " ..minposxz.y)
+										noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
+									end
+									
+									-- sample and place nodes
+									local n = nclamp(noise_cache[deco.name][nixz])
+		-- 							print(n)
+									if n <= deco.noise.threshold then
+										if 1 == math.random(deco.chance) then
+											data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+										end
+									end
+									
+								elseif deco.chance then
+									if 0 == math.random(deco.chance) then
+										data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+									end
+								end
+								
+							elseif deco.type == "density" then
 								if not noise_cache[deco.name] then
 	-- 								print(minposxz.x .. " " ..minposxz.y)
 									noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
 								end
 								
 								-- sample and place nodes
-								local n = nclamp(noise_cache[deco.name][nixz])
-	-- 							print(n)
-								if n <= deco.noise.threshold then
-									if 1 == math.random(deco.chance) then
+								local n = noise_cache[deco.name][nixz]
+	-- 							
+								if n > 0 then
+									if 1 == math.random(round(n)) then
 										data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
 									end
 								end
-								
-							elseif deco.chance then
-								if 0 == math.random(deco.chance) then
-									data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
-								end
-							end
 							
+							end
 						end
 					end
 				end
