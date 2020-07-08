@@ -9,7 +9,9 @@ local S = minetest.get_translator("default")
 -- Definitions made by this mod that other mods can use too
 default = {
 	biomes = {},
+	stone_biomes = {},
 	failsafe_biome = nil,
+	failsafe_stone_biome = nil,
 	surface_decorations = {},
 }
 
@@ -160,6 +162,53 @@ default.select_biome = function(x, y, z, heat, humidity, magic, flatness)
 	end
 	
 	local b = best or default.failsafe_biome
+-- 	print("  "..b.name)
+	return b
+end
+
+
+default.register_stone_biome = function(def)
+-- 	print("registering biome")
+	if def.noise then
+		def.noise.offset = 0.4
+		def.noise.scale = 0.4
+	end
+
+	if def.name == "failsafe" then
+		default.failsafe_stone_biome = def
+	else
+		default.stone_biomes[def.name] = def
+	end
+end
+
+
+default.select_stone_biome = function(x, y, z, heat, humidity, magic, flatness, vulcanism)
+-- 	print("   y="..y)
+	local best = nil
+	local best_d = 99999999999999999999
+	
+	for _,def in pairs(default.stone_biomes) do
+		local y_r = y + math.random(-def.y_rand, def.y_rand) 
+-- 		print(def.name.." "..y_r.. " "..def.y_min.. " "..def.y_max )
+		if def.y_min <= y_r and def.y_max >= y_r then
+			local he = heat - def.heat
+			local hu = humidity - def.humidity
+			local ma = magic - def.magic
+			local fl = flatness - def.flatness
+			local vu = vulcanism - def.vulcanism
+			local la = math.abs(z / 320) - def.lat_center 
+			local d = he*he + hu*hu + ma*ma + fl*fl + la*la + vu*vu
+			
+-- 			print(" "..def.name.. " d: "..d)
+			if d < best_d then
+				
+				best = def
+				best_d = d
+			end
+		end
+	end
+	
+	local b = best or default.failsafe_stone_biome
 -- 	print("  "..b.name)
 	return b
 end

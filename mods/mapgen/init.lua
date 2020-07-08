@@ -549,8 +549,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	-- skip some expensive calculations otherwise
 	local chunk_has_surface = false
--- 	local block_fully_underground = true
--- 	local block_fully_in_sky = true
+	local chunk_has_underground = false
 
 	-- first calculate the general ground height
 	for x = x0, x1 do 
@@ -599,6 +598,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			
 			if y0 <= o and o <= y1 then
 				chunk_has_surface = true
+			end
+			if o >= y1 then
+				chunk_has_underground = true
 			end
 			
 			-- fill in basic nodes and stone debugging placeholders
@@ -652,6 +654,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				-- the highest node below the cover and fill
 				rock_surface[nixz] = surf - depth - 2
+				if rock_surface[nixz] >= y0 then
+					chunk_has_underground = true
+				end
 				
 				local yd = math.max(y0, surf-1-depth)
 	-- 			for y = surf, y0, -1 do
@@ -721,23 +726,64 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 		
-		-- test the rock surface value
+	end
+	
+	
+	local stone_noise_cache = {}
+	-- underground stone biomes
+	if chunk_has_underground then
 		for x = x0, x1 do 
+			local xx = lx - (x1 - x) - 1
 			for z = z0, z1 do
-				local xx = lx - (x1 - x) - 1
 				local zz = lx - (z1 - z) - 1
-				
 				local nixz = zz * lx + xx + 1
-				
+					
 				local rs = rock_surface[nixz]
-				if y0 <= rs and rs <= y1 then
-					data[area:index(x,rs,z)] = c_basalt
+				if not rs then
+					rs = y1
 				end
+			
+				rs = math.min(y1, rs)
+-- 				print(rs)
+				if rs and rs >= y0 then
+					
+					for y = rs, y0, -1 do
+						local heat = nvals_heat[nixz]
+						local humidity = nvals_humidity[nixz]
+						local magic = nvals_magic[nixz]
+						local vulcanism = nvals_vulcanism[nixz]
+						local flatness = chunk_flatness_lookup[nixz] or 0
+				
+						local sbio = default.select_stone_biome(x,y,z, heat, humidity, magic, flatness, vulcanism)
+						
+						if sbio.solid then
+							data[area:index(x, y, z)] = minetest.get_content_id(sbio.solid)
+							
+						elseif sbio.noise then
+							if not stone_noise_cache[sbio.name] then
+								stone_noise_cache[sbio.name] = minetest.get_perlin_map(sbio.noise, chulens):get3dMap_flat(minposxyz)
+							end
+							
+							local yy = lx - (y1 - y) - 1
+							local nixyz = zz * lx * lx + yy * lx + xx + 1
+							
+							local n = math.abs(stone_noise_cache[sbio.name][nixyz])
+							
+							for _,sp in pairs(sbio.layers) do
+								if n < sp[1] then
+									data[area:index(x, y, z)] = minetest.get_content_id(sp[2])
+									break
+								end
+							end
+						end
+					end
+				end
+				
+			
 				
 			end
 		end
 	end
-	
 --[[
 	--- caves
 	for x = x0, x1 do 
@@ -765,9 +811,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- slices cut into the terrain for debugging
 	for x = x0, x1 do 
 		for z = z0, z1 do 
-	
-			if x < x0 + 3 or z < z0 + 3 then 
-				for y = y1, y0, -1 do 
+			for y = y1, y0, -1 do 
+		
+				if x < x0 + 3 or z < z0 + 3 or y < y0 + 3 then 
 					data[area:index(x, y, z)] = c_air
 				end
 			end

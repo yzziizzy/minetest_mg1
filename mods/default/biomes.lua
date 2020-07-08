@@ -80,3 +80,51 @@ default.register_biome({
 	fill_max = 6,
 	
 })
+
+default.register_stone_biome({
+	name = "failsafe",
+	description = "Failsafe Stone Biome",
+	
+	y_min = -33000,
+	y_max = 33000,
+	y_rand = 0,
+	flatness = 0,
+	magic = 0,
+	heat = 0,
+	humidity = 0,
+	vulcanism = 0,
+	lat_center = 0,
+	
+	solid = "default:granite",
+})
+
+
+default.register_stone_biome({
+	name = "igneous",
+	description = "Layered Volcanic Rocks",
+	
+	y_min = -200,
+	y_max = 32000,
+	y_rand = 1,
+	flatness = 100,
+	magic = 0,
+	heat = 30,
+	humidity = 60,
+	vulcanism = 100,
+	lat_center = 50,
+	
+	noise = { -- the absolute value of the nose in a rough range of 0,1 is used
+		spread = {x=64, y=64, z=64},
+		seed = 684,
+		octaves = 6,
+		persist = 0.7
+	},
+	
+	layers = { -- this list MUST be sorted ascending
+		{0.2, "default:granite"}, -- any value under 0.2 will use granite
+		{0.4, "default:basalt"}, -- any value between 0.2 and 0.4 will use basalt
+		{0.7, "default:obsidian"},
+		{1.0, "default:pumice"}, -- and value over 1.0 will also use pumice
+	},
+	
+})
