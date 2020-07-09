@@ -310,6 +310,7 @@ dofile(modpath.."/ores.lua")
 dofile(modpath.."/trees.lua")
 dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
+dofile(modpath.."/trees/fir.lua")
 
 --[[
 dofile(default_path.."/trees.lua")
