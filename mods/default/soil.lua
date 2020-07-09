@@ -49,5 +49,7 @@ for i = 0, 9 do
 		sounds = default.node_sound_dirt_defaults({
 			footstep = {name = "default_grass_footstep", gain = 0.25},
 		}),
+		
+		walk_speed = 1.2,
 	})
 end

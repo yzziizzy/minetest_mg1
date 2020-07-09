@@ -25,8 +25,8 @@ end
 
 
 
--- local SEASONS_YEARLEN = 60 * 60 * 4
-local SEASONS_YEARLEN = 90
+local SEASONS_YEARLEN = 60 * 60 * 4
+-- local SEASONS_YEARLEN = 90
 
 
 
@@ -129,7 +129,7 @@ function default.register_node_seasons(name, ndef)
 	
 	local default_season = ndef.default_season or "summer"
 	
-	function reg(ssn)
+	local function reg(ssn)
 		if not ndef[ssn] then
 			print(name .. " is missing season '"..ssn.."'")
 			return
@@ -142,13 +142,21 @@ function default.register_node_seasons(name, ndef)
 			newname = "default:"..ssn.."_"..oldmod.."_"..oldname
 		end
 	
-		cdef = deepclone(ndef)
+		local cdef = deepclone(ndef)
 		cdef.groups.not_in_creative_inventory = 1
 		cdef.groups.seasonal = 1
 	
 		-- override any fields provided
 		for k,v in pairs(ndef[ssn]) do
-			cdef[k] = v
+			
+			-- groups get combined, not overwritten
+			if k == "groups" then
+				for kk,vv in pairs(v) do
+					cdef.groups[kk] = vv
+				end
+			else
+				cdef[k] = v
+			end
 		end
 		
 		
@@ -199,9 +207,9 @@ local get_season_data = function()
 end
 
 
-local get_season = function() 
+local get_season = function()
+	local season, time
 	local t = minetest.get_gametime()
-	
 	local s = (t % SEASONS_YEARLEN) / SEASONS_YEARLEN
 	
 	if between(s, 0, .2) then 
@@ -231,10 +239,10 @@ default.get_season = get_season
 minetest.register_abm({
 	label = "Leaf Change",
 	nodenames = {"group:seasonal"},
--- 	interval = 3,
--- 	chance = 80,
-	interval = 1,
-	chance = 4,
+	interval = 4,
+	chance = 60,
+-- 	interval = 1,
+-- 	chance = 4,
 	catch_up = true,
 	action = function(pos, node)
 		local s, progress = get_season()
