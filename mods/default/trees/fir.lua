@@ -137,7 +137,7 @@ for i = 1,3 do
 	minetest.register_node("default:fir_leaves_"..i, {
 		description = "Fir Needles",
 		drawtype = "allfaces_optional",
-		tiles = {"default_pine_needles.png^[colorize:forest:"..((i-1)*10)},
+		tiles = {"default_pine_needles.png^[colorize:green:"..((i-1)*10)},
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,

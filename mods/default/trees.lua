@@ -21,6 +21,26 @@ function default.find_tree_bottom(pos)
 	return false, p2, "air"
 end
 
+function default.find_tree_root(pos)
+	local p2 = {x=pos.x, y=pos.y, z=pos.z}
+	
+	local n = minetest.get_node(p2)
+	local name = n.name
+	
+	for i = 1,10 do
+		p2.y = p2.y - 1
+		local n = minetest.get_node(p2)
+		if n.name ~= name then
+			def = minetest.registered_nodes[n.name]
+			if def.groups.tree_trunk_root_fertile then
+				return true, p2, n.name
+			end
+		end
+	end
+	
+	return false, p2, "air"
+end
+
 
 
 
@@ -127,6 +147,7 @@ function default.install_conifer_tree(pos, stage, meta, tree_def)
 	
 	meta:set_string("leaves", minetest.serialize(leaves))
 	meta:set_int("stage", stage + 1)
+	meta:set_int("height", tree_height)
 end
 
 
@@ -165,6 +186,7 @@ function default.install_blob_tree(pos, stage, meta, tree_def)
 	
 	meta:set_string("leaves", minetest.serialize(leaves))
 	meta:set_int("stage", stage + 1)
+	meta:set_int("height", stage)
 end
 
 
@@ -240,6 +262,341 @@ minetest.register_abm({
 		default.install_mapgen_random_tree(pos, sd)
 	end,
 })
+
+
+
+function default.register_tree_trunks(mod, growth_data)
+	local base = mod..":"..growth_data.name.."_"
+	local trunk_base = base.."tree_trunk_"
+	local root_base = base.."tree_trunk_root_"
+	local stump_base = base.."tree_stump_"
+	local log_base = base.."log_"
+	local nub_base = base.."tree_nub_"
+	
+	for sz_ = 1,growth_data.trunk_sizes do
+		local sz = sz_
+		local q = sz * 1
+		minetest.register_node(root_base..sz, {
+			description = growth_data.Name.." Tree Root",
+			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			
+			node_box = {
+				type = "fixed",
+				fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree_trunk = 1, tree_trunk_root_fertile = 1,
+			},
+			sounds = default.node_sound_wood_defaults(),
+			
+			tree_def = growth_data,
+			log_name = log_base..sz,
+			stump_name = stump_base..sz,
+			nub_name = nub_base..sz,
+			
+			on_place = function(itemstack, placer, pointed_thing)
+				local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
+				
+				local m = stage_data[sz]
+				if m.time then
+					minetest.get_node_timer(pointed_thing.above):start(m.time * growth_data.speed.tree_growth)
+				end
+				return stack
+			end,
+			
+			on_timer = function(pos, elapsed)
+				default.advance_tree(pos, elapsed, growth_data)
+			end,
+		})
+		
+		-- stumps are dead roots
+		minetest.register_node(stump_base..sz, {
+			description = growth_data.Name.." Tree Stump",
+			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			
+			node_box = {
+				type = "fixed",
+				fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree_trunk = 1, tree_stump = 1, rotting = 3
+			},
+			sounds = default.node_sound_wood_defaults(),
+			
+			tree_def = growth_data,
+			log_name = log_base..sz,
+			
+			on_place = function(itemstack, placer, pointed_thing)
+				local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
+				return stack
+			end,
+		})
+		
+		minetest.register_node(log_base..sz, {
+			description = growth_data.Name.." Log",
+			tiles = {
+				growth_data.tiles.side,
+				growth_data.tiles.side,
+				growth_data.tiles.side.."^[transformR90",
+				growth_data.tiles.side.."^[transformR90",
+				growth_data.tiles.top, -- todo: re-center textures
+				growth_data.tiles.top, 
+				
+			},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			
+			node_box = {
+				type = "fixed",
+				fixed = {-q/16, -0.5, -0.5, q/16, -0.5 + q/8, 0.5},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree_log = 1, rotting = 1,
+			},
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+		})
+		
+		minetest.register_node(trunk_base..sz, {
+			description = growth_data.Name.." Tree",
+			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			
+			node_box = {
+				type = "fixed",
+				fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree_trunk = 1, 
+			},
+			
+			log_name = log_base..sz,
+			nub_name = nub_base..sz,
+			
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+			on_dig = function(pos, node, digger)
+				local wielded = digger and digger:get_wielded_item()
+				local tp = wielded:get_tool_capabilities()
+				
+				if tp.groupcaps.choppy then
+					
+					if sz > 1 then
+						
+						minetest.set_node(pos, {name=trunk_base..sz.."_chopped_"..(sz-1)})
+						
+						if not core.settings:get_bool("creative_mode") then
+							wielded:add_wear(dp.wear)
+							if wielded:get_count() == 0 and wdef.sound and wdef.sound.breaks then
+								core.sound_play(wdef.sound.breaks, {
+									pos = pos,
+									gain = 0.5
+								}, true)
+							end
+						end
+						
+						digger:set_wielded_item(wielded)
+					else
+						default.fell_tree(pos, digger)
+	-- 					minetest.node_dig(pos, node, digger)
+					end
+				end
+			end
+			
+		})
+		
+		-- post-chopped remainders
+		minetest.register_node(nub_base..sz, {
+			description = growth_data.Name.." Tree",
+			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			
+			node_box = {
+				type = "fixed",
+				fixed = {
+					{-q/16, -0.5, -q/16, q/16, -0.3, q/16},
+					{-q/24, -0.3, -q/16, q/24, -0.2, q/16},
+					{-q/48, -0.2, -q/16, q/48, -0.1, q/16},
+				},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree_trunk = 1, rotting = 1,
+			},
+			
+			log_name = log_base..sz,
+			
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+		})
+		
+		
+		-- chopped versions
+		for j_ = sz,1,-1 do
+			local j = j_
+			minetest.register_node(trunk_base..sz.."_chopped_"..j, {
+				description = growth_data.Name.." Tree",
+			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+				paramtype = "light",
+				paramtype2 = "facedir",
+				drawtype = "nodebox",
+				
+				node_box = {
+					type = "fixed",
+					fixed = {
+						{-q/16, -0.5, -q/16, q/16, -0.1, q/16}, -- bottom
+						{-q/16,  0.1, -q/16, q/16,  0.5, q/16}, -- top
+						{-q/16, -0.1, -q/16, q/16,  0.1, j/16}, -- middle chunk negative
+					},
+				},
+				sunlight_propagates = true,
+				is_ground_content = false,
+				groups = {
+					tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+					tree_trunk = 1, 
+				},
+				
+				log_name = log_base..sz,
+				nub_name = nub_base..sz,
+				
+				sounds = default.node_sound_wood_defaults(),
+				on_place = minetest.rotate_node,
+				on_dig = function(pos, node, digger)
+					local wielded = digger and digger:get_wielded_item()
+					local tp = wielded:get_tool_capabilities()
+					if tp.groupcaps.choppy then
+						if j > 1 then
+							minetest.set_node(pos, {name=trunk_base..sz.."_chopped_"..(j-1)})
+							
+							if not core.settings:get_bool("creative_mode") then
+								wielded:add_wear(dp.wear)
+								if wielded:get_count() == 0 and wdef.sound and wdef.sound.breaks then
+									core.sound_play(wdef.sound.breaks, {
+										pos = pos,
+										gain = 0.5
+									}, true)
+								end
+							end
+							
+							digger:set_wielded_item(wielded)
+						else
+							default.fell_tree(pos, digger)
+	-- 						minetest.node_dig(pos, node, digger)
+						end
+					end
+				end
+				
+			})
+		end
+		
+		
+	end -- for trunk_sizes
+end -- default.register_tree_trunks()
+
+
+
+
+function default.fell_tree(chopped_pos, player)
+	local n = minetest.get_node(chopped_pos)
+	local chopped_def = minetest.registered_nodes[n.name]
+	
+	local found, root_pos = default.find_tree_root(chopped_pos)
+	
+	if not found then
+		print("Could not find tree root")
+		return
+	end
+	
+	local meta = minetest.get_meta(root_pos)
+	local root_def = minetest.registered_nodes[minetest.get_node(root_pos).name]
+	local height = meta:get_int("height") -- above the root
+	local felled_h = root_pos.y + height - chopped_pos.y
+	
+	-- todo: fetch log diameter?
+	
+-- 	print("Felled height " .. felled_h .. " of " .. height)
+	
+	-- get log sizes
+	local logs = {}
+	for y = chopped_pos.y, chopped_pos.y + felled_h do
+		local p = {x=chopped_pos.x, y=y, z=chopped_pos.z}
+		local n = minetest.get_node(p)
+		local def = minetest.registered_nodes[n.name]
+		if not def then
+			break
+		end
+		
+		if def.log_name then
+			table.insert(logs, def.log_name)
+			minetest.set_node(p, {name="air"})
+		end
+	end
+	
+	-- clear a path
+	for x = root_pos.x, root_pos.x + height do
+		for y = chopped_pos.y, chopped_pos.y + felled_h do
+			-- todo: sin(x - root_pos.x)
+			-- todo: wide swath of branches
+			minetest.set_node({x=x, y=y, z=root_pos.z}, {name="air"})
+		end
+	end
+
+	-- place logs
+	local x = root_pos.x + 1
+	for _,log in ipairs(logs) do
+		-- find ground level.
+		local lpos = {x=x, y=root_pos.y + 1, z=root_pos.z}
+		for y = root_pos.y+felled_h,root_pos.y,-1 do
+			lpos.y = y
+			local n = minetest.get_node(lpos)
+			if n.name ~= "air" then
+				lpos.y = lpos.y + 1
+				break
+			end
+		end
+		
+		minetest.set_node(lpos, {name=log, param2=1})
+		x = x + 1
+	end
+		
+	
+	default.clear_old_leaves(root_pos, meta)
+	
+	-- install dead root and chopped nub
+	minetest.swap_node(root_pos, {name=root_def.stump_name})
+	minetest.set_node(chopped_pos, {name=chopped_def.nub_name})
+	
+	-- TODO: set remaining part of trunk to rottable
+	
+	-- TODO: handle chopping more from lower on the trunk
+	
+	-- TODO: place shattered canopy on ground, with rotting leaves
+end
 
 
 

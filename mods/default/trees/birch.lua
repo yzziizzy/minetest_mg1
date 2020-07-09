@@ -4,6 +4,13 @@
 
 local birch_growth_data = {
 	type= "blob",
+	name = "birch",
+	Name = "Birch",
+	trunk_sizes = 6,
+	tiles = {
+		side = "default_aspen_tree.png^[colorize:brown:50",
+		top = "default_aspen_tree_top.png",
+	},
 	speed = {
 		retry = 30,
 		sapling = 10,
@@ -75,69 +82,8 @@ local birch_growth_data = {
 }
 
 
+default.register_tree_trunks("default", birch_growth_data)
 
-
-for sz = 1,6 do
-	local q = sz * 1
-	minetest.register_node("default:birch_tree_trunk_root_"..sz, {
-		description = "Birch Tree Root",
-		tiles = {"default_aspen_tree_top.png", "default_aspen_tree_top.png", "default_aspen_tree.png^[colorize:brown:50"},
-		paramtype = "light",
-		paramtype2 = "facedir",
-		drawtype = "nodebox",
-		
-		node_box = {
-			type = "fixed",
-			fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
-		},
-		sunlight_propagates = true,
-		is_ground_content = false,
-		groups = {
-			tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
-			tree_trunk = 1, tree_trunk_root_fertile = 1,
-		},
-		sounds = default.node_sound_wood_defaults(),
-		
-		tree_def = birch_growth_data,
-		
-		on_place = function(itemstack, placer, pointed_thing)
-			local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
-			
-			local m = stage_data[sz]
-			if m.time then
-				minetest.get_node_timer(pointed_thing.above):start(m.time * birch_growth_data.speed.tree_growth)
-			end
-			return stack
-		end,
-		
-		on_timer = function(pos, elapsed)
-			default.advance_tree(pos, elapsed, birch_growth_data)
-		end,
-	})
-	
-	minetest.register_node("default:birch_tree_trunk_"..sz, {
-		description = "Birch Tree",
-		tiles = {"default_aspen_tree_top.png", "default_aspen_tree_top.png", "default_aspen_tree.png^[colorize:brown:50^[colorize:brown:20"},
-		paramtype = "light",
-		paramtype2 = "facedir",
-		drawtype = "nodebox",
-		
-		node_box = {
-			type = "fixed",
-			fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
-		},
-		sunlight_propagates = true,
-		is_ground_content = false,
-		groups = {
-			tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
-			tree_trunk = 1, 
-		},
-		sounds = default.node_sound_wood_defaults(),
-		on_place = minetest.rotate_node,
-		
-	})
-	
-end
 
 
 for i = 1,3 do
