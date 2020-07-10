@@ -315,11 +315,76 @@ minetest.register_tool("default:axe_steel", {
 	sound = {breaks = "default_tool_breaks"},
 	groups = {axe = 1}
 })
+
+
+
+
+minetest.register_node("default:lake_magic", {
+	description = "Lake Magic Block",
+	tiles = {"default_snow.png"},
+	groups = {crumbly = 3, cools_lava = 1, snowy = 1},
+	on_timer = function(pos)
+		minetest.set_node(pos, {name = "default:lake_water_source"})
+	end
+})
+
+minetest.register_abm({
+	nodenames = {"default:lake_magic"},
+	neighbors = {"air"},
+	interval  = 1,
+	chance = 1,
+	catch_up = true,
+	action = function(pos, node)
+		
+		local n
+		
+		while 1==1 do
+			n = minetest.get_node({x=pos.x+1, y=pos.y, z=pos.z})
+			if n.name == "air" then break end
+			
+			n = minetest.get_node({x=pos.x-1, y=pos.y, z=pos.z})
+			if n.name == "air" then break end
+			
+			n = minetest.get_node({x=pos.x, y=pos.y, z=pos.z+1})
+			if n.name == "air" then break end
+			
+			n = minetest.get_node({x=pos.x, y=pos.y, z=pos.z-1})
+			if n.name == "air" then break end
+			
+			local timer = minetest.get_node_timer(pos)
+			if not timer:is_started() then
+				timer:start(15)
+			end
+			
+			return
+		end
+		
+		minetest.set_node(pos, {name="air"})
+	end,
+})
+
+minetest.register_abm({
+	nodenames = {"default:lake_magic"},
+	neighbors = {"default:lake_water_source"},
+	interval  = 1,
+	chance = 1,
+	catch_up = true,
+	action = function(pos, node)
+		minetest.set_node(pos, {name="default:lake_water_source"})
+	end
+})
+
+
+
+
+
+
 -- /temp
 
 
 
 dofile(modpath.."/functions.lua")
+dofile(modpath.."/water.lua")
 dofile(modpath.."/seasons.lua")
 dofile(modpath.."/player.lua")
 

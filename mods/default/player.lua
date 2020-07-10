@@ -293,8 +293,10 @@ local function run_update()
 	end
 	minetest.after(.25, run_update)
 end
-minetest.after(.25, run_update)
 
+if not minetest.settings:get_bool("creative_mode") then
+	minetest.after(.25, run_update)
+end
 --
 -- manna code
 --

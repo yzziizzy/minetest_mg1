@@ -125,8 +125,10 @@ end
 
 minetest.register_on_mods_loaded(function()
 -- 	print("foo")
-	minetest.after(2, cyclic_update)
-	minetest.after(.5, surface_update)
+	if not minetest.settings:get_bool("creative_mode") then
+		minetest.after(2, cyclic_update)
+		minetest.after(.5, surface_update)
+	end
 end)
 
 -- init player data structures

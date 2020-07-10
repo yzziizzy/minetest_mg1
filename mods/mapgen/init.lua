@@ -1,5 +1,4 @@
 
-
 --
 -- Average Temp
 --
@@ -133,19 +132,19 @@ local np_terrain5 = {
 
 local np_river1 = {
 	offset = 0,
-	scale = 10,
-	spread = {x=150, y=150, z=150},
+	scale = 1,
+	spread = {x=350, y=350, z=350},
 	seed = 7843,
 	octaves = 4,
-	persist = 0.65
+	persist = 0.55
 }
 local np_river2 = {
 	offset = 0,
-	scale = 10,
-	spread = {x=170, y=170, z=170},
+	scale = 1,
+	spread = {x=600, y=600, z=600},
 	seed = 45346,
-	octaves = 4,
-	persist = 0.65
+	octaves = 3,
+	persist = 0.35
 }
 
 
@@ -193,7 +192,8 @@ local np_plains2 = {
 	persist = 0.4
 }
 local np_continents = {
-	offset = -2,
+-- 	offset = -2,
+	offset = 4,
 	scale = 20,
 	spread = {x=350, y=350, z=350},
 	seed = 67824,
@@ -244,6 +244,26 @@ local np_sq1 = {
 	octaves = 5,
 	persist = 0.65
 }
+
+
+
+local np_lake_chance = {
+	offset = -9.0,
+	scale = 10,
+	spread = {x=100, y=100, z=100},
+	seed = 69566,
+	octaves = 6,
+	persist = 0.6
+}
+local np_lake_floor = {
+	offset = 5,
+	scale = 10,
+	spread = {x=60, y=60, z=60},
+	seed = 3734,
+	octaves = 4,
+	persist = 0.85
+}
+
 
 
 local np_fill_depth = {
@@ -312,92 +332,6 @@ end
 
 
 
-local function get_stone(x,y,z, nixyz, biomedef, noise, stones)
-	local density1 = math.abs(noise[1][nixyz])
-	local density2 = math.abs(noise[2][nixyz])
-	local density3 = math.abs(noise[3][nixyz])
-	local density4 = math.abs(noise[4][nixyz])
-	local density5 = math.abs(noise[5][nixyz])
-	local density_s = noise[6][nixyz]
-	local density1_f = noise[7][nixyz]
-
-	
-	-- ore veins first
-	if     density1 < thickness_normal and density2 < thickness_normal then
-		return c_mese
-	elseif density1 < thickness_abundant and density3 < thickness_abundant then
-		return c_iron
-	elseif density1 < thickness_normal and density4 < thickness_normal then
-		return c_copper
-	elseif density1 < thickness_rare and density5 < thickness_rare then
-		return c_mithril
-	elseif density2 < thickness_rare and density3 < thickness_rare then
-		return c_diamond
-	elseif density2 < thickness_scarce and density4 < thickness_scarce then
-		return c_silver
-	elseif density2 < thickness_normal and density5 < thickness_normal then
-		return c_tin
-	elseif density3 < thickness_scarce and density4 < thickness_scarce then
-		return c_gold
-	elseif density3 < thickness_normal and density5 < thickness_normal then
-		return c_chromium
-	elseif density4 < thickness_normal and density5 < thickness_normal then
-		return c_zinc
-
-
-	-- then ore pockets
-	elseif density1_f > 1.4 then
-		return c_uranium
-
-
-	-- normal rocks
-	elseif density_s > 1.25 then
-		return c_jade
-	elseif density_s > 1.10 then
-		return c_serpentine
-	elseif density_s > 1.00 then
-		return c_shale
-	elseif density_s > 0.90 then
-		return c_granite
-	elseif density_s > 0.80 then
-		return c_basalt
-	elseif density_s > 0.708 then
-		return c_slate
-	elseif density_s > 0.70 then
-		return c_anthracite
-	elseif density_s > 0.60 then
-		return c_marble
-	elseif density_s > 0.50 then
-		return c_gneiss
-	elseif density_s > 0.40 then
-		return c_desstone
-	elseif density_s > 0.30 then
-		return c_sandstone
-	elseif density_s > 0.202 then
-		return c_schist
-
-	elseif density_s > 0.20 then
-		return c_gravel
-	elseif density_s > 0.19 then
-		return c_coalblock
-	elseif density_s > 0.188 then
-		return c_gravel
-
-	elseif density_s > 0.10 then
-		return c_chalk
-	elseif density_s > 0.00 then
-		return c_clay
-	elseif density_s > -0.10 then
-		return c_ors
-	else
-		return c_stone
-
-	end
-
-
-end
-
-
 local function calc_heat(y, lat, nval)
 	local h_equator = 50
 	local y_rate = 1
@@ -428,6 +362,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local chunk_flatness_lookup = {}
 	local biome_immune = {}
 	local ground_surface = {}
+	local lake_surface = {}
+	local river_surface = {}
 	local rock_surface = {}
 	local surface_biome = {}
 	local biome_cache = {}
@@ -450,9 +386,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_stone = minetest.get_content_id("default:mg_stone")
 	local c_glass = minetest.get_content_id("default:mg_glass")
-	local c_s_water = minetest.get_content_id("default:water_source")
+	local c_s_water = minetest.get_content_id("default:sea_water_source")
 	local c_r_water = minetest.get_content_id("default:river_water_source")
 	local c_g_water = minetest.get_content_id("default:glacial_water_source")
+	local c_l_water = minetest.get_content_id("default:lake_magic")
 	
 	-- igneous
 	local c_granite = minetest.get_content_id("default:granite")
@@ -535,6 +472,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	]]
 	local nvals_continents = minetest.get_perlin_map(np_continents, chulens):get2dMap_flat(minposxz)
 	local nvals_hills = minetest.get_perlin_map(np_hills, chulens):get2dMap_flat(minposxz)
+	local nvals_lake_chance = minetest.get_perlin_map(np_lake_chance, chulens):get2dMap_flat(minposxz)
+-- 	local nvals_lake_floor = minetest.get_perlin_map(np_lake_floor, chulens):get2dMap_flat(minposxz)
 	
 	local nvals_heat = minetest.get_perlin_map(np_heat, chulens):get2dMap_flat(minposxz)
 	local nvals_humidity = minetest.get_perlin_map(np_humidity, chulens):get2dMap_flat(minposxz)
@@ -601,12 +540,39 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				o = o + s * ht * r
 			end
 			
+			
+			
 			-- this rounding is VERY important
 			-- you get all sorts of random noise errors from
 			--   calculations done later if it is omitted
-			o = round(o)
 -- 			print("y0: "..y0.."o: "..o.." y1: "..y1)
 			
+			
+			-- lakes
+			local lake_chance = nvals_lake_chance[nixz]
+			if o > 2 then
+-- 				local lake_floor = math.abs(nvals_lake_floor[nixz])
+				if lake_chance > 0 then
+					lake_surface[nixz] = round(o)
+					local k = lake_chance
+					o = o - k * 4 --(k * lake_floor)
+				end
+			end
+			
+			-- rivers
+			if o > 0 then
+				local rivers1 = math.abs(nvals_river1[nixz])
+				local rivers2 = math.abs(nvals_river2[nixz])
+				local river = math.abs(rivers1 - rivers2) 
+				if  river * math.max(1, (o / 10)) < 0.03 then
+					river_surface[nixz] = round(o)
+					o = o - clamp(0, 5 - (river * 60), 5)
+					
+				end
+			end
+			
+			o = round(o)
+
 			-- ground_surface is the highest non-air node of the terrain
 			-- g_s+1 is the first air node above the ground
 			ground_surface[nixz] = o
@@ -620,13 +586,32 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			
 			-- fill in basic nodes and stone debugging placeholders
 			for y = y0, y1 do
+				local ls = lake_surface[nixz] or -33000
+				local rs = river_surface[nixz] or -33000
+				local ws = math.max(ls, rs)
 				if y < o then
 					data[area:index(x, y, z)] = c_stone
 				else 
 					if y > 0 then
-						data[area:index(x, y, z)] = c_air
+						if ws > y then
+							if ls > rs then
+								data[area:index(x, y, z)] = c_l_water
+							else
+								data[area:index(x, y, z)] = c_r_water
+							end
+						else
+							data[area:index(x, y, z)] = c_air
+						end
 					else
-						data[area:index(x, y, z)] = c_s_water
+						if ws > y then
+							if ls > rs then
+								data[area:index(x, y, z)] = c_l_water
+							else
+								data[area:index(x, y, z)] = c_r_water
+							end
+						else
+							data[area:index(x, y, z)] = c_s_water
+						end
 					end
 				end
 			end
@@ -635,6 +620,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 	
+-- 	chunk_has_surface = false
 	-- surface biome calculation and filling
 	if chunk_has_surface then
 		for x = x0, x1 do 
@@ -763,8 +749,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	
 	
+	
 	local stone_noise_cache = {}
 	local ore_noise_cache = {}
+	
+-- 	chunk_has_underground = false
 	
 	-- underground stone biomes
 	if chunk_has_underground then
@@ -923,7 +912,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	]]
 	
-	-- slices cut into the terrain for debugging
+	--[[ slices cut into the terrain for debugging
 	for x = x0, x1 do 
 		for z = z0, z1 do 
 			for y = y1, y0, -1 do 
@@ -935,7 +924,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			
 		end
 	end
-	
+	--]]
 	
 	
 	vm:set_data(data)
