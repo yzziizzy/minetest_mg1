@@ -1,16 +1,150 @@
+local S = default.get_translator
+
+
 
 minetest.register_node("default:sand", {
-	description = "Sand",
+	description = S("Sand"),
 	tiles = {"default_sand.png"},
 	groups = {crumbly = 3, falling_node = 1, sand = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
+minetest.register_node("default:wet_sand", {
+	description = S("Sand"),
+	tiles = {"default_sand.png"},
+	groups = {crumbly = 2, falling_node = 1, sand = 1},
+	sounds = default.node_sound_sand_defaults(),
+})
+
+minetest.register_node("default:desert_sand", {
+	description = S("Desert Sand"),
+	tiles = {"default_desert_sand.png"},
+	groups = {crumbly = 3, falling_node = 1, sand = 1},
+	sounds = default.node_sound_sand_defaults(),
+})
+
+minetest.register_node("default:silver_sand", {
+	description = S("Silver Sand"),
+	tiles = {"default_silver_sand.png"},
+	groups = {crumbly = 3, falling_node = 1, sand = 1},
+	sounds = default.node_sound_sand_defaults(),
+})
+
+
 minetest.register_node("default:dirt", {
 	description = "Dirt",
 	tiles = {"default_dirt.png"},
-	groups = {crumbly = 3, soil = 1},
+	groups = {crumbly = 3, falling_node = 1, soil = 1},
 	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:topsoil", {
+	description = "Topsoil",
+	tiles = {"default_dirt.png"},
+	groups = {crumbly = 2, falling_node = 1, soil = 2},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+
+
+default.register_water({
+	mod = "default",
+	name = "mud",
+	desc = "Mud",
+	waving = 0,
+	tiles = {
+		source = "default_river_water_source_animated.png^[colorize:brown:220",
+		flowing_inv = "default_water.png^[colorize:brown:220",
+		flowing = "default_river_water_flowing_animated.png^[colorize:brown:220",
+	},
+	alpha = 255,
+	viscosity = 12,
+	renewable = false,
+	range = 1,
+	post_effect = {a = 255, r = 20, g = 20, b = 0},
+	sounds = default.node_sound_water_defaults(),
+	src_groups = { liquid = 3, falling_node = 1, },
+	flow_groups = { liquid = 3, not_in_creative_inventory = 1},
+})
+
+
+minetest.register_node("default:wet_clay", {
+	description = S("Wet Clay"),
+	tiles = {"default_clay.png"},
+	groups = {crumbly = 3, falling_node = 1, },
+	sounds = default.node_sound_dirt_defaults(),
+})
+minetest.register_node("default:dry_clay", {
+	description = S("Dry Clay"),
+	tiles = {"default_dry_dirt.png"},
+	groups = {crumbly = 3},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+
+
+
+
+minetest.register_node("default:snow", {
+	description = S("Snow"),
+	tiles = {"default_snow.png"},
+	inventory_image = "default_snowball.png",
+	wield_image = "default_snowball.png",
+	paramtype = "light",
+	buildable_to = true,
+	floodable = true,
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.25, 0.5},
+		},
+	},
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -7 / 16, 0.5},
+		},
+	},
+	groups = {crumbly = 3, falling_node = 1, snowy = 1},
+	sounds = default.node_sound_snow_defaults(),
+})
+
+minetest.register_node("default:snowblock", {
+	description = S("Snow Block"),
+	tiles = {"default_snow.png"},
+	groups = {crumbly = 3, cools_lava = 1, snowy = 1},
+	sounds = default.node_sound_snow_defaults(),
+
+})
+
+
+
+minetest.register_node("default:permafrost", {
+	description = S("Permafrost"),
+	tiles = {"default_permafrost.png"},
+	groups = {cracky = 3},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:permafrost_with_stones", {
+	description = S("Permafrost with Stones"),
+	tiles = {"default_permafrost.png^default_stones.png",
+		"default_permafrost.png",
+		"default_permafrost.png^default_stones_side.png"},
+	groups = {cracky = 3},
+	sounds = default.node_sound_gravel_defaults(),
+})
+
+minetest.register_node("default:permafrost_with_moss", {
+	description = S("Permafrost with Moss"),
+	tiles = {"default_moss.png", "default_permafrost.png",
+		{name = "default_permafrost.png^default_moss_side.png",
+			tileable_vertical = false}},
+	groups = {cracky = 3},
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name = "default_grass_footstep", gain = 0.25},
+	}),
 })
 
 for i = 0, 9 do
@@ -44,7 +178,7 @@ for i = 0, 9 do
 				{name = "default_dirt.png^default_grass_side_winter.png^[colorize:brown:"..i*4, tileable_vertical = false}
 			},
 		},
-		groups = {crumbly = 3, soil = 1, spreading_dirt_type = 1},
+		groups = {crumbly = 3, soil = 1, falling_node = 1, spreading_grass = 1},
 		drop = "default:dirt",
 		sounds = default.node_sound_dirt_defaults({
 			footstep = {name = "default_grass_footstep", gain = 0.25},

@@ -13,6 +13,8 @@ local aspen_growth_data = {
 	tiles = {
 		side = "default_aspen_tree.png",
 		top = "default_aspen_tree_top.png",
+		wood = "default_aspen_wood.png",
+		stick = "default_aspen_tree.png",
 	},
 	speed = {
 		retry = 30,
@@ -84,13 +86,6 @@ local aspen_growth_data = {
 	}
 }
 
-
-
-minetest.register_craftitem("default:aspen_stick", {
-	description = S("Aspen Stick"),
-	inventory_image = "default_stick.png^[colorize:white:180",
-	groups = {stick = 1, flammable = 2},
-})
 
 
 default.register_tree_trunks("default", aspen_growth_data)

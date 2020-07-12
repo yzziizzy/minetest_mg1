@@ -32,8 +32,8 @@ default.register_surface_deco({
 
 
 default.register_surface_deco({
-	name = "oaks",
-	description = "Aspen Tree Groves",
+	name = "birches",
+	description = "Birch Tree Groves",
 	
 	y_min = 5,
 	y_max = 100,
@@ -45,8 +45,9 @@ default.register_surface_deco({
 	lat_abs = true, -- appears in northern and southern hemicubes
 	
 	type = "density",
+	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
 	noise = { -- filter with these noise params
-		offset = -40, -- nodes are placed when the noise is greater than 1
+		offset = -98, -- nodes are placed when the noise is greater than 1
 		scale = 100,     -- according to math.random() == 1 of the noise number
 		spread = {x=600, y=600, z=600},
 		seed = 5685,
@@ -54,6 +55,6 @@ default.register_surface_deco({
 		persist = 0.89,
 	},
 	
-	place = {"default:mg_oak_sapling"}, -- randomly chosen list of nodes to place
+	place = {"default:mg_rand_birch_sapling"}, -- randomly chosen list of nodes to place
 	y_offset = 0, -- directly on top of the soil
 })

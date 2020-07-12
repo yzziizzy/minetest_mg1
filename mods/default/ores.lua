@@ -100,11 +100,11 @@ default.register_ore({
 		octaves = 3,
 		persist = 0.35,
 	},
-	threshold = .61, -- place if the noise is GREATER than this
+	threshold = 1.12, -- place if the noise is GREATER than this; larger value = smaller blob
 	
 	place_in = {
-		["default:limestone"] = {"default:magnetite"},
-		["default:sandstone"] = {"default:magnetite"},
+-- 		["default:limestone"] = {"default:magnetite"},
+-- 		["default:sandstone"] = {"default:magnetite"},
 		["*"] = {"default:mg_glass"},
 	},
 	stone_biomes = "*",

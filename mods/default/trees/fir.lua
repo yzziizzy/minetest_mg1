@@ -4,6 +4,15 @@ local S = default.get_translator
 
 local fir_growth_data = {
 	type = "conifer",
+	name = "fir",
+	Name = "Fir",
+	trunk_sizes = 6,
+	tiles = {
+		side = "default_pine_tree.png",
+		top = "default_pine_tree_top.png",
+		wood = "default_pine_wood.png",
+		stick = "default_pine_tree.png",
+	},
 	speed = {
 		retry = 30,
 		sapling = 10,
@@ -70,67 +79,9 @@ minetest.register_craftitem("default:fir_stick", {
 	groups = {stick = 1, flammable = 2},
 })
 
-for sz = 1,6 do
-	local q = sz * 1
-	minetest.register_node("default:fir_tree_trunk_root_"..sz, {
-		description = "Fir Tree Root",
-		tiles = {"default_pine_tree_top.png", "default_pine_tree_top.png", "default_pine_tree.png"},
-		paramtype = "light",
-		paramtype2 = "facedir",
-		drawtype = "nodebox",
-		
-		node_box = {
-			type = "fixed",
-			fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
-		},
-		sunlight_propagates = true,
-		is_ground_content = false,
-		groups = {
-			tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
-			tree_trunk = 1, tree_trunk_root_fertile = 1,
-		},
-		sounds = default.node_sound_wood_defaults(),
-		
-		tree_def = fir_growth_data,
-		
-		on_place = function(itemstack, placer, pointed_thing)
-			local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
-			
-			local m = stage_data[sz]
-			if m.time then
-				minetest.get_node_timer(pointed_thing.above):start(m.time * fir_growth_data.speed.tree_growth)
-			end
-			return stack
-		end,
-		
-		on_timer = function(pos, elapsed)
-			default.advance_tree(pos, elapsed, fir_growth_data)
-		end,
-	})
-	
-	minetest.register_node("default:fir_tree_trunk_"..sz, {
-		description = "Fir Tree",
-		tiles = {"default_pine_tree_top.png", "default_pine_tree_top.png", "default_pine_tree.png"},
-		paramtype = "light",
-		paramtype2 = "facedir",
-		drawtype = "nodebox",
-		
-		node_box = {
-			type = "fixed",
-			fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
-		},
-		sunlight_propagates = true,
-		is_ground_content = false,
-		groups = {
-			tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
-			tree_trunk = 1, 
-		},
-		sounds = default.node_sound_wood_defaults(),
-		on_place = minetest.rotate_node,
-		
-	})
-	
-end
+
+
+default.register_tree_trunks("default", fir_growth_data)
 
 
 for i = 1,3 do

@@ -54,7 +54,7 @@ function default.register_water(def)
 	minetest.register_node(flow_name, {
 		description = def.desc,
 		drawtype = "flowingliquid",
-		waving = 3,
+		waving = def.waving,
 		tiles = {def.tiles.flowing_inv},
 		special_tiles = {
 			{
@@ -106,6 +106,7 @@ end
 default.register_water({
 	mod = "default",
 	name = "sea_water",
+	desc = "Sea Water",
 	waving = 3,
 	tiles = {
 		source = "default_water_source_animated.png",
@@ -127,6 +128,7 @@ default.register_water({
 default.register_water({
 	mod = "default",
 	name = "river_water",
+	desc = "River Water",
 	waving = 0,
 	tiles = {
 		source = "default_river_water_source_animated.png",
@@ -146,6 +148,7 @@ default.register_water({
 default.register_water({
 	mod = "default",
 	name = "lake_water",
+	desc = "Lake Water",
 	waving = 0,
 	tiles = {
 		source = "default_river_water_source_animated.png^[colorize:green:40",

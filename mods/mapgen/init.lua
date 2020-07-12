@@ -397,36 +397,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_obsidian = minetest.get_content_id("default:obsidian")
 	local c_pumice = minetest.get_content_id("default:pumice")
 	
-	-- sedimentary
-	local c_limestone = minetest.get_content_id("default:limestone")
-	local c_sandstone = minetest.get_content_id("default:sandstone")
-	local c_laterite = minetest.get_content_id("default:laterite")
-	local c_gypsum = minetest.get_content_id("default:gypsum")
-	local c_halite = minetest.get_content_id("default:halite")
-	local c_shale = minetest.get_content_id("default:shale")
-	local c_conglomerate = minetest.get_content_id("default:conglomerate")
-	local c_chalk = minetest.get_content_id("default:chalk")
-	local c_breccia = minetest.get_content_id("default:breccia")
-	local c_mudstone = minetest.get_content_id("default:mudstone")
-	
-	-- metamorphic
-	local c_marble = minetest.get_content_id("default:marble")
-	local c_gneiss = minetest.get_content_id("default:gneiss")
-	local c_slate = minetest.get_content_id("default:slate")
-	local c_schist = minetest.get_content_id("default:schist")
-	
-	local grasses = {
-		minetest.get_content_id("default:dirt_with_grass_"..0),
-		minetest.get_content_id("default:dirt_with_grass_"..1),
-		minetest.get_content_id("default:dirt_with_grass_"..2),
-		minetest.get_content_id("default:dirt_with_grass_"..3),
-		minetest.get_content_id("default:dirt_with_grass_"..4),
-		minetest.get_content_id("default:dirt_with_grass_"..5),
-		minetest.get_content_id("default:dirt_with_grass_"..6),
-		minetest.get_content_id("default:dirt_with_grass_"..7),
-		minetest.get_content_id("default:dirt_with_grass_"..8),
-		minetest.get_content_id("default:dirt_with_grass_"..9),
-	}
 	
 -- 	local c_wood = minetest.get_content_id("default:wood")
 -- 	local c_glass = minetest.get_content_id("default:glass")
@@ -454,15 +424,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local minposxyz = {x=x0, y=y0, z=z0}
 	local minposxz = {x=x0, y=z0}
 
-	local nvals_caves = minetest.get_perlin_map(np_caves, chulens):get3dMap_flat(minposxyz)
-	local nvals_caves2 = minetest.get_perlin_map(np_caves2, chulens):get3dMap_flat(minposxyz)
-	local nvals_cave_size = minetest.get_perlin_map(np_cave_size, chulens):get3dMap_flat(minposxyz)
--- 	local nvals_terrain_s = minetest.get_perlin_map(np_stone, chulens):get3dMap_flat(minposxyz)
--- 	local nvals_terrain1 = minetest.get_perlin_map(np_terrain1, chulens):get3dMap_flat(minposxyz)
--- 	local nvals_terrain2 = minetest.get_perlin_map(np_terrain2, chulens):get3dMap_flat(minposxyz)
--- 	local nvals_terrain3 = minetest.get_perlin_map(np_terrain3, chulens):get3dMap_flat(minposxyz)
--- 	local nvals_terrain4 = minetest.get_perlin_map(np_terrain4, chulens):get3dMap_flat(minposxyz)
--- 	local nvals_terrain5 = minetest.get_perlin_map(np_terrain5, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_caves = minetest.get_perlin_map(np_caves, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_caves2 = minetest.get_perlin_map(np_caves2, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_cave_size = minetest.get_perlin_map(np_cave_size, chulens):get3dMap_flat(minposxyz)
 	
 	local nvals_river1 = minetest.get_perlin_map(np_river1, chulens):get2dMap_flat(minposxz)
 	local nvals_river2 = minetest.get_perlin_map(np_river2, chulens):get2dMap_flat(minposxz)
@@ -481,11 +445,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	local nvals_mountains = minetest.get_perlin_map(np_mtns3, chulens):get2dMap_flat(minposxz)
 	local nvals_vulcanism = minetest.get_perlin_map(np_mtns2, chulens):get2dMap_flat(minposxz)
-	local nvals_squiggle = minetest.get_perlin_map(np_sq1, chulens):get3dMap_flat(minposxyz)
-	local nvals_squiggle2 = minetest.get_perlin_map(np_sq2, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_squiggle = minetest.get_perlin_map(np_sq1, chulens):get3dMap_flat(minposxyz)
+-- 	local nvals_squiggle2 = minetest.get_perlin_map(np_sq2, chulens):get3dMap_flat(minposxyz)
 	
 	-- todo: only calculate if on the surface
-	local nvals_fill_depth = minetest.get_perlin_map(np_fill_depth, chulens):get2dMap_flat(minposxz)
 	
 	--[[
 	.008 # holy fuck way too much
@@ -623,6 +586,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 -- 	chunk_has_surface = false
 	-- surface biome calculation and filling
 	if chunk_has_surface then
+		local nvals_fill_depth = minetest.get_perlin_map(np_fill_depth, chulens):get2dMap_flat(minposxz)
+		
 		for x = x0, x1 do 
 			for z = z0, z1 do
 				local xx = lx - (x1 - x) - 1
@@ -630,118 +595,127 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				local nixz = zz * lx + xx + 1
 				
-				
 				local surf = ground_surface[nixz]
 				
-				local heat = calc_heat(surf, z, nvals_heat[nixz])
-				local humidity = nvals_humidity[nixz]
-				local magic = nvals_magic[nixz]
-				local flatness = chunk_flatness_lookup[nixz] or 0
+				local river_surf = river_surface[nixz] or -33000
+				local lake_surf = lake_surface[nixz] or -33000
+				local ws = math.max(river_surf, lake_surf)
 				
-				local bio = default.select_biome(x,surf,z, heat, humidity, magic, flatness)
-				
-				surface_biome[nixz] = bio 
-				if not biome_cache[bio.name] then
-					biome_cache[bio.name] = {
-						def = bio,
--- 						node_count = 1,
-					}
--- 				else
--- 					biome_cache[bio.name].node_count = biome_cache[bio.name].node_count + 1
-				end
-				
-				local depth = bio.fill_min + nclamp(nvals_fill_depth[nixz]) * (bio.fill_max - bio.fill_min)
-				depth = round(depth)
-				
-				-- the highest node below the cover and fill
-				rock_surface[nixz] = surf - depth - 2
-				if rock_surface[nixz] >= y0 then
-					chunk_has_underground = true
-				end
-				
-				local yd = math.max(y0, surf-1-depth)
-	-- 			for y = surf, y0, -1 do
-				if surf <= y1 then
-					if y0 <= surf then
-						data[area:index(x, surf, z)] = bio.cids.cover[math.random(#bio.cids.cover)]
+				-- don't place normal biome stuff under rivers and lakes
+				-- bugged
+				--if true and  ws < surf then
+					
+					local heat = calc_heat(surf, z, nvals_heat[nixz])
+					local humidity = nvals_humidity[nixz]
+					local magic = nvals_magic[nixz]
+					local flatness = chunk_flatness_lookup[nixz] or 0
+					
+					local bio = default.select_biome(x,surf,z, heat, humidity, magic, flatness)
+					
+					surface_biome[nixz] = bio 
+					if not biome_cache[bio.name] then
+						biome_cache[bio.name] = {
+							def = bio,
+	-- 						node_count = 1,
+						}
+	-- 				else
+	-- 					biome_cache[bio.name].node_count = biome_cache[bio.name].node_count + 1
 					end
 					
-					if y0 <= surf - 1 then
-						for y = surf-1, yd, -1 do
-							data[area:index(x, y, z)] = bio.cids.fill[math.random(#bio.cids.fill)]
+					local depth = bio.fill_min + nclamp(nvals_fill_depth[nixz]) * (bio.fill_max - bio.fill_min)
+					depth = round(depth)
+					
+					-- the highest node below the cover and fill
+					rock_surface[nixz] = surf - depth - 2
+					if rock_surface[nixz] >= y0 then
+						chunk_has_underground = true
+					end
+					
+					local yd = math.max(y0, surf-1-depth)
+		-- 			for y = surf, y0, -1 do
+					if surf <= y1 then
+						if y0 <= surf then
+							data[area:index(x, surf, z)] = bio.cids.cover[math.random(#bio.cids.cover)]
+						end
+						
+						if y0 <= surf - 1 then
+							for y = surf-1, yd, -1 do
+								data[area:index(x, y, z)] = bio.cids.fill[math.random(#bio.cids.fill)]
+							end
 						end
 					end
-				end
-				
-				
-				
-				-- place decorations
-				for dname,deco in pairs(bio.surface_decos) do
-					local y_feather = math.random(deco.y_rand) - (deco.y_rand / 2)
-					local min_y = deco.y_min + y_feather
-					local max_y = deco.y_max + y_feather
 					
-					local lat_feather = math.random(deco.lat_rand) - (deco.lat_rand / 2)
-					local min_lat = deco.lat_min + lat_feather
-					local max_lat = deco.lat_max + lat_feather
-					local lat_z = z
 					
-					if deco.lat_abs then
-						min_lat = math.abs(min_lat)
-						max_lat = math.abs(max_lat)
-						lat_z = math.abs(lat_z)
-					end
-					
-					if (min_y <= surf and surf <= max_y) and (min_lat <= lat_z and lat_z <= max_lat) then
-						local py = surf + 1 + deco.y_offset
+					-- place decorations
+					for dname,deco in pairs(bio.surface_decos) do
+						local y_feather = math.random(deco.y_rand) - (deco.y_rand / 2)
+						local min_y = deco.y_min + y_feather
+						local max_y = deco.y_max + y_feather
 						
-						if y0 <= py and py <= y1 then
+						local lat_feather = math.random(deco.lat_rand) - (deco.lat_rand / 2)
+						local min_lat = deco.lat_min + lat_feather
+						local max_lat = deco.lat_max + lat_feather
+						local lat_z = z
+						
+						if deco.lat_abs then
+							min_lat = math.abs(min_lat)
+							max_lat = math.abs(max_lat)
+							lat_z = math.abs(lat_z)
+						end
+						
+						if (min_y <= surf and surf <= max_y) and (min_lat <= lat_z and lat_z <= max_lat) then
+							local py = surf + 1 + deco.y_offset
 							
-							-- even filling inside a noise-defined 2d blob
-							if deco.type == "blob" then
-								if deco.noise then
-									-- initialize and cache the noise values 
+							if y0 <= py and py <= y1 then
+								
+								-- even filling inside a noise-defined 2d blob
+								if deco.type == "blob" then
+									if deco.noise then
+										-- initialize and cache the noise values 
+										if not noise_cache[deco.name] then
+			-- 								print(minposxz.x .. " " ..minposxz.y)
+											noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
+										end
+										
+										-- sample and place nodes
+										local n = nclamp(noise_cache[deco.name][nixz])
+			-- 							print(n)
+										if n <= deco.noise.threshold then
+											if 1 == math.random(deco.chance) then
+												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+											end
+										end
+										
+									elseif deco.chance then
+										if 1 == math.random(deco.chance) then
+											data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+										end
+									end
+									
+								elseif deco.type == "density" then
+									-- deco.noise is required in "density" types
 									if not noise_cache[deco.name] then
 		-- 								print(minposxz.x .. " " ..minposxz.y)
 										noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
 									end
 									
 									-- sample and place nodes
-									local n = nclamp(noise_cache[deco.name][nixz])
-		-- 							print(n)
-									if n <= deco.noise.threshold then
-										if 1 == math.random(deco.chance) then
-											data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+									local n = noise_cache[deco.name][nixz]
+		-- 							
+									if n > 0 then
+										if 1 == math.random(round(n)) then
+											if not deco.chance or 1 == math.random(deco.chance) then
+												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+											end
 										end
 									end
-									
-								elseif deco.chance then
-									if 1 == math.random(deco.chance) then
-										data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
-									end
-								end
 								
-							elseif deco.type == "density" then
-								-- deco.noise is required in "density" types
-								if not noise_cache[deco.name] then
-	-- 								print(minposxz.x .. " " ..minposxz.y)
-									noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
 								end
-								
-								-- sample and place nodes
-								local n = noise_cache[deco.name][nixz]
-	-- 							
-								if n > 0 then
-									if 1 == math.random(round(n)) then
-										data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
-									end
-								end
-							
 							end
 						end
 					end
-				end
-				
+					
+				--end -- if ws < ground
 				
 			end
 		end
@@ -762,7 +736,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			for z = z0, z1 do
 				local zz = lx - (z1 - z) - 1
 				local nixz = zz * lx + xx + 1
-					
+				
 				local rs = rock_surface[nixz]
 				if not rs then
 					rs = y1
@@ -912,7 +886,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	]]
 	
-	--[[ slices cut into the terrain for debugging
+	-- slices cut into the terrain for debugging
 	for x = x0, x1 do 
 		for z = z0, z1 do 
 			for y = y1, y0, -1 do 

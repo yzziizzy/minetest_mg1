@@ -42,6 +42,7 @@ cypress
 spruce, pine (ponderosa and lodgepole), fir, cedar
 cottonwood by certain rivers
 
+firedamp in coal mines
 
 items:
 wood chips
@@ -87,58 +88,65 @@ minetest.register_node("default:mg_glass", {
 
 
 local stonedefs = {
-	{n="granite", d="Granite", t="i"},
-	{n="basalt", d="Basalt", t="i"},
-	{n="obsidian", d="Obsidian", t="i"},
-	{n="pumice", d="Pumice", t="i"},
+	{n="granite", d="Granite", t="i"}, --
+	{n="basalt", d="Basalt", t="i"}, --
+	{n="obsidian", d="Obsidian", t="i"}, --
+	{n="pumice", d="Pumice", t="i"}, --
 
-	{n="limestone", d="Limestone", t="s"},
-	{n="sandstone", d="Sandstone", t="s"},
-	{n="laterite", d="Laterite", t="s"},
-	{n="gypsum", d="Gypsum", t="s"},
-	{n="halite", d="Halite", t="s"},
-	{n="shale", d="Shale", t="s"},
-	{n="conglomerate", d="Conglomerate", t="s"},
-	{n="chalk", d="Chalk", t="s"},
-	{n="breccia", d="Breccia", t="s"},
-	{n="mudstone", d="Mudstone", t="s"},
+	{n="limestone", d="Limestone", t="s"}, --
+	{n="sandstone", d="Sandstone", t="s"}, --
+	{n="gypsum", d="Gypsum", t="s"}, --
+	{n="halite", d="Halite", t="s"}, --
+	{n="shale", d="Shale", t="s"}, --
+	{n="conglomerate", d="Conglomerate", t="s"}, --
+	{n="chalk", d="Chalk", t="s"}, --
+	{n="breccia", d="Breccia", t="s"}, --
+	{n="mudstone", d="Mudstone", t="s"}, --
 	
-	{n="marble", d="Marble", t="m"},
-	{n="gneiss", d="Gneiss", t="m"},
-	{n="slate", d="Slate", t="m"},
-	{n="schist", d="Schist", t="m"},
-	{n="serpentine", d="Serpentine", t="m"},
+	{n="marble", d="Marble", t="m"}, --
+	{n="gneiss", d="Gneiss", t="m"}, --
+	{n="slate", d="Slate", t="m"}, --
+	{n="schist", d="Schist", t="m"}, --
+	{n="serpentine", d="Serpentine", t="m"}, --
+	
+	-- fossil rocks
+	{n="lignite", d="Lignite", t="f"}, 
+	{n="bituminous_coal", d="Coal", t="f"},
+	{n="anthracite_coal", d="Anthracite Coal", t="f"},
+	{n="graphite", d="Graphite", t="f"}, 
+	{n="oil_shale", d="Oil Shale", t="f"},
+	{n="tar_sand", d="tar_sand", t="f"}, 
 }
 
 local stone_types = {
 	["i"] = 1,
 	["s"] = 2,
 	["m"] = 3,
-}
-
-local colors = {
-	["i"] = "red",
-	["s"] = "yellow",
-	["m"] = "orange",
+	["f"] = 4,
 }
 
 for i,def in pairs(stonedefs) do
 	minetest.register_node("default:"..def.n.."_cobble", {
 		description = def.d.." Cobble",
--- 		tiles = {"default_"..def.n.."_cobble.png"},
-		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
+		tiles = {"default_"..def.n..".png^default_cobble.png"},
+-- 		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
 		groups = {cracky = 1, cobble = 1, stone_type = stone_types[def.t]},
 		sounds = default.node_sound_stone_defaults(),
 	})
 	
 	minetest.register_node("default:"..def.n, {
 		description = def.d,
--- 		tiles = {"default_"..def.n..".png"},
-		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
+		tiles = {"default_"..def.n..".png"},
+-- 		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
 		groups = {cracky = 3, stone = 1, stone_type = stone_types[def.t]},
 		drop = "default:"..def.n.."_cobble",
 		sounds = default.node_sound_stone_defaults(),
 	})
+	
+	-- TODO: native metals in various rocks
+	-- TODO: mossy versions
+	-- TODO: gravels
+	
 end
 
 

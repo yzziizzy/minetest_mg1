@@ -272,6 +272,9 @@ function default.register_tree_trunks(mod, growth_data)
 	local stump_base = base.."tree_stump_"
 	local log_base = base.."log_"
 	local nub_base = base.."tree_nub_"
+	local plank_base = base.."wood_planks"
+	local box_base = base.."wood_box"
+	local stick_base = base.."stick"
 	
 	for sz_ = 1,growth_data.trunk_sizes do
 		local sz = sz_
@@ -290,7 +293,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, tree_trunk_root_fertile = 1,
 			},
 			sounds = default.node_sound_wood_defaults(),
@@ -299,6 +302,7 @@ function default.register_tree_trunks(mod, growth_data)
 			log_name = log_base..sz,
 			stump_name = stump_base..sz,
 			nub_name = nub_base..sz,
+			tree_type = growth_data.name,
 			
 			on_place = function(itemstack, placer, pointed_thing)
 				local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
@@ -330,13 +334,14 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, tree_stump = 1, rotting = 3
 			},
 			sounds = default.node_sound_wood_defaults(),
 			
 			tree_def = growth_data,
 			log_name = log_base..sz,
+			tree_type = growth_data.name,
 			
 			on_place = function(itemstack, placer, pointed_thing)
 				local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
@@ -366,8 +371,18 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 				tree_log = 1, rotting = 1,
+			},
+			
+			tree_type = growth_data.name,
+			
+			drop = {
+				max_items = 1,
+				items = {
+					{ tools = {"group:axe"}, items = {plank_base.." "..sz}, },
+					{ items = {log_base}, },
+				},
 			},
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
@@ -387,12 +402,13 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, 
 			},
 			
 			log_name = log_base..sz,
 			nub_name = nub_base..sz,
+			tree_type = growth_data.name,
 			
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
@@ -445,11 +461,12 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, rotting = 1,
 			},
 			
 			log_name = log_base..sz,
+			tree_type = growth_data.name,
 			
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
@@ -477,13 +494,14 @@ function default.register_tree_trunks(mod, growth_data)
 				sunlight_propagates = true,
 				is_ground_content = false,
 				groups = {
-					tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+					tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 					tree_trunk = 1, 
 				},
 				
 				log_name = log_base..sz,
 				nub_name = nub_base..sz,
-				
+				tree_type = growth_data.name,
+			
 				sounds = default.node_sound_wood_defaults(),
 				on_place = minetest.rotate_node,
 				on_dig = function(pos, node, digger)
@@ -513,6 +531,97 @@ function default.register_tree_trunks(mod, growth_data)
 				
 			})
 		end
+		
+		-- planks
+		minetest.register_node(plank_base, {
+			description = growth_data.Name.." Planks",
+			tiles = {growth_data.tiles.wood},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			node_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				choppy = 2, flammable = 3, wood_planks = 1, 
+			},
+			
+			tree_type = growth_data.name,
+			
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+		})
+		
+		-- boxes
+		minetest.register_node(box_base, {
+			description = growth_data.Name.." Box",
+			tiles = {growth_data.tiles.wood},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			node_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				choppy = 2, flammable = 3, wood_box = 1,
+			},
+			
+			tree_type = growth_data.name,
+			
+			drop = {
+				max_items = 1,
+				items = {
+					{ tools = {"group:axe"}, items = {plank_base .. " 8"}, },
+					{ items = {box_base}, },
+				},
+			},
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+		})
+		
+		-- sticks
+		minetest.register_node(stick_base, {
+			description = growth_data.Name.." Stick",
+			tiles = {growth_data.tiles.stick},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			node_box = {
+				type = "fixed",
+				fixed = {-0.03, -0.5, -0.5, 0.03, -0.5+0.06, 0.5},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				choppy = 3, flammable = 3, stick = 1, oddly_breakable_by_hand = 1,
+			},
+			
+			tree_type = growth_data.name,
+			
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+		})
+		
+		
+		--------------
+		--  Crafts  --
+		--------------
+		
+		-- planks into a box
+		minetest.register_craft({
+			output = box_base,
+			recipe = {
+				{plank_base, plank_base, plank_base},
+				{plank_base, "",         plank_base},
+				{plank_base, plank_base, plank_base},
+			}
+		})
 		
 		
 	end -- for trunk_sizes

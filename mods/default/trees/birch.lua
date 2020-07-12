@@ -10,6 +10,8 @@ local birch_growth_data = {
 	tiles = {
 		side = "default_aspen_tree.png^[colorize:brown:50",
 		top = "default_aspen_tree_top.png",
+		wood = "default_aspen_wood.png^[colorize:yellow:20",
+		stick = "default_aspen_tree.png^[colorize:brown:50",
 	},
 	speed = {
 		retry = 30,
