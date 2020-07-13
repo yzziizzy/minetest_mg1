@@ -34,8 +34,8 @@ for _, climate in pairs(fractal.climate_zones) do
 		y_rand = 1,
 		flatness = 100,
 		magic = 0,
-		heat = climate.temp * 12.5,
-		humidity = climate.water * 12.5,
+		heat = climate.temp * 4.5,
+		humidity = ( climate.water + 0.5 ) * ( 100 / (climate.temp * 5/7 + 3 ) ),
 		lat_center = 50,
 
 		cover = climate.cover,
