@@ -294,8 +294,8 @@ minetest.register_lbm({
 })
 minetest.register_abm({
 	nodenames = {"group:mg_rand_blob_sapling"},
-	interval  = 5,
-	chance = 1,
+	interval  = 1,
+	chance = 5,
 	catch_up = true,
 	action = function(pos, node)
 		local def = minetest.registered_nodes[node.name]
@@ -776,8 +776,8 @@ minetest.register_lbm({
 })
 minetest.register_abm({
 	nodenames = {"group:mg_rand_conifer_sapling"},
-	interval  = 5,
-	chance = 1,
+	interval  = 1,
+	chance = 5,
 	catch_up = true,
 	action = function(pos, node)
 		local def = minetest.registered_nodes[node.name]

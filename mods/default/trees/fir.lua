@@ -149,9 +149,26 @@ end
 local function box_extdim(def, n, amt)
 	local t = {}
 	local w = {0,0,0,0,0,0}
+	local t = {1,1,1,-1,-1,-1}
 	w[n] = 1
+	local o = ((n + 2) % 6) + 1
+	
+	local max = 0
 	for _,q in ipairs(def) do
-		table.insert(t, {q[1]+n[1]*amt, q[2]+n[2]*amt, q[3]+n[3]*amt, q[4]+n[4]*amt, q[5]+n[5]*amt, q[6]+n[6]*amt})
+		max = math.max(max, math.abs(q[o]))
+	end
+	
+	print("foo: "..n.." "..o.." "..max)
+	
+	for _,q in ipairs(def) do
+		table.insert(t, {
+			q[1]+(w[1]*((q[1]+t[1])*amt - t[1])), 
+			q[2]+(w[2]*((q[2]+t[2])*amt - t[2])), 
+			q[3]+(w[3]*((q[3]+t[3])*amt - t[3])), 
+			q[4]+(w[4]*((q[4]+t[4])*amt - t[4])), 
+			q[5]+(w[5]*((q[5]+t[5])*amt - t[5])), 
+			q[6]+(w[6]*((q[6]+t[6])*amt - t[6])), 
+		})
 	end
 	
 	return t
@@ -162,7 +179,7 @@ end
 local needle_boxen = {
 	{-0.45, -0.2, -0.75, 0.3, 0.1, 0.75}, -- base
 	{-0.6, -0.2, -0.4, 0.3, -0.0, 0.4}, -- base 2
-	{-0.05, -0.2, -0.95, 0.35, -0.0, 0.4}, -- base 3
+	{-0.05, -0.2, -0.95, 0.35, -0.0, 0.95}, -- base 3
 	{-0.3,  0.1, -0.5, 0.8, 0.25, 0.5}, -- lvl 1
 	{ 0.1,  0.25, -0.3, 1.0, 0.35, 0.3}, -- lvl 2
 	{ 0.3,  0.35, -0.2, 1.0, 0.45, 0.2}, -- lvl 3

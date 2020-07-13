@@ -8,6 +8,8 @@ local S = minetest.get_translator("default")
 
 -- Definitions made by this mod that other mods can use too
 default = {
+	deepest_fill = 1,
+	
 	biomes = {},
 	failsafe_biome = nil,
 	failsafe_stone_biome = nil,
@@ -69,6 +71,8 @@ minetest.register_on_mods_loaded(function()
 -- 	print("mapgen init")
 	for _,def in pairs(default.biomes) do
 		
+		default.deepest_fill = math.max(default.deepest_fill, def.fill_max + 1)
+		
 		def.surface_decos = {}
 		def.surface_ores = {}
 		
@@ -101,7 +105,7 @@ minetest.register_on_mods_loaded(function()
 			end
 		end
 		
-		print(dump(def))
+-- 		print(dump(def))
 		
 	end
 	
@@ -442,6 +446,7 @@ minetest.register_abm({
 	end,
 })
 
+
 minetest.register_abm({
 	nodenames = {"default:lake_magic"},
 	neighbors = {"default:lake_water_source"},
@@ -450,6 +455,16 @@ minetest.register_abm({
 	catch_up = true,
 	action = function(pos, node)
 		minetest.set_node(pos, {name="default:lake_water_source"})
+		
+		pos.y = pos.y - 1
+		local n = minetest.get_node(pos)
+		if n.name ~= "air" 
+			and n.name ~= "default:lake_water_source" 
+			and n.name ~= "default:lake_magic" 
+		then
+			minetest.set_node(pos, {name="default:wet_sand"})
+		end
+		
 	end
 })
 

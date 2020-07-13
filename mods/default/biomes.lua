@@ -47,14 +47,14 @@ default.register_biome({
 	
 	y_min = 2,
 	y_max = 30,
-	y_rand = 1,
+	y_rand = 5,
 	flatness = 100,
 	magic = 0,
 	heat = 30,
 	humidity = 10,
 	lat_center = 50,
 	
-	cover = {"default:dirt_with_grass_0", "default:dirt_with_grass_6"},
+	cover = {"default:dirt_with_grass_0", "default:dirt_with_grass_1"},
 	fill = {"default:dirt"},
 	fill_min = 2,
 	fill_max = 6,
@@ -67,8 +67,28 @@ default.register_biome({
 	
 	y_min = 2,
 	y_max = 30,
-	y_rand = 1,
+	y_rand = 5,
 	flatness = 100,
+	magic = 0,
+	heat = 30,
+	humidity = 60,
+	lat_center = 50,
+	
+	cover = {"default:dirt_with_grass_2", "default:dirt_with_grass_3"},
+	fill = {"default:dirt"},
+	fill_min = 2,
+	fill_max = 6,
+	
+})
+
+default.register_biome({
+	name = "alpine_forest",
+	description = "Alpine Forest",
+	
+	y_min = 30,
+	y_max = 70,
+	y_rand = 5,
+	flatness = 0,
 	magic = 0,
 	heat = 30,
 	humidity = 60,
@@ -76,8 +96,28 @@ default.register_biome({
 	
 	cover = {"default:dirt_with_grass_9", "default:dirt_with_grass_8"},
 	fill = {"default:dirt"},
-	fill_min = 2,
-	fill_max = 6,
+	fill_min = 1,
+	fill_max = 3,
+	
+})
+
+default.register_biome({
+	name = "snowcap",
+	description = "Mountain Snow Cap",
+	
+	y_min = 70,
+	y_max = 32000,
+	y_rand = 5,
+	flatness = 0,
+	magic = 0,
+	heat = 30,
+	humidity = 60,
+	lat_center = 50,
+	
+	cover = {"default:snowblock"},
+	fill = {"default:snowblock"},
+	fill_min = 3,
+	fill_max = 4,
 	
 })
 
@@ -137,10 +177,10 @@ default.register_stone_biome({
 	lat_center = 50,
 	
 	noise = { -- the absolute value of the nose in a rough range of 0,1 is used
-		spread = {x=64, y=64, z=64},
-		seed = 684,
-		octaves = 6,
-		persist = 0.7
+		spread = {x=130, y=130, z=130},
+		seed = 8464,
+		octaves = 4,
+		persist = 0.3
 	},
 	
 	layers = { -- this list MUST be sorted ascending
@@ -167,10 +207,10 @@ default.register_stone_biome({
 	lat_center = 50,
 	
 	noise = { -- the absolute value of the nose in a rough range of 0,1 is used
-		spread = {x=64, y=64, z=64},
-		seed = 5675,
-		octaves = 6,
-		persist = 0.7
+		spread = {x=150, y=150, z=150},
+		seed = 3456,
+		octaves = 4,
+		persist = 0.5
 	},
 	
 	layers = { -- this list MUST be sorted ascending
@@ -198,16 +238,24 @@ default.register_stone_biome({
 	lat_center = 50,
 	
 	noise = { -- the absolute value of the nose in a rough range of 0,1 is used
-		spread = {x=64, y=64, z=64},
+		spread = {x=150, y=150, z=150},
 		seed = 6564,
-		octaves = 6,
-		persist = 0.7
+		octaves = 3,
+		persist = 0.3
 	},
 	
 	layers = { -- this list MUST be sorted ascending
 		{0.2, "default:limestone"}, 
+		{0.210, "default:sandstone"}, 
+		{0.220, "default:limestone"}, 
 		{0.4, "default:sandstone"}, 
+		{0.420, "default:mudstone"}, 
+		{0.440, "default:sandstone"}, 
+		{0.460, "default:mudstone"}, 
+		{0.480, "default:sandstone"}, 
 		{0.7, "default:mudstone"},
+		{0.800, "default:sandstone"},
+		{0.810, "default:mudstone"},
 		{1.0, "default:chalk"}, 
 	},
 	
@@ -228,10 +276,10 @@ default.register_stone_biome({
 	lat_center = 50,
 	
 	noise = { -- the absolute value of the nose in a rough range of 0,1 is used
-		spread = {x=64, y=64, z=64},
-		seed = 6564,
-		octaves = 6,
-		persist = 0.7
+		spread = {x=150, y=150, z=150},
+		seed = 8943,
+		octaves = 3,
+		persist = 0.3
 	},
 	
 	layers = { -- this list MUST be sorted ascending
@@ -257,10 +305,10 @@ default.register_stone_biome({
 	lat_center = 50,
 	
 	noise = { -- the absolute value of the nose in a rough range of 0,1 is used
-		spread = {x=64, y=64, z=64},
-		seed = 6564,
-		octaves = 6,
-		persist = 0.7
+		spread = {x=120, y=120, z=120},
+		seed = 7832,
+		octaves = 3,
+		persist = 0.5
 	},
 	
 	layers = { -- this list MUST be sorted ascending

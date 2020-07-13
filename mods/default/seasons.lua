@@ -239,8 +239,8 @@ default.get_season = get_season
 minetest.register_abm({
 	label = "Leaf Change",
 	nodenames = {"group:seasonal"},
-	interval = 4,
-	chance = 60,
+	interval = 6,
+	chance = 120,
 -- 	interval = 1,
 -- 	chance = 4,
 	catch_up = true,

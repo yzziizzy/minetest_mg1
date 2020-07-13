@@ -398,28 +398,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_obsidian = minetest.get_content_id("default:obsidian")
 	local c_pumice = minetest.get_content_id("default:pumice")
 	
-	
--- 	local c_wood = minetest.get_content_id("default:wood")
--- 	local c_glass = minetest.get_content_id("default:glass")
--- 	local c_dirt = minetest.get_content_id("default:dirt")
-
-	-- ores
-	--[[
-	local c_mese = minetest.get_content_id("default:stone_with_mese")
-	local c_iron = minetest.get_content_id("default:stone_with_iron")
-	local c_coal = minetest.get_content_id("default:stone_with_coal")
-	local c_coalblock = minetest.get_content_id("default:coalblock")
-	local c_copper = minetest.get_content_id("default:stone_with_copper")
-	local c_diamond = minetest.get_content_id("default:stone_with_diamond")
-	local c_gold = minetest.get_content_id("default:stone_with_gold")
-	local c_uranium = minetest.get_content_id("technic:mineral_uranium")
-	local c_chromium = minetest.get_content_id("technic:mineral_chromium")
-	local c_zinc = minetest.get_content_id("technic:mineral_zinc")
-	local c_silver = minetest.get_content_id("moreores:mineral_silver")
-	local c_tin = minetest.get_content_id("moreores:mineral_tin")
-	local c_mithril = minetest.get_content_id("moreores:mineral_mithril")
-	]]
-
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
 	local minposxyz = {x=x0, y=y0, z=z0}
@@ -449,15 +427,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 -- 	local nvals_squiggle = minetest.get_perlin_map(np_sq1, chulens):get3dMap_flat(minposxyz)
 -- 	local nvals_squiggle2 = minetest.get_perlin_map(np_sq2, chulens):get3dMap_flat(minposxyz)
 	
-	-- todo: only calculate if on the surface
-	
-	--[[
-	.008 # holy fuck way too much
-	.005 # thick consistent vein a few nodes in diameter
-	.003 # continuous one node thick vein, occasinoally skips a node or becomes 2 thick
-	.0015 # ores are spaced several nodes apart. easy to lose but easy to find again.
 
-	]]
 	local thickness_abundant = .0025*scaler
 	local thickness_normal = .0020*scaler
 	local thickness_scarce = .0016*scaler
@@ -498,10 +468,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local n = math.pow(clamp(0, m, 6) / 7, 2)
 				o = 2 + m  --[[+ n*ht*q]] + hills * p
 				
-				local r = clamp(0, hills - 5, 6) / 5
-				local s = 1 / (1 + math.exp(-p)) 
+				local r = clamp(0, hills - 5, 6) / 5 -- blend with hills
+				local s = 1 / (1 + math.exp(-p)) -- when to get mountainous
 				
 				o = o + s * ht * r
+				
+				-- TODO: improve
+				chunk_flatness_lookup[nixz] = s
 			end
 			
 			
@@ -524,13 +497,18 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 			
 			-- rivers
-			if o > 0 then
+			if o > -4 then
+				local delta = 1
+				if o < 0 then
+					delta = 1 - (-o / 4)
+				end
+				
 				local rivers1 = math.abs(nvals_river1[nixz])
 				local rivers2 = math.abs(nvals_river2[nixz])
 				local river = math.abs(rivers1 - rivers2) 
 				if  river * math.max(1, (o / 10)) < 0.03 then
 					river_surface[nixz] = round(o)
-					o = o - clamp(0, 5 - (river * 60), 5)
+					o = o - clamp(0, 5 - (river * 60), 5) * delta
 					
 				end
 			end
@@ -541,14 +519,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			-- g_s+1 is the first air node above the ground
 			ground_surface[nixz] = o
 			
-			if y0 <= o and o <= y1 then
+			if y0 <= o and o - default.deepest_fill <= y1 then
 				chunk_has_surface = true
 			end
 			if o >= y1 then
 				chunk_has_underground = true
 			end
 			
-			-- fill in basic nodes and stone debugging placeholders
+			-- fill in water and stone debugging placeholders
 			for y = y0, y1 do
 				local ls = lake_surface[nixz] or -33000
 				local rs = river_surface[nixz] or -33000
@@ -604,7 +582,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				-- don't place normal biome stuff under rivers and lakes
 				-- bugged
-				if true and  ws < surf then
+				if ws < surf then
 					
 					local heat = calc_heat(surf, z, nvals_heat[nixz])
 					local humidity = nvals_humidity[nixz]
@@ -634,8 +612,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					
 					local yd = math.max(y0, surf-1-depth)
 		-- 			for y = surf, y0, -1 do
-					if surf <= y1 then
-						if y0 <= surf then
+					
+					if surf - default.deepest_fill <= y1 then
+						if y0 <= surf and surf <= y1 then
 							local ncid = bio.cids.cover[math.random(#bio.cids.cover)]
 							
 							for _,v in pairs(bio.cids.chance_cover) do
@@ -648,8 +627,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							data[area:index(x, surf, z)] = ncid
 						end
 						
-						if y0 <= surf - 1 then
-							for y = surf-1, yd, -1 do
+						if y0 <= surf then
+							for y = math.min(surf-1, y1), yd, -1 do
 								local ncid = bio.cids.fill[math.random(#bio.cids.fill)]
 								
 								for _,v in pairs(bio.cids.chance_fill) do
@@ -804,6 +783,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								stone_noise_cache[sbio.name] = minetest.get_perlin_map(sbio.noise, chulens):get3dMap_flat(minposxyz)
 							end
 							
+							base_stone = sbio.layers[#sbio.layers][2]
 							
 							local n = math.abs(stone_noise_cache[sbio.name][nixyz])
 							
