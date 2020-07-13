@@ -390,6 +390,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_r_water = minetest.get_content_id("default:river_water_source")
 	local c_g_water = minetest.get_content_id("default:glacial_water_source")
 	local c_l_water = minetest.get_content_id("default:lake_magic")
+	local c_wetsand = minetest.get_content_id("default:wet_sand")
 	
 	-- igneous
 	local c_granite = minetest.get_content_id("default:granite")
@@ -603,7 +604,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				
 				-- don't place normal biome stuff under rivers and lakes
 				-- bugged
-				--if true and  ws < surf then
+				if true and  ws < surf then
 					
 					local heat = calc_heat(surf, z, nvals_heat[nixz])
 					local humidity = nvals_humidity[nixz]
@@ -635,12 +636,30 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		-- 			for y = surf, y0, -1 do
 					if surf <= y1 then
 						if y0 <= surf then
-							data[area:index(x, surf, z)] = bio.cids.cover[math.random(#bio.cids.cover)]
+							local ncid = bio.cids.cover[math.random(#bio.cids.cover)]
+							
+							for _,v in pairs(bio.cids.chance_cover) do
+								if 1 == math.random(v.chance) then
+									ncid = v.cid
+									break
+								end
+							end
+							
+							data[area:index(x, surf, z)] = ncid
 						end
 						
 						if y0 <= surf - 1 then
 							for y = surf-1, yd, -1 do
-								data[area:index(x, y, z)] = bio.cids.fill[math.random(#bio.cids.fill)]
+								local ncid = bio.cids.fill[math.random(#bio.cids.fill)]
+								
+								for _,v in pairs(bio.cids.chance_fill) do
+									if 1 == math.random(v.chance) then
+										ncid = v.cid
+										break
+									end
+								end
+							
+								data[area:index(x, y, z)] = ncid
 							end
 						end
 					end
@@ -683,6 +702,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 										if n <= deco.noise.threshold then
 											if 1 == math.random(deco.chance) then
 												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+												break -- no more decorations in this column
 											end
 										end
 										
@@ -690,6 +710,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 										if 1 == math.random(deco.chance) then
 											data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
 										end
+										break -- no more decorations in this column
 									end
 									
 								elseif deco.type == "density" then
@@ -706,6 +727,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 										if 1 == math.random(round(n)) then
 											if not deco.chance or 1 == math.random(deco.chance) then
 												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
+												break -- no more decorations in this column
 											end
 										end
 									end
@@ -714,8 +736,19 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					end
+				
+				else -- if ws < ground
 					
-				--end -- if ws < ground
+					if y0 <= surf and surf <= y1 then
+						data[area:index(x, surf, z)] = c_wetsand
+					end
+					
+					rock_surface[nixz] = surf - 1
+					if rock_surface[nixz] >= y0 then
+						chunk_has_underground = true
+					end
+				
+				end -- if ws < ground
 				
 			end
 		end

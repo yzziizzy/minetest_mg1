@@ -81,6 +81,29 @@ default.register_biome({
 	
 })
 
+default.register_biome({
+	name = "peat_bog",
+	description = "Peat Bog",
+	
+	y_min = -5,
+	y_max = 30,
+	y_rand = 1,
+	flatness = 100,
+	magic = 0,
+	heat = 10,
+	humidity = 100,
+	lat_center = 50,
+	
+	cover = {"default:peat"},
+	fill = {
+		{chance = 100, name = "default:peat_with_bog_iron"},
+		"default:peat",
+	},
+	fill_min = 3,
+	fill_max = 4,
+	
+})
+
 default.register_stone_biome({
 	name = "failsafe",
 	description = "Failsafe Stone Biome",

@@ -110,3 +110,25 @@ default.register_ore({
 	stone_biomes = "*",
 
 })
+
+--[[ not implemented
+default.register_surface_ore({
+	name = "bog_iron",
+	type = "random",
+	
+	y_min = -5,
+	y_max = 30,
+	lat_min = 0,
+	lat_max = 32000,
+	lat_abs = true,
+	
+	chance = 100,
+	
+	place_in = {
+		["default:peat"] = {"default:peat_with_bog_iron"},
+	},
+	
+	biomes = "peat_bog",
+})
+--]]
+

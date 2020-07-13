@@ -11,8 +11,8 @@ minetest.register_node("default:sand", {
 
 minetest.register_node("default:wet_sand", {
 	description = S("Sand"),
-	tiles = {"default_sand.png"},
-	groups = {crumbly = 2, falling_node = 1, sand = 1},
+	tiles = {"default_sand.png^[colorize:gray:20"},
+	groups = {crumbly = 2, falling_node = 1, wet_sand = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
@@ -40,7 +40,7 @@ minetest.register_node("default:dirt", {
 
 minetest.register_node("default:topsoil", {
 	description = "Topsoil",
-	tiles = {"default_dirt.png"},
+	tiles = {"default_dirt.png^[colorize:black:20"},
 	groups = {crumbly = 2, falling_node = 1, soil = 2},
 	sounds = default.node_sound_dirt_defaults(),
 })
@@ -71,7 +71,7 @@ default.register_water({
 minetest.register_node("default:wet_clay", {
 	description = S("Wet Clay"),
 	tiles = {"default_clay.png"},
-	groups = {crumbly = 3, falling_node = 1, },
+	groups = {crumbly = 3, falling_node = 1, wet_clay = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 minetest.register_node("default:dry_clay", {
@@ -187,3 +187,45 @@ for i = 0, 9 do
 		walk_speed = 1.2,
 	})
 end
+
+
+
+minetest.register_node("default:peat", {
+	description = S("Peat"),
+	tiles = {
+		"default_moss.png", 
+		"default_dirt.png",
+		{name = "default_dirt.png^default_moss_side.png", tileable_vertical = false}
+	},
+	groups = {crumbly = 1, },
+})
+
+
+minetest.register_node("default:iron_ore", {
+	description = S("Iron Ore"),
+	tiles = {
+		"default_iron_lump.png", 
+	},
+	groups = {crumbly = 1, },
+})
+
+
+minetest.register_node("default:peat_with_bog_iron", {
+	description = S("Peat with Bog Iron"),
+	tiles = {
+		"default_moss.png^default_iron_lump.png", 
+		"default_dirt.png",
+		{name = "default_dirt.png^default_moss_side.png", tileable_vertical = false}
+	},
+	drop = {
+		max_items = 2,
+		items = {
+			{items = {"default:peat"}},
+			{items = {"default:iron_ore"}},
+		},
+	},
+	groups = {crumbly = 1, },
+})
+
+
+

@@ -14,6 +14,7 @@ default = {
 	ores = {},
 	stone_biomes = {},
 	surface_decorations = {},
+	surface_ores = {}, -- NOT IMPLEMENTED
 }
 
 default.LIGHT_MAX = 14
@@ -69,35 +70,73 @@ minetest.register_on_mods_loaded(function()
 	for _,def in pairs(default.biomes) do
 		
 		def.surface_decos = {}
+		def.surface_ores = {}
 		
 -- 		print(dump(def))
 		def.cids = {
 			cover = {},
+			chance_cover = {},
 			fill = {},
+			chance_fill = {},
 		}
 		
 		for i,v in ipairs(def.cover) do
-			def.cids.cover[i] = minetest.get_content_id(v)
+			if type(v) == "string" then
+				table.insert(def.cids.cover, minetest.get_content_id(v))
+			else
+				def.cids.chance_cover[i] = {
+					chance = v.chance,
+					cid = minetest.get_content_id(v.name),
+				}
+			end
 		end
 		for i,v in ipairs(def.fill) do
-			def.cids.fill[i] = minetest.get_content_id(v)
+			if type(v) == "string" then
+				table.insert(def.cids.fill, minetest.get_content_id(v))
+			else
+				def.cids.chance_fill[i] = {
+					chance = v.chance,
+					cid = minetest.get_content_id(v.name),
+				}
+			end
 		end
+		
+		print(dump(def))
 		
 	end
 	
 	local def = default.failsafe_biome
 	def.surface_decos = {}
+	def.surface_ores = {} -- NOT IMPLEMENTED
 	def.cids = {
 		cover = {},
+		chance_cover = {},
 		fill = {},
+		chance_fill = {},
 	}
 	
 	for i,v in ipairs(def.cover) do
-		def.cids.cover[i] = minetest.get_content_id(v)
+		if type(v) == "string" then
+			table.insert(def.cids.cover, minetest.get_content_id(v))
+		else
+			def.cids.chance_cover[i] = {
+				chance = v.chance,
+				cid = minetest.get_content_id(v.name),
+			}
+		end
 	end
 	for i,v in ipairs(def.fill) do
-		def.cids.fill[i] = minetest.get_content_id(v)
+		if type(v) == "string" then
+			table.insert(def.cids.fill, minetest.get_content_id(v))
+		else
+			def.cids.chance_fill[i] = {
+				chance = v.chance,
+				cid = minetest.get_content_id(v.name),
+			}
+		end
 	end
+	
+	
 	
 	-- pre-process surface decorations
 	for k,deco in pairs(default.surface_decorations) do
@@ -123,6 +162,31 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 	
+	--[[ NOT IMPLEMENTED
+	-- pre-process surface ores
+	for k,ore in pairs(default.surface_ores) do
+		
+		-- cache content id's
+		ore.cids = {
+			place = {},
+		}
+		
+		for i,v in ipairs(ore.place) do
+			ore.cids.place[i] = minetest.get_content_id(v)
+		end
+		
+		-- NOT IMPLEMENTED
+		-- fill decorations into biomes
+		for _,biome_name in ipairs(ore.biomes) do
+			local bio = default.biomes[biome_name]
+			if not bio then
+				print("Unknown biome '"..biome_name.."' in surface ore '"..ore.name.."'.")
+			else
+				bio.surface_ores[ore.name] = ore
+			end
+		end
+	end
+	]]
 	
 	
 	--
@@ -278,6 +342,21 @@ default.register_surface_deco = function(def)
 end
 
 
+-- NOT IMPLEMENTED
+default.register_surface_ore = function(def)
+	
+	-- todo: fill in missing defaults
+	-- TODO: warnings for invalid data
+	
+	if def.noise then
+		def.noise.offset = 0.4
+		def.noise.scale = 0.4
+	end
+	
+	default.surface_ores[def.name] = def
+end
+
+
 
 default.register_ore = function(def)
 -- 	print("registering ore")
@@ -395,6 +474,8 @@ dofile(modpath.."/trees.lua")
 dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
 dofile(modpath.."/trees/fir.lua")
+
+dofile(modpath.."/casting.lua")
 
 --[[
 dofile(default_path.."/trees.lua")

@@ -33,7 +33,8 @@ native metals vs ores
 grades of coal
 sand, mud, clay, dirt, topsoil and composting
 swamps
-shades of grass
+random blob ores and decorations
+shades of grass - hardware?
 firewood
 grades of planks
 aspen (spread underground), birch, alder
@@ -41,6 +42,8 @@ oak, maple
 cypress
 spruce, pine (ponderosa and lodgepole), fir, cedar
 cottonwood by certain rivers
+magic ancient stone circles
+placer deposits in rivers
 
 firedamp in coal mines
 
@@ -88,34 +91,36 @@ minetest.register_node("default:mg_glass", {
 
 
 local stonedefs = {
-	{n="granite", d="Granite", t="i"}, --
-	{n="basalt", d="Basalt", t="i"}, --
-	{n="obsidian", d="Obsidian", t="i"}, --
-	{n="pumice", d="Pumice", t="i"}, --
+	-- hardness: higher is harder
+	-- n_ame, d_escription, t_ype, h_ardness 
+	{n="granite", d="Granite", t="i", h=3}, --
+	{n="basalt", d="Basalt", t="i", h=3}, --
+	{n="obsidian", d="Obsidian", t="i", h=4}, --
+	{n="pumice", d="Pumice", t="i", h=1}, --
 
-	{n="limestone", d="Limestone", t="s"}, --
-	{n="sandstone", d="Sandstone", t="s"}, --
-	{n="gypsum", d="Gypsum", t="s"}, --
-	{n="halite", d="Halite", t="s"}, --
-	{n="shale", d="Shale", t="s"}, --
-	{n="conglomerate", d="Conglomerate", t="s"}, --
-	{n="chalk", d="Chalk", t="s"}, --
-	{n="breccia", d="Breccia", t="s"}, --
-	{n="mudstone", d="Mudstone", t="s"}, --
+	{n="limestone", d="Limestone", t="s", h=2}, --
+	{n="sandstone", d="Sandstone", t="s", h=2}, --
+	{n="gypsum", d="Gypsum", t="s", h=1}, --
+	{n="halite", d="Halite", t="s", h=2}, --
+	{n="shale", d="Shale", t="s", h=2}, --
+	{n="conglomerate", d="Conglomerate", t="s", h=2}, --
+	{n="chalk", d="Chalk", t="s", h=1}, --
+	{n="breccia", d="Breccia", t="s", h=2}, --
+	{n="mudstone", d="Mudstone", t="s", h=2}, --
 	
-	{n="marble", d="Marble", t="m"}, --
-	{n="gneiss", d="Gneiss", t="m"}, --
-	{n="slate", d="Slate", t="m"}, --
-	{n="schist", d="Schist", t="m"}, --
-	{n="serpentine", d="Serpentine", t="m"}, --
+	{n="marble", d="Marble", t="m", h=3}, --
+	{n="gneiss", d="Gneiss", t="m", h=3}, --
+	{n="slate", d="Slate", t="m", h=4}, --
+	{n="schist", d="Schist", t="m", h=3}, --
+	{n="serpentine", d="Serpentine", t="m", h=3}, --
 	
 	-- fossil rocks
-	{n="lignite", d="Lignite", t="f"}, 
-	{n="bituminous_coal", d="Coal", t="f"},
-	{n="anthracite_coal", d="Anthracite Coal", t="f"},
-	{n="graphite", d="Graphite", t="f"}, 
-	{n="oil_shale", d="Oil Shale", t="f"},
-	{n="tar_sand", d="tar_sand", t="f"}, 
+	{n="lignite", d="Lignite", t="f", h=1}, 
+	{n="bituminous_coal", d="Coal", t="f", h=2},
+	{n="anthracite_coal", d="Anthracite Coal", t="f", h=3},
+	{n="graphite", d="Graphite", t="f", h=4}, 
+	{n="oil_shale", d="Oil Shale", t="f", h=2},
+	{n="tar_sand", d="tar_sand", t="f", h=1}, -- remove, not being stone?
 }
 
 local stone_types = {
@@ -124,6 +129,10 @@ local stone_types = {
 	["m"] = 3,
 	["f"] = 4,
 }
+
+local function mkbox(x,y,z, szx, szy, szz)
+	return {x, y, z, x+szx, y+szy, z+szz}
+end
 
 for i,def in pairs(stonedefs) do
 	minetest.register_node("default:"..def.n.."_cobble", {
@@ -143,10 +152,56 @@ for i,def in pairs(stonedefs) do
 		sounds = default.node_sound_stone_defaults(),
 	})
 	
+	-- pile of stones on the ground
+	minetest.register_node("default:"..def.n.."_stones", {
+		description = def.d .. " Stones",
+		tiles = {"default_"..def.n..".png"},
+		paramtype = "light",
+		drawtype = "nodebox",
+		node_box = {
+			type = "fixed",
+			fixed = {
+				mkbox(-0.3, -0.5, -0.3, 0.2, 0.1, 0.2),
+				mkbox(0.05, -0.5, 0.3, 0.1, 0.1, 0.1),
+				mkbox(-0.1, -0.5, -0.1, 0.2, 0.2, 0.2),
+				mkbox(0.2, -0.5, 0.1, 0.1, 0.1, 0.1),
+				mkbox(0.0, -0.5, 0.0, -0.3, 0.07, 0.3),
+				mkbox(0.3, -0.5, -0.3, 0.1, 0.05, 0.1),
+			},
+		},
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+		},
+		sunlight_propagates = true,
+		groups = {stones = 1, stone_type = stone_types[def.t], oddly_breakable_by_hand = 1},
+		sounds = default.node_sound_stone_defaults(),
+	})
+	
+	-- stone/cobble crafts
+	minetest.register_craft({
+		output = "default:"..def.n.."_stones 9",
+		type = "shapeless",
+		recipe = {"default:"..def.n.."_cobble"}
+	})
+	
+	minetest.register_craft({
+		output = "default:"..def.n.."_cobble",
+		recipe = {
+			{"default:"..def.n.."_stones", "default:"..def.n.."_stones", "default:"..def.n.."_stones"},
+			{"default:"..def.n.."_stones", "default:"..def.n.."_stones", "default:"..def.n.."_stones"},
+			{"default:"..def.n.."_stones", "default:"..def.n.."_stones", "default:"..def.n.."_stones"},
+		},
+	})
+	
+	
 	-- TODO: native metals in various rocks
 	-- TODO: mossy versions
 	-- TODO: gravels
-	
+	-- TODO: porous rocks that leak groundwater
+	-- TODO: drilling and blasting
+	-- TODO: quality glass production
+	-- TODO: stone hardness
 end
 
 

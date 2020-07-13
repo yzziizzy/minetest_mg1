@@ -85,8 +85,11 @@ function default.install_straight_trunk(pos, height, trunk_list, meta)
 	
 	for i = 1,height do
 		local p = {x=pos.x, y=pos.y+i, z=pos.z}
-		minetest.set_node(p, {name=trunk_list[math.random(#trunk_list)]})
-		table.insert(trunks, p)
+-- 		local n = minetest.get_node(p)
+-- 		if n.name == "air" then
+			minetest.set_node(p, {name=trunk_list[math.random(#trunk_list)]})
+			table.insert(trunks, p)
+-- 		end
 	end
 	
 	meta:set_string("trunks", minetest.serialize(trunks))
@@ -98,12 +101,16 @@ function default.install_tapered_trunk(pos, height, m, meta)
 	
 	for i = 1,height do
 		local p = {x=pos.x, y=pos.y+i, z=pos.z}
-		local name = m.trunk_list[math.random(#m.trunk_list)]
-		local taper = m.trunk.taper_min + math.floor((trange / i)) 
-		name = string.gsub(name, "#", taper)
-		
-		minetest.set_node(p, {name=name})
-		table.insert(trunks, p)
+-- 		local n = minetest.get_node(p)
+-- 		if n.name == "air" then
+			local name = m.trunk_list[math.random(#m.trunk_list)]
+			local a = (height - i) / height
+			local taper = m.trunk.taper_min + math.floor(trange * a + 0.6) 
+			name = string.gsub(name, "#", taper)
+			
+			minetest.set_node(p, {name=name})
+			table.insert(trunks, p)
+-- 		end
 	end
 	
 	meta:set_string("trunks", minetest.serialize(trunks))
@@ -116,28 +123,27 @@ function default.install_conifer_tree(pos, stage, meta, tree_def)
 	
 	default.clear_old_leaves(pos, meta)
 	local leaves = {} 
+
+	local function install_leaves(h, x, z)
+		local p = {x=pos.x+x, y=pos.y+h, z=pos.z+z}
+		local n = minetest.get_node(p)
+		if n.name == "air" then
+			minetest.set_node(p, {name=m.leaf_list[math.random(#m.leaf_list)]})
+			table.insert(leaves, p)
+		end
+	end
 	
 	local function install_leaf_tier(h, dist)
-		local dd = math.max(dist)
-		for x = -dd,dd do
-		for z = -dd,dd do
-			local d = math.sqrt(x*x + z*z)
-			if d < dist +  math.random() * m.boughs.rand then
-				local p = {x=pos.x+x, y=pos.y+h, z=pos.z+z}
-				local n = minetest.get_node(p)
-				if n.name == "air" then
-					minetest.set_node(p, {name=m.leaf_list[math.random(#m.leaf_list)]})
-					table.insert(leaves, p)
-				end
-			end
-		end
-		end
+		install_leaves(h, 0, 1)
+		install_leaves(h, 0, -1)
+		install_leaves(h, 1, 0)
+		install_leaves(h, -1, 0)
 	end
 	
 	local tree_height = m.trunk.min + math.random(m.trunk.max - m.trunk.min)
 	
 	for i = 0,m.boughs.num-1 do
-		install_leaf_tier(tree_height - i * 2, m.boughs.dist)
+		install_leaf_tier(tree_height - i, m.boughs.dist)
 	end
 	
 	
@@ -161,6 +167,41 @@ function default.install_blob_tree(pos, stage, meta, tree_def)
 	
 	local leaves = {}
 	
+	local vm = minetest.get_voxel_manip()
+	local minp, maxp = vm:read_from_map(
+		{x=pos.x-m.xrange, y=pos.y-m.ymin, z=pos.z-m.zrange,},
+		{x=pos.x+m.xrange, y=pos.y+m.ymax, z=pos.z+m.zrange,}
+	)
+	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
+	local data = vm:get_data()
+	local c_air = minetest.get_content_id("air")
+	
+	for x = -m.xrange,m.xrange do
+	for y = m.ymin,m.ymax do
+	for z = -m.zrange,m.zrange do
+		
+		local y2 = (y-m.yoff) / m.ysquash
+		local d = math.sqrt(x*x + z*z + y2*y2)
+-- 		if d  < (stage/2) +  math.random() then
+		if d  < m.dist +  math.random() * m.rand then
+			local p = {x=pos.x+x, y=pos.y+y, z=pos.z+z}
+			local vi = a:index(pos.x+x, pos.y+y, pos.z+z)
+			local n = data[vi]
+			if n == c_air then
+				data[vi] = minetest.get_content_id(m.leaf_list[math.random(#m.leaf_list)])
+-- 				minetest.set_node(p, {name=})
+				table.insert(leaves, p)
+			end
+		end
+	end
+	end
+	end
+	
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_map()
+	
+	--[[
 	for x = -m.xrange,m.xrange do
 	for y = m.ymin,m.ymax do
 	for z = -m.zrange,m.zrange do
@@ -178,7 +219,7 @@ function default.install_blob_tree(pos, stage, meta, tree_def)
 	end
 	end
 	end
-	
+	]]
 	
 	minetest.swap_node({x=pos.x, y=pos.y, z=pos.z}, {name=m.root_list[math.random(#m.root_list)]})
 	

@@ -23,7 +23,7 @@ local fir_growth_data = {
 	stages = {
 		[1] = {
 			trunk = { min = 2, max = 2, taper_min = 1, taper_max = 1 },
-			boughs = { dist = 1.6, dist_divisor = 1, num = 1, rand = 0, },
+			boughs = { dist = 1.6, dist_divisor = 1, num = 2, rand = 0, },
 			time = 10,
 			root_list = {"default:fir_tree_trunk_root_1"},
 			trunk_list = {"default:fir_tree_trunk_#"},
@@ -31,7 +31,7 @@ local fir_growth_data = {
 		},
 		[2] = {
 			trunk = { min = 3, max = 4, taper_min = 1, taper_max = 2 },
-			boughs = { dist = 1.6, dist_divisor = 1, num = 2, rand = 0, },
+			boughs = { dist = 1.6, dist_divisor = 1, num = 3, rand = 0, },
 			time = 15,
 			root_list = {"default:fir_tree_trunk_root_2"},
 			trunk_list = {"default:fir_tree_trunk_#"},
@@ -39,7 +39,7 @@ local fir_growth_data = {
 		},
 		[3] = {
 			trunk = { min = 5, max = 7, taper_min = 1, taper_max = 3 },
-			boughs = { dist = 2, dist_divisor = 1, num = 3, rand = 0, },
+			boughs = { dist = 2, dist_divisor = 1, num = 5, rand = 0, },
 			time = 10,
 			root_list = {"default:fir_tree_trunk_root_3"},
 			trunk_list = {"default:fir_tree_trunk_#"},
@@ -47,7 +47,7 @@ local fir_growth_data = {
 		},
 		[4] = {
 			trunk = { min = 7, max = 9, taper_min = 1, taper_max = 4 },
-			boughs = { dist = 2, dist_divisor = 1, num = 3, rand = 0, },
+			boughs = { dist = 2, dist_divisor = 1, num = 7, rand = 0, },
 			time = 15,
 			root_list = {"default:fir_tree_trunk_root_4"},
 			trunk_list = {"default:fir_tree_trunk_#"},
@@ -55,7 +55,7 @@ local fir_growth_data = {
 		},
 		[5] = {
 			trunk = { min = 9, max = 10, taper_min = 1, taper_max = 5 },
-			boughs = { dist = 2, dist_divisor = 1, num = 4, rand = 0, },
+			boughs = { dist = 2, dist_divisor = 1, num = 9, rand = 0, },
 			time = 10,
 			root_list = {"default:fir_tree_trunk_root_5"},
 			trunk_list = {"default:fir_tree_trunk_#"},
@@ -63,7 +63,7 @@ local fir_growth_data = {
 		},
 		[6] = {
 			trunk = { min = 10, max = 11, taper_min = 1, taper_max = 6 },
-			boughs = { dist = 2, dist_divisor = 1, num = 5, rand = 0, },
+			boughs = { dist = 2, dist_divisor = 1, num = 10, rand = 0, },
 			root_list = {"default:fir_tree_trunk_root_6"},
 			trunk_list = {"default:fir_tree_trunk_#"},
 			leaf_list = {"default:fir_leaves_1","default:fir_leaves_2","default:fir_leaves_3",},
@@ -73,17 +73,11 @@ local fir_growth_data = {
 
 
 
-minetest.register_craftitem("default:fir_stick", {
-	description = S("Fir Stick"),
-	inventory_image = "default_stick.png^[colorize:brown:40",
-	groups = {stick = 1, flammable = 2},
-})
-
 
 
 default.register_tree_trunks("default", fir_growth_data)
 
-
+--[[
 for i = 1,3 do
 	minetest.register_node("default:fir_leaves_"..i, {
 		description = "Fir Needles",
@@ -96,7 +90,7 @@ for i = 1,3 do
 		sounds = default.node_sound_leaves_defaults(),
 	})
 end
-
+]]
 
 
 minetest.register_node("default:mg_rand_fir_sapling", {
@@ -135,3 +129,74 @@ minetest.register_node("default:mg_rand_fir_sapling", {
 	]]
 })
 
+local function boxrot(def, n)
+	local t = {}
+	for _,q in ipairs(def) do
+		if n == "right" then
+			table.insert(t, {q[1], q[2], q[3], q[4], q[5], q[6]})
+		elseif n == "left" then
+			table.insert(t, {-q[1], q[2], q[3], -q[4], q[5], q[6]})
+		elseif n == "back" then
+			table.insert(t, {q[3], q[2], q[1], q[6], q[5], q[4]})
+		elseif n == "front" then
+			table.insert(t, {q[3], q[2], -q[1], q[6], q[5], -q[4]})
+		end
+	end
+	
+	return t
+end
+
+local function box_extdim(def, n, amt)
+	local t = {}
+	local w = {0,0,0,0,0,0}
+	w[n] = 1
+	for _,q in ipairs(def) do
+		table.insert(t, {q[1]+n[1]*amt, q[2]+n[2]*amt, q[3]+n[3]*amt, q[4]+n[4]*amt, q[5]+n[5]*amt, q[6]+n[6]*amt})
+	end
+	
+	return t
+end
+
+
+
+local needle_boxen = {
+	{-0.45, -0.2, -0.75, 0.3, 0.1, 0.75}, -- base
+	{-0.6, -0.2, -0.4, 0.3, -0.0, 0.4}, -- base 2
+	{-0.05, -0.2, -0.95, 0.35, -0.0, 0.4}, -- base 3
+	{-0.3,  0.1, -0.5, 0.8, 0.25, 0.5}, -- lvl 1
+	{ 0.1,  0.25, -0.3, 1.0, 0.35, 0.3}, -- lvl 2
+	{ 0.3,  0.35, -0.2, 1.0, 0.45, 0.2}, -- lvl 3
+	{ 0.4,  0.45, -0.15, 1.0, 0.499,  0.15}, -- lvl 4
+}
+
+for i = 1,3 do
+	minetest.register_node("default:fir_leaves_"..i, {
+		description = "Fir Needles",
+		tiles = {"default_pine_needles.png^[colorize:green:"..((i-1)*10)},
+		paramtype = "light",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "connected",
+			disconnected = {
+				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+			},
+			connect_left = boxrot(needle_boxen, "left"),
+			connect_right = boxrot(needle_boxen, "right"),
+			connect_front = boxrot(needle_boxen, "front"),
+			connect_back = boxrot(needle_boxen, "back"),
+		},
+		collision_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.2, -0.5, 0.5, 0.3, 0.5},
+		},
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.2, -0.5, 0.5, 0.3, 0.5},
+		},
+		connects_to = {"group:tree_trunk"},
+		sunlight_propagates = true,
+		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1},
+		sounds = default.node_sound_wood_defaults(),
+	})
+end

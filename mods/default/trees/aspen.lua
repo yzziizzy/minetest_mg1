@@ -25,7 +25,7 @@ local aspen_growth_data = {
 	},
 	stages = {
 		[1] = {
-			ymin = 1, ymax=2, ysquash = 3, yoff = 2,
+			ymin = 1, ymax=3, ysquash = 3, yoff = 2,
 			xrange = 1, zrange = 1,
 			rand = .2,
 			dist = 1.1,
@@ -35,7 +35,7 @@ local aspen_growth_data = {
 			leaf_list = {"default:aspen_leaves_1","default:aspen_leaves_2","default:aspen_leaves_3",},
 		},
 		[2] = {
-			ymin = 2, ymax=4, ysquash = 3, yoff = 2,
+			ymin = 2, ymax=5, ysquash = 3, yoff = 2,
 			xrange = 2, zrange = 2,
 			rand = .6,
 			dist = 1.2,
@@ -45,7 +45,7 @@ local aspen_growth_data = {
 			leaf_list = {"default:aspen_leaves_1","default:aspen_leaves_2","default:aspen_leaves_3",},
 		},
 		[3] = {
-			ymin = 3, ymax=6, ysquash = 3, yoff = 3,
+			ymin = 3, ymax=7, ysquash = 3, yoff = 3,
 			xrange = 3, zrange = 3,
 			rand = 1,
 			dist = 1.6,
@@ -55,7 +55,7 @@ local aspen_growth_data = {
 			leaf_list = {"default:aspen_leaves_1","default:aspen_leaves_2","default:aspen_leaves_3",},
 		},
 		[4] = {
-			ymin = 3, ymax=7, ysquash = 3, yoff = 3,
+			ymin = 3, ymax=8, ysquash = 3, yoff = 3,
 			xrange = 3, zrange = 3,
 			rand = 1,
 			dist = 1.9,
@@ -65,7 +65,7 @@ local aspen_growth_data = {
 			leaf_list = {"default:aspen_leaves_1","default:aspen_leaves_2","default:aspen_leaves_3",},
 		},
 		[5] = {
-			ymin = 4, ymax = 8, ysquash = 3, yoff = 4,
+			ymin = 4, ymax = 9, ysquash = 3, yoff = 4,
 			xrange = 4, zrange = 4,
 			rand = 1,
 			dist = 2.1,
@@ -75,7 +75,7 @@ local aspen_growth_data = {
 			leaf_list = {"default:aspen_leaves_1","default:aspen_leaves_2","default:aspen_leaves_3",},
 		},
 		[6] = {
-			ymin = 5, ymax = 10, ysquash = 3, yoff = 5,
+			ymin = 5, ymax = 11, ysquash = 3, yoff = 5,
 			xrange = 4, zrange = 4,
 			rand = 1.1,
 			dist = 2.5,
