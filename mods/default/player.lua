@@ -3,6 +3,14 @@ default.players = {}
 default.player_objs = {}
 
 
+local function clamp(l, x, h)
+	return math.min(h, math.max(x, l))
+end
+
+local function nclamp(x)
+	return math.min(1, math.max(x, 0))
+end
+
 -- thaw out the player data storage
 local mod_storage = minetest.get_mod_storage()
 
@@ -16,14 +24,92 @@ if not default.players then
 end
 
 
-local function set_bar_pct(player, bar_name, pct)
+
+function default.hide_bar(player, bar_name)
 	local obj = default.player_objs[player:get_player_name()]
 	if obj then
 		local bar = obj.ui[bar_name]
-		if bar.orient == "h" then
-			player:hud_change(bar.bar, "scale", {x = pct, y = 1})
+		
+		if not bar.shown then
+			return
+		end
+		
+		local def = bar.def
+		
+		player:hud_remove(bar.bar)
+		player:hud_remove(bar.border)
+		
+		bar.bar = nil
+		bar.border = nil
+		bar.shown = false
+	end
+end
+
+
+function default.show_bar(player, bar_name)
+	local obj = default.player_objs[player:get_player_name()]
+	if obj then
+		local bar = obj.ui[bar_name]
+		
+		if bar.shown then
+			return
+		end
+		
+		local def = bar.def
+		
+		if def.orient and def.orient == "v" then
+			bar.bar = player:hud_add({
+				hud_elem_type = "image",
+				position  = def.pos,
+				offset    = def.off,
+				text      = def.image,
+				scale     = { x = 1, y = bar.pct},
+				alignment = def.align,
+			})
+			bar.border = player:hud_add({
+				hud_elem_type = "image",
+				position  = def.pos,
+				offset    = def.off,
+				text      = "default_manna_border.png",
+				scale     = { x = 1, y = 1 },
+				alignment = def.align
+			})
 		else
-			player:hud_change(bar.bar, "scale", {x = 1, y = pct})
+			bar.bar = player:hud_add({
+				hud_elem_type = "image",
+				position  = def.pos,
+				offset    = def.off,
+				text      = def.image,
+				scale     = { x = bar.pct, y = 1},
+				alignment = def.align,
+			})
+			bar.border = player:hud_add({
+				hud_elem_type = "image",
+				position  = def.pos,
+				offset    = def.off,
+				text      = "default_hp_border.png",
+				scale     = { x = 1, y = 1 },
+				alignment = def.align
+			})
+		end
+		
+		bar.shown = true
+	end
+end
+
+function default.set_bar_pct(player, bar_name, pct)
+	local obj = default.player_objs[player:get_player_name()]
+	if obj then
+		local bar = obj.ui[bar_name]
+		
+		bar.pct = pct
+		
+		if bar.shown then
+			if bar.orient == "h" then
+				player:hud_change(bar.bar, "scale", {x = pct, y = 1})
+			else
+				player:hud_change(bar.bar, "scale", {x = 1, y = pct})
+			end
 		end
 	end
 end
@@ -40,12 +126,12 @@ minetest.register_playerevent(function(player, event)
 	if event == "health_changed" then
 		local hp = player:get_hp()
 		local max = player:get_properties().hp_max
-		set_bar_pct(player, "hp", hp / max)
+		default.set_bar_pct(player, "hp", hp / max)
 		
 	elseif event == "breath_changed" then
 		local br = player:get_breath()
 		local max = player:get_properties().breath_max
-		set_bar_pct(player, "breath", br / max)
+		default.set_bar_pct(player, "breath", br / max)
 		
 	elseif event == "hud_changed" then
 		print("hud changed event")
@@ -56,49 +142,17 @@ end)
 local function create_bar(player, def)
 	local bar, border
 	
-	if def.orient and def.orient == "v" then
-		bar = player:hud_add({
-			hud_elem_type = "image",
-			position  = def.pos,
-			offset    = def.off,
-			text      = def.image,
-			scale     = { x = 1, y = def.pct},
-			alignment = def.align,
-		})
-		border = player:hud_add({
-			hud_elem_type = "image",
-			position  = def.pos,
-			offset    = def.off,
-			text      = "default_manna_border.png",
-			scale     = { x = 1, y = 1 },
-			alignment = def.align
-		})
-	
-	else
-		bar = player:hud_add({
-			hud_elem_type = "image",
-			position  = def.pos,
-			offset    = def.off,
-			text      = def.image,
-			scale     = { x = def.pct, y = 1},
-			alignment = def.align,
-		})
-		border = player:hud_add({
-			hud_elem_type = "image",
-			position  = def.pos,
-			offset    = def.off,
-			text      = "default_hp_border.png",
-			scale     = { x = 1, y = 1 },
-			alignment = def.align
-		})
-	end
-	
 	local obj = default.player_objs[player:get_player_name()]
 	obj.ui[def.name] = {
 		orient = def.orient or "h",
-		bar = bar,
-		border = border,
+		bar = nil,
+		border = nil,
+		shown = false,
+		pct = def.pct,
+		def = def,
 	}
+	
+	default.show_bar(player, def.name)
 	
 	return obj.ui[def.name]
 end
@@ -131,6 +185,15 @@ minetest.register_on_joinplayer(function(player)
 			
 			max_breath = player:get_properties().breath_max,
 			max_hp = player:get_properties().hp_max,
+			
+			overheat_temp = 46,
+			freeze_temp = -10,
+			comfy_temp = 27,
+			bar_limit_ratio = 0.6667,
+			
+			-- per ten seconds 
+			freeze_damage_per_degree = 0.1,
+			heat_damage_per_degree = 1,
 		}
 		
 		default.players[name] = info
@@ -185,6 +248,15 @@ minetest.register_on_joinplayer(function(player)
 		align = { x = 1, y = 0 },
 		pct = info.coldness / info.max_coldness,
 	})
+	create_bar(player, {
+		name = "heat",
+		pos   = {x = 0.5, y = 1},
+		off   = {x = 0-64, y = -115},
+		image = "default_heat_bar.png",
+		align = { x = 1, y = 0 },
+		pct = 0,
+	})
+	default.hide_bar(player, "heat")
 
 	create_bar(player, {
 		name = "breath",
@@ -215,11 +287,11 @@ end
 
 function default.use_stamina(player, info, amt)
 	info.stamina = math.min(math.max(0, info.stamina - amt), info.max_stamina)
-	set_bar_pct(player, "stamina", info.stamina / info.max_stamina)
+	default.set_bar_pct(player, "stamina", info.stamina / info.max_stamina)
 end
 function default.add_stamina(player, info, amt)
 	info.stamina = math.min(math.max(0, info.stamina + amt), info.max_stamina)
-	set_bar_pct(player, "stamina", info.stamina / info.max_stamina)
+	default.set_bar_pct(player, "stamina", info.stamina / info.max_stamina)
 end
 
 
@@ -311,9 +383,31 @@ local function check_cold(player)
 	local pos = player:get_pos()
 	
 	local t = default.get_temp(pos)
+	info.temp = t
 	
-	-- TODO cold/heat damage
--- 	print("temp: "..t)
+	if t >= info.comfy_temp then -- 80F
+		-- show heat bar
+		local range = info.overheat_temp - info.comfy_temp
+		local blevel = nclamp((t - info.comfy_temp) / range)
+		default.hide_bar(player, "cold")
+		default.show_bar(player, "heat")
+		default.set_bar_pct(player, "heat", blevel)
+	else 
+		-- show cold bar
+		local range = info.comfy_temp - info.freeze_temp
+		local blevel = nclamp((info.comfy_temp - t) / range)
+		default.hide_bar(player, "heat")
+		default.show_bar(player, "cold")
+		default.set_bar_pct(player, "cold", blevel)
+	end
+	
+	if t < info.freeze_temp then
+		-- cold damage
+		player:set_hp(player:get_hp() - (info.freeze_damage_per_degree * math.abs(info.freeze_temp - t)))
+	elseif t > info.overheat_temp then
+		-- heat damage
+		player:set_hp(player:get_hp() - (info.heat_damage_per_degree * math.abs(t - info.overheat_temp)))
+	end
 end
 
 local function cold_update()
