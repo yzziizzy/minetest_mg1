@@ -206,11 +206,14 @@ local get_season_data = function()
 	return season, snorm, sign
 end
 
+function default.get_timeofyear()
+	local t = minetest.get_gametime()
+	return ((t + (SEASONS_YEARLEN / 3)) % SEASONS_YEARLEN) / SEASONS_YEARLEN
+end
 
 local get_season = function()
 	local season, time
-	local t = minetest.get_gametime()
-	local s = ((t + (SEASONS_YEARLEN / 3)) % SEASONS_YEARLEN) / SEASONS_YEARLEN
+	local s = default.get_timeofyear()
 	
 	if between(s, 0, .2) then 
 		season = "spring"

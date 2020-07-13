@@ -297,6 +297,35 @@ end
 if not minetest.settings:get_bool("creative_mode") then
 	minetest.after(.25, run_update)
 end
+
+
+
+--
+-- coldness
+--
+
+local function check_cold(player)
+	local pname = player:get_player_name()
+	local info = default.players[pname]
+	
+	local pos = player:get_pos()
+	
+	local t = default.get_temp(pos)
+	
+	-- TODO cold/heat damage
+-- 	print("temp: "..t)
+end
+
+local function cold_update()
+	for _, player in ipairs(minetest.get_connected_players()) do
+		check_cold(player)
+	end
+	minetest.after(10, cold_update)
+end
+
+-- if not minetest.settings:get_bool("creative_mode") then
+	minetest.after(10, cold_update)
+-- end
 --
 -- manna code
 --
