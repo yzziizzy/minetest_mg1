@@ -17,6 +17,15 @@ default = {
 	stone_biomes = {},
 	surface_decorations = {},
 	surface_ores = {}, -- NOT IMPLEMENTED
+	
+	cold = { -- all in degrees C
+		base_temp = 10,
+		lat_variation = 80,
+		day_variation = 15,
+		season_variation = 20,
+		deg_per_meter = 0.1,
+		max_elev = 300,
+	},
 }
 
 default.LIGHT_MAX = 14
@@ -62,7 +71,6 @@ default.gui_survival_form = "size[8,8.5]"..
 
 -- Load files
 local modpath = minetest.get_modpath("default")
-
 
 
 
@@ -241,6 +249,32 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 end)
+
+
+function default.get_elev_temp_factor(y)
+	local y2 = math.max(0, math.min(pos.y, default.cold.max_elev))
+	return -(y2 * default.cold.deg_per_meter)
+end
+
+
+function default.get_temp(pos)
+	local y = math.max(0, math.min(pos.y, default.cold.max_elev))
+	local elev_factor = -(y * default.cold.deg_per_meter)
+	
+	local lat = math.abs(pos.z)
+	local lat_factor = (math.cos((math.pi / 31000) * lat) - 1) * 0.5 * default.cold.lat_variation
+	
+	local time = minetest.get_timeofday()
+	local day_factor = math.sin(math.pi * time) * default.cold.day_variation
+	
+	local season_factor = math.sin(math.pi * default.get_timeofyear()) * default.cold.season_variation
+-- 	print("  ")
+-- 	print("  day factor: ".. day_factor)
+-- 	print("  ele factor: ".. elev_factor)
+-- 	print("  lat factor: ".. lat_factor)
+-- 	print("  sea factor: ".. season_factor)
+	return default.cold.base_temp + elev_factor + lat_factor + day_factor + season_factor
+end
 
 
 default.register_biome = function(def)

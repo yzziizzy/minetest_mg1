@@ -150,7 +150,7 @@ local np_river2 = {
 
 local np_heat = {
 	offset = 0,
-	scale = 30,
+	scale = 10,
 	spread = {x=500, y=500, z=500},
 	seed = 76783,
 	octaves = 3,
@@ -333,17 +333,19 @@ end
 
 
 local function calc_heat(y, lat, nval)
-	local h_equator = 50
-	local y_rate = 1
--- 	local y_min = 50
-	local y_max = 150
+
+	local y2 = math.max(0, math.min(y, default.cold.max_elev))
+	local elev_factor = -(y2 * default.cold.deg_per_meter)
 	
-	-- 1 at lat = 0, 0 at lat = 32000
-	local lat_factor = math.cos(6.283185 * (math.abs(lat) / 32000))
+	local alat = math.abs(lat)
+	local lat_factor = (math.cos((math.pi / 31000) * alat) - 1) * 0.5 * default.cold.lat_variation
 	
-	local alt_factor = (1 - (clamp(0, y, y_max) / y_max)) * y_rate
-	
-	return nval - alt_factor + (lat_factor * h_equator)
+	return default.cold.base_temp + 
+		elev_factor + 
+		lat_factor + 
+		nval +
+		(default.cold.day_variation / 2) +
+		(default.cold.season_variation / 2)
 end
 
 
@@ -703,7 +705,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									local n = noise_cache[deco.name][nixz]
 		-- 							
 									if n > 0 then
-										if 1 == math.random(round(n)) then
+										if 1 == math.random(math.abs(round(n))) then
 											if not deco.chance or 1 == math.random(deco.chance) then
 												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
 												break -- no more decorations in this column
