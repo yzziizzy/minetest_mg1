@@ -523,6 +523,7 @@ dofile(modpath.."/trees.lua")
 dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
 dofile(modpath.."/trees/fir.lua")
+dofile(modpath.."/trees/larch.lua")
 
 dofile(modpath.."/casting.lua")
 

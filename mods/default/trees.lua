@@ -128,26 +128,35 @@ function default.install_conifer_tree(pos, stage, meta, tree_def)
 	default.clear_old_leaves(pos, meta)
 	local leaves = {} 
 
-	local function install_leaves(h, x, z)
+	local function install_leaves(h, x, z, leaf_sz)
 		local p = {x=pos.x+x, y=pos.y+h, z=pos.z+z}
 		local n = minetest.get_node(p)
 		if n.name == "air" then
-			minetest.set_node(p, {name=m.leaf_list[math.random(#m.leaf_list)]})
+		
+			local name = m.leaf_list[math.random(#m.leaf_list)]
+			name = string.gsub(name, "#", leaf_sz)
+		
+			minetest.set_node(p, {name=name})
 			table.insert(leaves, p)
 		end
 	end
 	
-	local function install_leaf_tier(h, dist)
-		install_leaves(h, 0, 1)
-		install_leaves(h, 0, -1)
-		install_leaves(h, 1, 0)
-		install_leaves(h, -1, 0)
+	local function install_leaf_tier(h, dist, leaf_sz)
+		install_leaves(h, 0, 1, leaf_sz)
+		install_leaves(h, 0, -1, leaf_sz)
+		install_leaves(h, 1, 0, leaf_sz)
+		install_leaves(h, -1, 0, leaf_sz)
 	end
+	
 	
 	local tree_height = m.trunk.min + math.random(m.trunk.max - m.trunk.min)
 	
+	local trange = m.trunk.taper_max - m.trunk.taper_min
 	for i = 0,m.boughs.num-1 do
-		install_leaf_tier(tree_height - i, m.boughs.dist)
+		local a = (i) / tree_height
+		local taper = m.trunk.taper_min + math.floor(trange * a + 0.6) 
+	
+		install_leaf_tier(tree_height - i, m.boughs.dist, taper)
 	end
 	
 	
@@ -322,9 +331,11 @@ function default.register_tree_trunks(mod, growth_data)
 	local stick_base = base.."stick"
 	local firewood_base = base.."firewood"
 	
+	local thick = growth_data.trunk_thickness or 1
+	
 	for sz_ = 1,growth_data.trunk_sizes do
 		local sz = sz_
-		local q = sz * 1
+		local q = sz * thick
 		minetest.register_node(root_base..sz, {
 			description = growth_data.Name.." Tree Root",
 			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},

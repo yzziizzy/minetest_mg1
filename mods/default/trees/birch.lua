@@ -18,7 +18,7 @@ local birch_growth_data = {
 		sapling = 10,
 		rand = 2,
 		fruiting = 1,
-		tree_growth = 10,
+		tree_growth = 60*60*0.25,
 	},
 	stages = {
 		[1] = {

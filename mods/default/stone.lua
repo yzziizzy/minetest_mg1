@@ -35,7 +35,6 @@ sand, mud, clay, dirt, topsoil and composting
 swamps
 random blob ores and decorations
 shades of grass - hardware?
-firewood
 grades of planks
 aspen (spread underground), birch, alder
 oak, maple

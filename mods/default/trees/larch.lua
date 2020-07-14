@@ -2,17 +2,17 @@
 local S = default.get_translator
 
 
-local fir_growth_data = {
+local larch_growth_data = {
 	type = "conifer",
-	name = "fir",
-	Name = "Fir",
+	name = "larch",
+	Name = "Larch",
 	trunk_sizes = 6,
 	trunk_thickness = .6,
 	tiles = {
-		side = "default_pine_tree.png",
-		top = "default_pine_tree_top.png",
-		wood = "default_pine_wood.png",
-		stick = "default_pine_tree.png",
+		side = "default_pine_tree.png^[colorize:black:30",
+		top = "default_pine_tree_top.png^[colorize:brown:30",
+		wood = "default_pine_wood.png^[colorize:brown:30",
+		stick = "default_pine_tree.png^[colorize:brown:30",
 	},
 	speed = {
 		retry = 30,
@@ -26,48 +26,48 @@ local fir_growth_data = {
 			trunk = { min = 2, max = 2, taper_min = 1, taper_max = 1 },
 			boughs = { dist = 1.6, dist_divisor = 1, num = 2, rand = 0, },
 			time = 10,
-			root_list = {"default:fir_tree_trunk_root_1"},
-			trunk_list = {"default:fir_tree_trunk_#"},
-			leaf_list = {"default:fir_leaves_#"},
+			root_list = {"default:larch_tree_trunk_root_1"},
+			trunk_list = {"default:larch_tree_trunk_#"},
+			leaf_list = {"default:larch_leaves_#"},
 		},
 		[2] = {
 			trunk = { min = 3, max = 4, taper_min = 1, taper_max = 2 },
 			boughs = { dist = 1.6, dist_divisor = 1, num = 3, rand = 0, },
 			time = 15,
-			root_list = {"default:fir_tree_trunk_root_2"},
-			trunk_list = {"default:fir_tree_trunk_#"},
-			leaf_list = {"default:fir_leaves_#"},
+			root_list = {"default:larch_tree_trunk_root_2"},
+			trunk_list = {"default:larch_tree_trunk_#"},
+			leaf_list = {"default:larch_leaves_#"},
 		},
 		[3] = {
 			trunk = { min = 5, max = 7, taper_min = 1, taper_max = 3 },
 			boughs = { dist = 2, dist_divisor = 1, num = 5, rand = 0, },
 			time = 10,
-			root_list = {"default:fir_tree_trunk_root_3"},
-			trunk_list = {"default:fir_tree_trunk_#"},
-			leaf_list = {"default:fir_leaves_#"},
+			root_list = {"default:larch_tree_trunk_root_3"},
+			trunk_list = {"default:larch_tree_trunk_#"},
+			leaf_list = {"default:larch_leaves_#"},
 		},
 		[4] = {
 			trunk = { min = 7, max = 9, taper_min = 1, taper_max = 4 },
 			boughs = { dist = 2, dist_divisor = 1, num = 7, rand = 0, },
 			time = 15,
-			root_list = {"default:fir_tree_trunk_root_4"},
-			trunk_list = {"default:fir_tree_trunk_#"},
-			leaf_list = {"default:fir_leaves_#"},
+			root_list = {"default:larch_tree_trunk_root_4"},
+			trunk_list = {"default:larch_tree_trunk_#"},
+			leaf_list = {"default:larch_leaves_#"},
 		},
 		[5] = {
 			trunk = { min = 9, max = 10, taper_min = 1, taper_max = 5 },
 			boughs = { dist = 2, dist_divisor = 1, num = 9, rand = 0, },
 			time = 10,
-			root_list = {"default:fir_tree_trunk_root_5"},
-			trunk_list = {"default:fir_tree_trunk_#"},
-			leaf_list = {"default:fir_leaves_#"},
+			root_list = {"default:larch_tree_trunk_root_5"},
+			trunk_list = {"default:larch_tree_trunk_#"},
+			leaf_list = {"default:larch_leaves_#"},
 		},
 		[6] = {
 			trunk = { min = 10, max = 11, taper_min = 1, taper_max = 6 },
 			boughs = { dist = 2, dist_divisor = 1, num = 10, rand = 0, },
-			root_list = {"default:fir_tree_trunk_root_6"},
-			trunk_list = {"default:fir_tree_trunk_#"},
-			leaf_list = {"default:fir_leaves_#"},
+			root_list = {"default:larch_tree_trunk_root_6"},
+			trunk_list = {"default:larch_tree_trunk_#"},
+			leaf_list = {"default:larch_leaves_#"},
 		},
 	}
 }
@@ -76,12 +76,12 @@ local fir_growth_data = {
 
 
 
-default.register_tree_trunks("default", fir_growth_data)
+default.register_tree_trunks("default", larch_growth_data)
 
 --[[
 for i = 1,3 do
-	minetest.register_node("default:fir_leaves_"..i, {
-		description = "Fir Needles",
+	minetest.register_node("default:larch_leaves_"..i, {
+		description = "Larch Needles",
 		drawtype = "allfaces_optional",
 		tiles = {"default_pine_needles.png^[colorize:green:"..((i-1)*10)},
 		waving = 1,
@@ -94,12 +94,12 @@ end
 ]]
 
 
-minetest.register_node("default:mg_rand_fir_sapling", {
-	description = "Fir Tree Sapling",
+minetest.register_node("default:mg_rand_larch_sapling", {
+	description = "Larch Tree Sapling",
 	drawtype = "plantlike",
-	tiles = {"default_pine_sapling.png"},
-	inventory_image = "default_pine_sapling.png",
-	wield_image = "default_pine_sapling.png",
+	tiles = {"default_pine_sapling.png^[colorize:brown:30"},
+	inventory_image = "default_pine_sapling.png^[colorize:brown:30",
+	wield_image = "default_pine_sapling.png^[colorize:brown:30",
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
@@ -108,7 +108,7 @@ minetest.register_node("default:mg_rand_fir_sapling", {
 		fixed = {-3 / 16, -0.5, -3 / 16, 3 / 16, 0.5, 3 / 16}
 	},
 	
-	tree_def = fir_growth_data,
+	tree_def = larch_growth_data,
 	
 	groups = {snappy = 2, dig_immediate = 3, flammable = 3, mg_rand_blob_sapling = 1,
 		attached_node = 1, sapling = 1},
@@ -116,7 +116,7 @@ minetest.register_node("default:mg_rand_fir_sapling", {
 	--[[
 	on_place = function(itemstack, placer, pointed_thing)
 		
-		minetest.set_node(pointed_thing.above, {name="default:fir_sapling", param2 = 0})
+		minetest.set_node(pointed_thing.above, {name="default:larch_sapling", param2 = 0})
 		local timer = minetest.get_node_timer(pointed_thing.above)
 		timer:start(orange_speed.sapling + gr())
 		
@@ -162,35 +162,6 @@ local function box_shell(def)
 	return w
 end
 
-local function box_extdim(def, n, amt)
-	local t = {}
-	local w = {0,0,0,0,0,0}
-	local t = {1,1,1,-1,-1,-1}
-	w[n] = 1
-	local o = ((n + 2) % 6) + 1
-	
-	local max = 0
-	for _,q in ipairs(def) do
-		max = math.max(max, math.abs(q[o]))
-	end
-	
-	print("foo: "..n.." "..o.." "..max)
-	
-	for _,q in ipairs(def) do
-		table.insert(t, {
-			q[1]+(w[1]*((q[1]+t[1])*amt - t[1])), 
-			q[2]+(w[2]*((q[2]+t[2])*amt - t[2])), 
-			q[3]+(w[3]*((q[3]+t[3])*amt - t[3])), 
-			q[4]+(w[4]*((q[4]+t[4])*amt - t[4])), 
-			q[5]+(w[5]*((q[5]+t[5])*amt - t[5])), 
-			q[6]+(w[6]*((q[6]+t[6])*amt - t[6])), 
-		})
-	end
-	
-	return t
-end
-
-
 
 local needle_boxen = {
 	{ -- 1
@@ -233,11 +204,25 @@ local needle_boxen = {
 }
 
 for sz = 1,6 do
-	minetest.register_node("default:fir_leaves_"..sz, {
-		description = "Fir Needles",
+	default.register_node_seasons("default:larch_leaves_"..sz, {
+		description = "Larch Needles",
 		tiles = {"default_pine_needles.png"},
 		paramtype = "light",
 		drawtype = "nodebox",
+		
+		spring = {
+			tiles = {"default_larch_needles_spring.png"},
+		},
+		summer = {
+			tiles = {"default_larch_needles_summer.png"},
+		},
+		fall = {
+			tiles = {"default_larch_needles_fall.png"},
+		},
+		winter = {
+			tiles = {"default_larch_needles_winter.png"},
+			drop = "default:larch_stick"
+		},
 		
 		node_box = {
 			type = "connected",
