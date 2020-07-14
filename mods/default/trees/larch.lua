@@ -110,7 +110,7 @@ minetest.register_node("default:mg_rand_larch_sapling", {
 	
 	tree_def = larch_growth_data,
 	
-	groups = {snappy = 2, dig_immediate = 3, flammable = 3, mg_rand_blob_sapling = 1,
+	groups = {snappy = 2, dig_immediate = 3, flammable = 3, mg_rand_sapling = 1,
 		attached_node = 1, sapling = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	--[[
@@ -145,6 +145,36 @@ local function boxrot(def, n)
 	end
 	
 	return t
+end
+
+local function boxrotdim(def, dim)
+	local t = {}
+	for _,q in ipairs(def) do
+		if dim.x == 1 then
+			table.insert(t, {q[2], q[4], q[3], q[5], q[1], q[6]})
+		elseif dim.x == -1 then
+			table.insert(t, {-q[1], q[2], q[3], -q[4], q[5], q[6]})
+		elseif dim.z == 1 then
+			table.insert(t, {q[2], q[4], q[3], q[5], q[1], q[6]})
+		elseif dim.z == -1 then
+			table.insert(t, {q[3], q[2], -q[1], q[6], q[5], -q[4]})
+		end
+	end
+	
+	return t
+end
+
+local function boxtrans(def, amt)
+	for _,q in ipairs(def) do
+		q[1] = q[1] + amt.x
+		q[2] = q[2] + amt.y
+		q[3] = q[3] + amt.z
+		q[4] = q[4] + amt.x
+		q[5] = q[5] + amt.y
+		q[6] = q[6] + amt.z
+	end
+	
+	return def
 end
 
 local function box_shell(def)
@@ -204,6 +234,9 @@ local needle_boxen = {
 }
 
 for sz = 1,6 do
+	
+	local sh = -0.5 + (sz * larch_growth_data.trunk_thickness / 16) 
+	
 	default.register_node_seasons("default:larch_leaves_"..sz, {
 		description = "Larch Needles",
 		tiles = {"default_pine_needles.png"},
@@ -226,13 +259,12 @@ for sz = 1,6 do
 		
 		node_box = {
 			type = "connected",
-			disconnected = {
-				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
-			},
+			disconnected = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 			connect_left = boxrot(needle_boxen[sz], "left"),
 			connect_right = boxrot(needle_boxen[sz], "right"),
 			connect_front = boxrot(needle_boxen[sz], "front"),
 			connect_back = boxrot(needle_boxen[sz], "back"),
+		
 		},
 		collision_box = {
 			type = "connected",
@@ -255,6 +287,52 @@ for sz = 1,6 do
 			connect_back = boxrot({box_shell(needle_boxen[sz])}, "back"),
 		},
 		connects_to = {"group:tree_trunk"},
+		sunlight_propagates = true,
+		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1},
+		sounds = default.node_sound_wood_defaults(),
+	})
+	
+	
+	minetest.register_node("default:fallen_larch_leaves_"..sz, {
+		description = "Dead Larch Needles",
+		tiles = {"default_larch_needles_fall.png"},
+		paramtype = "light",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "connected",
+			disconnected = {
+				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+			},
+			connect_bottom = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
+			connect_top = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "right"), {x=1, z=0}), {x=0, y=sh, z=0}),
+			connect_front = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "front"), {x=1, z=0}), {x=0, y=sh, z=0}),
+			connect_back = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "back"), {x=1, z=0}), {x=0, y=sh, z=0}),
+-- 			connect_right = boxrotdim(boxrot(needle_boxen[sz], "right"), {x=1, z=0}),
+-- 			connect_front = boxrotdim(boxrot(needle_boxen[sz], "front"), {x=1, z=0}),
+-- 			connect_back = boxrotdim(boxrot(needle_boxen[sz], "back"), {x=1, z=0}),
+		},
+		collision_box = {
+			type = "connected",
+			disconnected = {
+				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+			},
+			connect_left = boxrot({box_shell(needle_boxen[sz])}, "left"),
+			connect_right = boxrot({box_shell(needle_boxen[sz])}, "right"),
+			connect_front = boxrot({box_shell(needle_boxen[sz])}, "front"),
+			connect_back = boxrot({box_shell(needle_boxen[sz])}, "back"),
+		},
+		selection_box = {
+			type = "connected",
+			disconnected = {
+				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+			},
+			connect_left = boxrot({box_shell(needle_boxen[sz])}, "left"),
+			connect_right = boxrot({box_shell(needle_boxen[sz])}, "right"),
+			connect_front = boxrot({box_shell(needle_boxen[sz])}, "front"),
+			connect_back = boxrot({box_shell(needle_boxen[sz])}, "back"),
+		},
+		connects_to = {"group:tree_log"},
 		sunlight_propagates = true,
 		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),

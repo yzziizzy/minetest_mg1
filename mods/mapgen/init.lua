@@ -603,48 +603,46 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- 					biome_cache[bio.name].node_count = biome_cache[bio.name].node_count + 1
 					end
 					
-					local depth = bio.fill_min + nclamp(nvals_fill_depth[nixz]) * (bio.fill_max - bio.fill_min)
-					depth = round(depth)
+					local drand = nclamp(nvals_fill_depth[nixz])
+					
+					local d = surf -- current depth
+					
+					if d - default.deepest_fill <= y1 then
+						for _,fill in ipairs(bio.cids.fill) do
+							local depth = fill.min + round(drand * (fill.max - fill.min))
+							
+							if d < y0 then break end
+							
+							local ed = d - depth
+							if ed <= y1 then -- we have nodes to place
+								
+								-- process chances and place nodes
+								for y = math.min(d, y1), ed, -1 do
+									local ncid = fill.nodes[math.random(#fill.nodes)]
+									
+									for _,v in pairs(fill.chance_fill) do
+										if 1 == math.random(v.chance) then
+											ncid = v.cid
+											break
+										end
+									end
+								
+									data[area:index(x, y, z)] = ncid
+								end
+								
+							end -- if ed >= y0
+							
+							d = ed
+							
+						end -- for bio.fills
+					end -- if surf-deepest <= y1
+					
 					
 					-- the highest node below the cover and fill
-					rock_surface[nixz] = surf - depth - 2
+					rock_surface[nixz] = d
 					if rock_surface[nixz] >= y0 then
 						chunk_has_underground = true
 					end
-					
-					local yd = math.max(y0, surf-1-depth)
-		-- 			for y = surf, y0, -1 do
-					
-					if surf - default.deepest_fill <= y1 then
-						if y0 <= surf and surf <= y1 then
-							local ncid = bio.cids.cover[math.random(#bio.cids.cover)]
-							
-							for _,v in pairs(bio.cids.chance_cover) do
-								if 1 == math.random(v.chance) then
-									ncid = v.cid
-									break
-								end
-							end
-							
-							data[area:index(x, surf, z)] = ncid
-						end
-						
-						if y0 <= surf then
-							for y = math.min(surf-1, y1), yd, -1 do
-								local ncid = bio.cids.fill[math.random(#bio.cids.fill)]
-								
-								for _,v in pairs(bio.cids.chance_fill) do
-									if 1 == math.random(v.chance) then
-										ncid = v.cid
-										break
-									end
-								end
-							
-								data[area:index(x, y, z)] = ncid
-							end
-						end
-					end
-					
 					
 					-- place decorations
 					for dname,deco in pairs(bio.surface_decos) do

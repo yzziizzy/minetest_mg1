@@ -132,7 +132,7 @@ minetest.register_node("default:mg_rand_birch_sapling", {
 	
 	tree_def = birch_growth_data,
 	
-	groups = {snappy = 2, dig_immediate = 3, flammable = 3, mg_rand_blob_sapling = 1,
+	groups = {snappy = 2, dig_immediate = 3, flammable = 3, mg_rand_sapling = 1,
 		attached_node = 1, sapling = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	--[[

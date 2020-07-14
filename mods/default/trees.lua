@@ -175,6 +175,22 @@ end
 
 
 
+function default.place_fallen_boughs(pos, updir, name)
+	if updir.x == 1 then
+		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name=name, param2=1})
+		minetest.set_node({x=pos.x, y=pos.y, z=pos.z+1}, {name=name, param2=1})
+		minetest.set_node({x=pos.x, y=pos.y, z=pos.z-1}, {name=name, param2=1})
+	elseif updir.x == -1 then
+		
+	elseif updir.z == 1 then
+		
+	elseif updir.z == -1 then
+		
+	end
+	
+end
+
+
 
 function default.install_blob_tree(pos, stage, meta, tree_def)
 
@@ -300,26 +316,37 @@ end
 
 
 minetest.register_lbm({
-	name = ":group:mg_rand_blob_sapling",
-	nodenames = {"group:mg_rand_blob_sapling"},
+	name = ":group:mg_rand_sapling",
+	nodenames = {"group:mg_rand_sapling"},
 	catch_up = true,
 	action = function(pos, node)
 		local def = minetest.registered_nodes[node.name]
 		local sd = def.tree_def
+		pos.y = pos.y - 1
 		default.install_mapgen_random_tree(pos, sd)
 	end,
 })
 minetest.register_abm({
-	nodenames = {"group:mg_rand_blob_sapling"},
+	nodenames = {"group:mg_rand_sapling"},
 	interval  = 1,
 	chance = 5,
 	catch_up = true,
 	action = function(pos, node)
 		local def = minetest.registered_nodes[node.name]
 		local sd = def.tree_def
+		pos.y = pos.y - 1
 		default.install_mapgen_random_tree(pos, sd)
 	end,
 })
+
+local function str_or_nil(str, n)
+	if n > 0 then
+		return str
+	end
+	
+	return nil
+end
+
 
 
 
@@ -342,14 +369,14 @@ function default.register_tree_trunks(mod, growth_data)
 		local q = sz * thick
 		minetest.register_node(root_base..sz, {
 			description = growth_data.Name.." Tree Root",
-			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+			tiles = {"default_grass.png", growth_data.tiles.top, growth_data.tiles.side},
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
 			
 			node_box = {
 				type = "fixed",
-				fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
+				fixed = {-8/16, -0.5, -8/16, 8/16, 0.5, 8/16},
 			},
 			sunlight_propagates = true,
 			is_ground_content = false,
@@ -364,6 +391,7 @@ function default.register_tree_trunks(mod, growth_data)
 			stump_name = stump_base..sz,
 			nub_name = nub_base..sz,
 			tree_type = growth_data.name,
+			tree_stage = sz,
 			
 			on_place = function(itemstack, placer, pointed_thing)
 				local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
@@ -383,14 +411,14 @@ function default.register_tree_trunks(mod, growth_data)
 		-- stumps are dead roots
 		minetest.register_node(stump_base..sz, {
 			description = growth_data.Name.." Tree Stump",
-			tiles = {growth_data.tiles.top, growth_data.tiles.top, growth_data.tiles.side},
+			tiles = {"default_grass.png", growth_data.tiles.top, growth_data.tiles.side},
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
 			
 			node_box = {
 				type = "fixed",
-				fixed = {-q/16, -0.5, -q/16, q/16, 0.5, q/16},
+				fixed = {-8/16, -0.5, -8/16, 8/16, 0.5, 8/16},
 			},
 			sunlight_propagates = true,
 			is_ground_content = false,
@@ -403,6 +431,7 @@ function default.register_tree_trunks(mod, growth_data)
 			tree_def = growth_data,
 			log_name = log_base..sz,
 			tree_type = growth_data.name,
+			tree_stage = sz,
 			
 			on_place = function(itemstack, placer, pointed_thing)
 				local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
@@ -437,6 +466,7 @@ function default.register_tree_trunks(mod, growth_data)
 			},
 			
 			tree_type = growth_data.name,
+			tree_stage = sz,
 			
 			drop = {
 				max_items = 1,
@@ -470,6 +500,9 @@ function default.register_tree_trunks(mod, growth_data)
 			log_name = log_base..sz,
 			nub_name = nub_base..sz,
 			tree_type = growth_data.name,
+			tree_stage = sz,
+			
+			node_placement_prediction = str_or_nil(trunk_base..sz.."_chopped_"..sz-1, sz-1),
 			
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
@@ -549,7 +582,7 @@ function default.register_tree_trunks(mod, growth_data)
 					fixed = {
 						{-q/16, -0.5, -q/16, q/16, -0.1, q/16}, -- bottom
 						{-q/16,  0.1, -q/16, q/16,  0.5, q/16}, -- top
-						{-q/16, -0.1, -q/16, q/16,  0.1, j/16}, -- middle chunk negative
+						{-q/16, -0.1, -q/16, q/16,  0.1, (j*thick)/16}, -- middle chunk negative
 					},
 				},
 				sunlight_propagates = true,
@@ -562,7 +595,9 @@ function default.register_tree_trunks(mod, growth_data)
 				log_name = log_base..sz,
 				nub_name = nub_base..sz,
 				tree_type = growth_data.name,
-			
+				
+				node_placement_prediction = str_or_nil(trunk_base..sz.."_chopped_"..j-1, j-1),
+				
 				sounds = default.node_sound_wood_defaults(),
 				on_place = minetest.rotate_node,
 				on_dig = function(pos, node, digger)
@@ -765,6 +800,8 @@ function default.fell_tree(chopped_pos, player)
 	
 	local meta = minetest.get_meta(root_pos)
 	local root_def = minetest.registered_nodes[minetest.get_node(root_pos).name]
+	local tree_def = root_def.tree_def
+	local stage_num = root_def.tree_stage
 	local height = meta:get_int("height") -- above the root
 	local felled_h = root_pos.y + height - chopped_pos.y
 	
@@ -798,11 +835,16 @@ function default.fell_tree(chopped_pos, player)
 	end
 
 	-- place logs
+	local i = 0
 	local x = root_pos.x + 1
+	local max_fall_y = root_pos.y
+	
+	local bn = tree_def.stages[stage_num].boughs and tree_def.stages[stage_num].boughs.num
+	
 	for _,log in ipairs(logs) do
 		-- find ground level.
 		local lpos = {x=x, y=root_pos.y + 1, z=root_pos.z}
-		for y = root_pos.y+felled_h,root_pos.y,-1 do
+		for y = root_pos.y+felled_h,max_fall_y,-1 do
 			lpos.y = y
 			local n = minetest.get_node(lpos)
 			if n.name ~= "air" then
@@ -811,7 +853,20 @@ function default.fell_tree(chopped_pos, player)
 			end
 		end
 		
+		max_fall_y = math.max(max_fall_y, lpos.y)
+		lpos.y = max_fall_y
+		
 		minetest.set_node(lpos, {name=log, param2=1})
+		
+		if tree_def.type == "conifer" then
+			if i > #logs - bn then
+				local sz = minetest.registered_nodes[log].tree_stage
+				default.place_fallen_boughs(lpos, {x=1, z=0}, "default:fallen_larch_leaves_"..sz)
+			end
+		end
+
+		i = i + 1
+		
 		x = x + 1
 	end
 		
@@ -832,38 +887,4 @@ end
 
 
 
-
---------------------------
---
---  Conifers
---
---------------------------
-
-
-
-
-
-
-
-minetest.register_lbm({
-	name = ":group:mg_rand_conifer_sapling",
-	nodenames = {"group:mg_rand_conifer_sapling"},
-	catch_up = true,
-	action = function(pos, node)
-		local def = minetest.registered_nodes[node.name]
-		local sd = def.tree_def
-		default.install_mapgen_random_conifer_tree(pos, sd)
-	end,
-})
-minetest.register_abm({
-	nodenames = {"group:mg_rand_conifer_sapling"},
-	interval  = 1,
-	chance = 5,
-	catch_up = true,
-	action = function(pos, node)
-		local def = minetest.registered_nodes[node.name]
-		local sd = def.tree_def
-		default.install_mapgen_random_conifer_tree(pos, sd)
-	end,
-})
 
