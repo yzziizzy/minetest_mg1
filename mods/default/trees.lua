@@ -149,7 +149,11 @@ function default.install_conifer_tree(pos, stage, meta, tree_def)
 	end
 	
 	
-	local tree_height = m.trunk.min + math.random(m.trunk.max - m.trunk.min)
+	
+	local tree_height = m.trunk.min
+	if m.trunk.max > m.trunk.min then
+		tree_height = tree_height + math.random(m.trunk.max - m.trunk.min)
+	end
 	
 	local trange = m.trunk.taper_max - m.trunk.taper_min
 	for i = 0,m.boughs.num-1 do
