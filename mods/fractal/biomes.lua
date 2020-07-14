@@ -1,7 +1,7 @@
 fractal.debug("fractal biomes")
 
 default.biomes = {}
-
+default.cold.base_temp = 0
 
 default.register_biome({
 	name = "ocean_floor",
@@ -22,7 +22,6 @@ default.register_biome({
 	fill_max = 6,
 })
 
-print(dump(fractal))
 for _, climate in pairs(fractal.climate_zones) do
 	fractal.debug("registering climate: "..climate.name)
 	default.register_biome({
