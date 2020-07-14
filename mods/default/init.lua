@@ -73,81 +73,56 @@ default.gui_survival_form = "size[8,8.5]"..
 local modpath = minetest.get_modpath("default")
 
 
+local function pre_process_biome(def)
+	local max_fill_depth = 0
+	
+	def.surface_decos = {}
+	def.surface_ores = {}
+	
+-- 		print(dump(def))
+	def.cids = {
+		fill = {},
+	}
+	
+
+	for fi,f in ipairs(def.fill) do
+		if f.max > 0 then
+			local filln = {
+				min = f.min,
+				max = f.max,
+				nodes = {},
+				chance_fill = {},
+			}
+			
+			max_fill_depth = max_fill_depth + f.max
+			
+			def.cids.fill[fi] = filln
+			
+			for i,v in ipairs(f.nodes) do
+				if type(v) == "string" then
+					table.insert(filln.nodes, minetest.get_content_id(v))
+				else
+					filln.chance_fill[i] = {
+						chance = v.chance,
+						cid = minetest.get_content_id(v.name),
+					}
+				end
+			end
+		end
+	end
+	
+	default.deepest_fill = math.max(default.deepest_fill, max_fill_depth)
+end
+
 
 
 minetest.register_on_mods_loaded(function()
 -- 	print("mapgen init")
 	for _,def in pairs(default.biomes) do
-		
-		default.deepest_fill = math.max(default.deepest_fill, def.fill_max + 1)
-		
-		def.surface_decos = {}
-		def.surface_ores = {}
-		
--- 		print(dump(def))
-		def.cids = {
-			cover = {},
-			chance_cover = {},
-			fill = {},
-			chance_fill = {},
-		}
-		
-		for i,v in ipairs(def.cover) do
-			if type(v) == "string" then
-				table.insert(def.cids.cover, minetest.get_content_id(v))
-			else
-				def.cids.chance_cover[i] = {
-					chance = v.chance,
-					cid = minetest.get_content_id(v.name),
-				}
-			end
-		end
-		for i,v in ipairs(def.fill) do
-			if type(v) == "string" then
-				table.insert(def.cids.fill, minetest.get_content_id(v))
-			else
-				def.cids.chance_fill[i] = {
-					chance = v.chance,
-					cid = minetest.get_content_id(v.name),
-				}
-			end
-		end
-		
--- 		print(dump(def))
-		
+		pre_process_biome(def)
 	end
 	
-	local def = default.failsafe_biome
-	def.surface_decos = {}
-	def.surface_ores = {} -- NOT IMPLEMENTED
-	def.cids = {
-		cover = {},
-		chance_cover = {},
-		fill = {},
-		chance_fill = {},
-	}
-	
-	for i,v in ipairs(def.cover) do
-		if type(v) == "string" then
-			table.insert(def.cids.cover, minetest.get_content_id(v))
-		else
-			def.cids.chance_cover[i] = {
-				chance = v.chance,
-				cid = minetest.get_content_id(v.name),
-			}
-		end
-	end
-	for i,v in ipairs(def.fill) do
-		if type(v) == "string" then
-			table.insert(def.cids.fill, minetest.get_content_id(v))
-		else
-			def.cids.chance_fill[i] = {
-				chance = v.chance,
-				cid = minetest.get_content_id(v.name),
-			}
-		end
-	end
-	
+	pre_process_biome(default.failsafe_biome)	
 	
 	
 	-- pre-process surface decorations

@@ -14,10 +14,12 @@ default.register_biome({
 	humidity = 9999,
 	lat_center = 99999999,
 	
-	cover = {"default:granite"},
-	fill = {"default:granite"},
-	fill_min = 1,
-	fill_max = 1,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:granite"},
+		},
+	},
 })
 
 
@@ -34,10 +36,12 @@ default.register_biome({
 	humidity = 0,
 	lat_center = 0,
 	
-	cover = {"default:sand"},
-	fill = {"default:sand"},
-	fill_min = 1,
-	fill_max = 6,
+	fill = {
+		{
+			min = 2, max = 6,
+			nodes = {"default:wet_sand"},
+		},
+	},
 })
 
 
@@ -54,10 +58,17 @@ default.register_biome({
 	humidity = 10,
 	lat_center = 50,
 	
-	cover = {"default:dirt_with_grass_0", "default:dirt_with_grass_1"},
-	fill = {"default:dirt"},
-	fill_min = 2,
-	fill_max = 6,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:dirt_with_grass_0", "default:dirt_with_grass_1"},
+		},
+		{
+			min = 2, max = 6,
+			nodes = {"default:dirt"},
+		},
+	},
+
 	
 })
 
@@ -74,10 +85,16 @@ default.register_biome({
 	humidity = 60,
 	lat_center = 50,
 	
-	cover = {"default:dirt_with_grass_2", "default:dirt_with_grass_3"},
-	fill = {"default:dirt"},
-	fill_min = 2,
-	fill_max = 6,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:dirt_with_grass_2", "default:dirt_with_grass_3"},
+		},
+		{
+			min = 2, max = 6,
+			nodes = {"default:dirt"},
+		},
+	},
 	
 })
 
@@ -94,10 +111,16 @@ default.register_biome({
 	humidity = 60,
 	lat_center = 50,
 	
-	cover = {"default:dirt_with_grass_9", "default:dirt_with_grass_8"},
-	fill = {"default:dirt"},
-	fill_min = 1,
-	fill_max = 3,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:dirt_with_grass_8", "default:dirt_with_grass_9"},
+		},
+		{
+			min = 1, max = 3,
+			nodes = {"default:dirt"},
+		},
+	},
 	
 })
 
@@ -114,11 +137,12 @@ default.register_biome({
 	humidity = 60,
 	lat_center = 50,
 	
-	cover = {"default:snowblock"},
-	fill = {"default:snowblock"},
-	fill_min = 3,
-	fill_max = 4,
-	
+	fill = {
+		{
+			min = 4, max = 5,
+			nodes = {"default:snowblock"},
+		},
+	},
 })
 
 default.register_biome({
@@ -134,13 +158,15 @@ default.register_biome({
 	humidity = 100,
 	lat_center = 50,
 	
-	cover = {"default:peat"},
 	fill = {
-		{chance = 100, name = "default:peat_with_bog_iron"},
-		"default:peat",
+		{
+			min = 4, max = 5,
+			nodes = {
+				{chance = 100, name = "default:peat_with_bog_iron"},
+				"default:peat",
+			},
+		},
 	},
-	fill_min = 3,
-	fill_max = 4,
 	
 })
 
