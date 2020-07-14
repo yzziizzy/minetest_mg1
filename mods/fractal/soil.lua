@@ -87,7 +87,9 @@ fractal.register_climate_zone({
 	zones = {
 		{2,0},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	cover = {"default:permafrost"},
+	fill = {"default:silver_sand"},
 })
 fractal.register_climate_zone({
 	name = "moist_tundra",
@@ -95,7 +97,9 @@ fractal.register_climate_zone({
 	zones = {
 		{2,1},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	cover = {"default:permafrost"},
+	fill = {"default:silver_sand"},
 })
 fractal.register_climate_zone({
 	name = "wet_tundra",
@@ -103,7 +107,9 @@ fractal.register_climate_zone({
 	zones = {
 		{2,2},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	cover = {"default:permafrost_with_moss"},
+	fill = {"default:permafrost"},
 })
 fractal.register_climate_zone({
 	name = "rain_tundra",
@@ -111,7 +117,9 @@ fractal.register_climate_zone({
 	zones = {
 		{2,3},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	cover = {"default:permafrost_with_moss"},
+	fill = {"default:permafrost"},
 })
 
 -- desert
