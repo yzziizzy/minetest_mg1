@@ -537,7 +537,7 @@ function default.register_tree_trunks(mod, growth_data)
 						minetest.set_node(pos, {name=trunk_base..sz.."_chopped_"..(sz-1)})
 						
 						if not core.settings:get_bool("creative_mode") then
-							wielded:add_wear(dp.wear)
+							wielded:add_wear(tp.wear)
 							if wielded:get_count() == 0 and wdef.sound and wdef.sound.breaks then
 								core.sound_play(wdef.sound.breaks, {
 									pos = pos,
@@ -628,7 +628,7 @@ function default.register_tree_trunks(mod, growth_data)
 							minetest.set_node(pos, {name=trunk_base..sz.."_chopped_"..(j-1)})
 							
 							if not core.settings:get_bool("creative_mode") then
-								wielded:add_wear(dp.wear)
+								wielded:add_wear(tp.wear)
 								if wielded:get_count() == 0 and wdef.sound and wdef.sound.breaks then
 									core.sound_play(wdef.sound.breaks, {
 										pos = pos,
