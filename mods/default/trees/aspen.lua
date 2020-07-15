@@ -23,6 +23,7 @@ local aspen_growth_data = {
 		fruiting = 1,
 		tree_growth = 60*60*0.25,
 	},
+	fallen_leaves = {"default:aspen_fallen_leaves_1","default:aspen_fallen_leaves_2","default:aspen_fallen_leaves_3"},
 	stages = {
 		[1] = {
 			ymin = 1, ymax=3, ysquash = 3, yoff = 2,
@@ -112,6 +113,18 @@ for i = 1,3 do
 		paramtype = "light",
 		is_ground_content = false,
 		groups = {snappy = 3, leaf_rot = 1, flammable = 2, leaves = 1},
+		sounds = default.node_sound_leaves_defaults(),
+	})
+	
+	
+	minetest.register_node("default:aspen_fallen_leaves_"..i, {
+		description = "Aspen Tree Leaves",
+		drawtype = "allfaces_optional",
+		tiles = {"default_aspen_leaves.png^[colorize:yellow:"..((i-1)*20)},
+		waving = 1,
+		paramtype = "light",
+		is_ground_content = false,
+		groups = {snappy = 3, leaf_rot = 1, flammable = 2, leaves = 1, fallen_leaves = 1},
 		sounds = default.node_sound_leaves_defaults(),
 	})
 end

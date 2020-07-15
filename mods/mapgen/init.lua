@@ -703,7 +703,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									local n = noise_cache[deco.name][nixz]
 		-- 							
 									if n > 0 then
-										if 1 == math.random(math.abs(round(n))) then
+										if 1 == math.random(math.abs(math.ceil(n))) then
 											if not deco.chance or 1 == math.random(deco.chance) then
 												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
 												break -- no more decorations in this column

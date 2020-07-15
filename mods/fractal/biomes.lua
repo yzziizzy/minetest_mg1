@@ -1,5 +1,5 @@
 fractal.debug("fractal biomes")
-
+--[[
 default.biomes = {}
 default.cold.base_temp = 0
 
@@ -44,3 +44,4 @@ for _, climate in pairs(fractal.climate_zones) do
 	})
 end
 
+]]
