@@ -58,6 +58,26 @@ function default.install_tree(pos, stage, meta, tree_def)
 	end
 end
 
+function default.felling_clear_old_leaves(pos, meta)
+	local leaves = minetest.deserialize(meta:get_string("leaves"))
+	if not leaves then
+		return
+	end
+	
+	local out = {}
+	for _,v in ipairs(leaves) do
+		local n = minetest.get_node(v)
+		if minetest.registered_nodes[n.name].groups.leaves then
+			minetest.set_node(v, {name="air"})
+			table.insert(out, v)
+		end
+	end
+	
+	meta:set_string("leaves", "")
+	
+	return out
+end
+	
 function default.clear_old_leaves(pos, meta)
 
 	local leaves = minetest.deserialize(meta:get_string("leaves"))
@@ -785,6 +805,23 @@ function default.register_tree_trunks(mod, growth_data)
 end -- default.register_tree_trunks()
 
 
+local function rotate_about(list, center, rotdim)
+	local o = {}
+	
+	for _,a in pairs(list) do
+	
+		local b = vector.subtract(a, center)
+		local c
+		if rotdim.x == 1 then
+			c = {x=b.y, y=b.x, z=b.z}
+		end
+		
+		table.insert(o, vector.add(c, center))
+	end
+	
+	return o
+end
+
 
 
 function default.fell_tree(chopped_pos, player)
@@ -804,6 +841,9 @@ function default.fell_tree(chopped_pos, player)
 	local stage_num = root_def.tree_stage
 	local height = meta:get_int("height") -- above the root
 	local felled_h = root_pos.y + height - chopped_pos.y
+	
+	local leaves = default.felling_clear_old_leaves(root_pos, meta)
+
 	
 	-- todo: fetch log diameter?
 	
@@ -841,7 +881,8 @@ function default.fell_tree(chopped_pos, player)
 	
 	local bn = tree_def.stages[stage_num].boughs and tree_def.stages[stage_num].boughs.num
 	
-	for _,log in ipairs(logs) do
+	local log_pos = {}
+	for li,log in ipairs(logs) do
 		-- find ground level.
 		local lpos = {x=x, y=root_pos.y + 1, z=root_pos.z}
 		for y = root_pos.y+felled_h,max_fall_y,-1 do
@@ -857,7 +898,7 @@ function default.fell_tree(chopped_pos, player)
 		lpos.y = max_fall_y
 		
 		minetest.set_node(lpos, {name=log, param2=1})
-		
+		--[[
 		if tree_def.type == "conifer" then
 			if i > #logs - bn then
 				local sz = minetest.registered_nodes[log].tree_stage
@@ -865,13 +906,13 @@ function default.fell_tree(chopped_pos, player)
 			end
 		end
 
-		i = i + 1
-		
+		i = i + 1]]
 		x = x + 1
+		log_pos[li] = lpos
 	end
 		
 	
-	default.clear_old_leaves(root_pos, meta)
+-- 	default.clear_old_leaves(root_pos, meta)
 	
 	-- install dead root and chopped nub
 	minetest.swap_node(root_pos, {name=root_def.stump_name})
@@ -882,6 +923,29 @@ function default.fell_tree(chopped_pos, player)
 	-- TODO: handle chopping more from lower on the trunk
 	
 	-- TODO: place shattered canopy on ground, with rotting leaves
+	
+	if tree_def.type == "conifer" then
+		for li,log in ipairs(logs) do
+			if i > #logs - bn then
+				local sz = minetest.registered_nodes[log].tree_stage
+				default.place_fallen_boughs(log_pos[li], {x=1, z=0}, "default:fallen_larch_leaves_"..sz)
+			end
+		
+			i = i + 1
+			x = x + 1
+		end
+	elseif tree_def.type == "blob" then
+		local place_leaves = rotate_about(leaves, {x=root_pos.x, y=root_pos.y+1, z=root_pos.z}, {x=1, z=0})
+		
+		for _,p in ipairs(place_leaves) do
+			local n = minetest.get_node(p)
+			
+			if n.name == "air" then
+				minetest.set_node(p, {name=tree_def.fallen_leaves[math.random(#tree_def.fallen_leaves)]})
+			end
+		end
+		
+	end
 end
 
 
