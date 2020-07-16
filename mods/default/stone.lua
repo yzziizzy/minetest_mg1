@@ -137,17 +137,125 @@ for i,def in pairs(stonedefs) do
 	minetest.register_node("default:"..def.n.."_cobble", {
 		description = def.d.." Cobble",
 		tiles = {"default_"..def.n..".png^default_cobble.png"},
--- 		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
-		groups = {cracky = 1, cobble = 1, stone_type = stone_types[def.t]},
+		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
+		sounds = default.node_sound_stone_defaults(),
+		node_placement_prediction = "default:"..def.n.."_cobble_2",
+		on_dig = function(pos, node, digger)
+			minetest.set_node(pos, {name="default:"..def.n.."_cobble_2"})
+		end
+	})
+	minetest.register_node("default:"..def.n.."_cobble_2", {
+		description = def.d.." Cobble",
+		tiles = {"default_"..def.n..".png^default_cobble.png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, .16667, 0.5},
+		},
+		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
+		sounds = default.node_sound_stone_defaults(),
+		node_placement_prediction = "default:"..def.n.."_cobble_3",
+		on_dig = function(pos, node, digger)
+			minetest.set_node(pos, {name="default:"..def.n.."_cobble_3"})
+		end
+	})
+	minetest.register_node("default:"..def.n.."_cobble_3", {
+		description = def.d.." Cobble",
+		tiles = {"default_"..def.n..".png^default_cobble.png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, -.16667, 0.5},
+		},
+		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
 		sounds = default.node_sound_stone_defaults(),
 	})
 	
 	minetest.register_node("default:"..def.n, {
 		description = def.d,
 		tiles = {"default_"..def.n..".png"},
--- 		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
+		
+		cobble = "default:"..def.n.."_cobble",
+		
 		groups = {cracky = 3, stone = 1, stone_type = stone_types[def.t]},
 		drop = "default:"..def.n.."_cobble",
+		node_placement_prediction = "default:"..def.n.."_2",
+		sounds = default.node_sound_stone_defaults(),
+		on_dig = function(pos, node, digger)
+			local b = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+			if b.name ~= "air" and 0 == minetest.get_item_group(b.name, "partial_stone") then
+				print("d")
+				minetest.set_node(pos, {name="default:"..def.n.."_2"})
+				return
+			end
+			local u = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
+			if u.name ~= "air" then
+				print("u")
+				minetest.set_node(pos, {name="default:"..def.n.."_2", param2 = 20})
+				return
+			end
+		
+-- 			minetest.set_node(pos, {name="default:"..def.n.."_2"})
+		end
+	})
+	
+	minetest.register_node("default:"..def.n.."_2", {
+		description = def.d,
+		tiles = {"default_"..def.n..".png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, .16667, 0.5},
+		},
+		
+		
+		cobble = "default:"..def.n.."_cobble_2",
+		
+		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
+		drop = "default:"..def.n.."_cobbl_2e",
+		node_placement_prediction = "default:"..def.n.."_3",
+		sounds = default.node_sound_stone_defaults(),
+		on_dig = function(pos, node, digger)
+			local b = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+			if b.name ~= "air" and 0 == minetest.get_item_group(b.name, "partial_stone") then
+				print("d")
+				minetest.set_node(pos, {name="default:"..def.n.."_3"})
+				return
+			end
+			local u = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
+			if u.name ~= "air" then
+				print("u")
+				minetest.set_node(pos, {name="default:"..def.n.."_3", param2 = 20})
+				return
+			end
+		end
+	})
+	
+	minetest.register_node("default:"..def.n.."_3", {
+		description = def.d,
+		tiles = {"default_"..def.n..".png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, -0.16667, 0.5},
+		},
+		
+		cobble = "default:"..def.n.."_cobble_3",
+		
+		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
+		drop = "default:"..def.n.."_cobble_3",
 		sounds = default.node_sound_stone_defaults(),
 	})
 	
@@ -349,3 +457,37 @@ minetest.register_node("default:lava_flowing", {
 		not_in_creative_inventory = 1},
 })
 
+
+
+-- collapsing
+minetest.register_abm({
+	nodenames = {"group:stone"},
+	neightbors = {"air"},
+	interval  = 1,
+	chance = 20,
+	catch_up = true,
+	action = function(pos, node)
+		
+		pos.y = pos.y - 1
+		local n = minetest.get_node(pos)
+		if n.name ~= "air" then
+			return
+		end
+		pos.y = pos.y + 1
+		
+		
+		airs = minetest.find_nodes_in_area(
+			{x=pos.x - 1, y=pos.y - 1, z=pos.z - 1},
+			{x=pos.x + 1, y=pos.y - 1, z=pos.z + 1},
+			"air"
+		)
+		
+		if #airs > 5 and 1 == math.random(9 - #airs) then
+			local def = minetest.registered_nodes[node.name]
+			minetest.set_node(pos, {name = def.cobble})
+			minetest.spawn_falling_node(pos)
+		end
+		
+		
+	end,
+})

@@ -899,7 +899,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	]]
 	
-	-- slices cut into the terrain for debugging
+	--[[ slices cut into the terrain for debugging
 	for x = x0, x1 do 
 		for z = z0, z1 do 
 			for y = y1, y0, -1 do 
