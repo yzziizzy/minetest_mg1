@@ -14,9 +14,9 @@ end
 -- thaw out the player data storage
 local mod_storage = minetest.get_mod_storage()
 
-if mod_storage ~= nil and false then
+if mod_storage ~= nil then
 	default.players = minetest.deserialize(mod_storage:get_string("players"))
-	print(dump(default.players))
+-- 	print(dump(default.players))
 end
 
 if not default.players then

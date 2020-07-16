@@ -156,6 +156,8 @@ local np_heat = {
 	octaves = 3,
 	persist = 0.3
 }
+default.set_noise_params("heat", np_heat)
+
 local np_humidity = {
 	offset = 50,
 	scale = 50,
@@ -164,6 +166,8 @@ local np_humidity = {
 	octaves = 3,
 	persist = 0.3
 }
+default.set_noise_params("humidity", np_humidity)
+
 local np_magic = {
 	offset = 50,
 	scale = 50,
@@ -172,6 +176,7 @@ local np_magic = {
 	octaves = 3,
 	persist = 0.5
 }
+default.set_noise_params("magic", np_magic)
 
 
 local np_plains1 = {
@@ -200,6 +205,7 @@ local np_continents = {
 	octaves = 3,
 	persist = 0.2
 }
+default.set_noise_params("flatness_1", np_continents)
 
 local np_hills = {
 	offset = 0,
@@ -226,6 +232,7 @@ local np_mtns2 = {
 	octaves = 3,
 	persist = 0.6
 }
+default.set_noise_params("vulcanism", np_mtns2)
 
 local np_mtns3 = {
 	offset = 0,

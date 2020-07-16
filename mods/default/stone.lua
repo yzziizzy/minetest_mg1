@@ -463,8 +463,8 @@ minetest.register_node("default:lava_flowing", {
 minetest.register_abm({
 	nodenames = {"group:stone"},
 	neightbors = {"air"},
-	interval  = 1,
-	chance = 20,
+	interval  = 5,
+	chance = 100,
 	catch_up = true,
 	action = function(pos, node)
 		
@@ -482,7 +482,7 @@ minetest.register_abm({
 			"air"
 		)
 		
-		if #airs > 5 and 1 == math.random(9 - #airs) then
+		if #airs > 5 and 1 == math.random(10 - #airs) then
 			local def = minetest.registered_nodes[node.name]
 			minetest.set_node(pos, {name = def.cobble})
 			minetest.spawn_falling_node(pos)

@@ -10,6 +10,7 @@ local S = minetest.get_translator("default")
 default = {
 	deepest_fill = 1,
 	
+	noise_params = {},
 	biomes = {},
 	failsafe_biome = nil,
 	failsafe_stone_biome = nil,
@@ -226,133 +227,7 @@ minetest.register_on_mods_loaded(function()
 end)
 
 
-function default.get_elev_temp_factor(y)
-	local y2 = math.max(0, math.min(pos.y, default.cold.max_elev))
-	return -(y2 * default.cold.deg_per_meter)
-end
 
-
-function default.get_temp(pos)
-	local y = math.max(0, math.min(pos.y, default.cold.max_elev))
-	local elev_factor = -(y * default.cold.deg_per_meter)
-	
-	local lat = math.abs(pos.z)
-	local lat_factor = (math.cos((math.pi / 31000) * lat) - 1) * 0.5 * default.cold.lat_variation
-	
-	local time = minetest.get_timeofday()
-	local day_factor = math.sin(math.pi * time) * default.cold.day_variation
-	
-	local season_factor = math.sin(math.pi * default.get_timeofyear()) * default.cold.season_variation
--- 	print("  ")
--- 	print("  day factor: ".. day_factor)
--- 	print("  ele factor: ".. elev_factor)
--- 	print("  lat factor: ".. lat_factor)
--- 	print("  sea factor: ".. season_factor)
-	return default.cold.base_temp + elev_factor + lat_factor + day_factor + season_factor
-end
-
-
-default.register_biome = function(def)
--- 	print("registering biome")
-	if def.name == "failsafe" then
-		default.failsafe_biome = def
-	else
-		default.biomes[def.name] = def
-	end
-end
-
-
-default.select_biome = function(x, y, z, heat, humidity, magic, flatness)
--- 	print("   y="..y)
-	local best = nil
-	local best_d = 99999999999999999999
-	
-	for _,def in pairs(default.biomes) do
-		local y_r = y + math.random(-def.y_rand, def.y_rand) 
--- 		print(def.name.." "..y_r.. " "..def.y_min.. " "..def.y_max )
-		if def.y_min <= y_r and def.y_max >= y_r then
-			local he = heat - def.heat
-			local hu = humidity - def.humidity
-			local ma = magic - def.magic
-			local fl = flatness - def.flatness
-			local la = math.abs(z / 320) - def.lat_center 
-			local d = he * he + hu * hu + ma * ma + fl * fl + la * la
-			
--- 			print(" "..def.name.. " d: "..d)
-			if d < best_d then
-				
-				best = def
-				best_d = d
-			end
-		end
-	end
-	
-	local b = best or default.failsafe_biome
--- 	print("  "..b.name)
-	return b
-end
-
-
-default.register_stone_biome = function(def)
--- 	print("registering biome")
-	if def.noise then
-		def.noise.offset = 0.4
-		def.noise.scale = 0.4
-	end
-
-	if def.name == "failsafe" then
-		default.failsafe_stone_biome = def
-	else
-		default.stone_biomes[def.name] = def
-	end
-end
-
-
-default.select_stone_biome = function(x, y, z, heat, humidity, magic, flatness, vulcanism)
--- 	print("   y="..y)
-	local best = nil
-	local best_d = 99999999999999999999
-	
-	for _,def in pairs(default.stone_biomes) do
-		local y_r = y + math.random(-def.y_rand, def.y_rand) 
--- 		print(def.name.." "..y_r.. " "..def.y_min.. " "..def.y_max )
-		if def.y_min <= y_r and def.y_max >= y_r then
-			local he = heat - def.heat
-			local hu = humidity - def.humidity
-			local ma = magic - def.magic
-			local fl = flatness - def.flatness
-			local vu = vulcanism - def.vulcanism
-			local la = math.abs(z / 320) - def.lat_center 
-			local d = he*he + hu*hu + ma*ma + fl*fl + la*la + vu*vu
-			
--- 			print(" "..def.name.. " d: "..d)
-			if d < best_d then
-				
-				best = def
-				best_d = d
-			end
-		end
-	end
-	
-	local b = best or default.failsafe_stone_biome
--- 	print("  "..b.name)
-	return b
-end
-
-
-
-default.register_surface_deco = function(def)
-	
-	-- todo: fill in missing defaults
-	-- TODO: warnings for invalid data
-	
-	if def.noise then
-		def.noise.offset = 0.4
-		def.noise.scale = 0.4
-	end
-	
-	default.surface_decorations[def.name] = def
-end
 
 
 -- NOT IMPLEMENTED
@@ -487,6 +362,7 @@ minetest.register_abm({
 
 
 dofile(modpath.."/functions.lua")
+dofile(modpath.."/environment.lua")
 dofile(modpath.."/water.lua")
 dofile(modpath.."/seasons.lua")
 dofile(modpath.."/player.lua")
@@ -499,6 +375,9 @@ dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
 dofile(modpath.."/trees/fir.lua")
 dofile(modpath.."/trees/larch.lua")
+-- dofile(modpath.."/trees/redwood.lua")
+-- dofile(modpath.."/trees/rain_tree.lua")
+-- dofile(modpath.."/trees/bamboo.lua")
 
 dofile(modpath.."/casting.lua")
 
