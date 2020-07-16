@@ -25,7 +25,7 @@ end
 
 
 
-local SEASONS_YEARLEN = 60 * 60 * 4
+local SEASONS_YEARLEN =  4 * 4 -- in days
 -- local SEASONS_YEARLEN = 90
 
 
@@ -177,10 +177,9 @@ end
 
 
 
-
+--[[ not actually used
 local get_season_data = function() 
 	local t = minetest.get_gametime()
-	
 	local s = (((t *  math.pi * 2) / (SEASONS_YEARLEN)) + (SEASONS_YEARLEN / 3)) % (math.pi * 2)
 	local snorm = (math.sin(s) + 1) * 0.5 
 	local cnorm = (math.cos(s) + 1) * 0.5 
@@ -205,10 +204,17 @@ local get_season_data = function()
 	
 	return season, snorm, sign
 end
+]]
 
 function default.get_timeofyear()
-	local t = minetest.get_gametime()
-	return ((t + (SEASONS_YEARLEN / 3)) % SEASONS_YEARLEN) / SEASONS_YEARLEN
+	local tod = minetest.get_timeofday()
+	local doy = minetest.get_day_count() % SEASONS_YEARLEN
+	
+	local a = (tod + doy) / SEASONS_YEARLEN
+-- 	print("TOY: "..a)
+	return a
+-- 	local t = minetest.get_gametime()
+-- 	return ((t + (SEASONS_YEARLEN / 3)) % SEASONS_YEARLEN) / SEASONS_YEARLEN
 end
 
 local get_season = function()
