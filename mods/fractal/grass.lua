@@ -24,7 +24,8 @@ function grass.base_groups()
 		snappy = 3,
 		flora = 1,
 		grass = 1,
-		flammable = 1
+		flammable = 1,
+		squashable = 1,
 	}
 end
 function grass.lifecycle(spring_grow, summer_grow, summer_ripe, winter_kill)

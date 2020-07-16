@@ -1,5 +1,5 @@
 fractal.debug("fractal biomes")
---[[
+
 default.biomes = {}
 default.cold.base_temp = 0
 
@@ -16,10 +16,54 @@ default.register_biome({
 	humidity = 0,
 	lat_center = 0,
 
-	cover = {"default:sand"},
-	fill = {"default:sand"},
-	fill_min = 1,
-	fill_max = 6,
+	fill = {
+		{
+			min = 2, max = 6,
+			nodes = {"default:wet_sand"},
+		},
+	},
+})
+
+default.register_biome({
+	name = "sand_dunes",
+	description = "Sand Dunes",
+
+	y_min = 0,
+	y_max = 1,
+	y_rand = 0,
+	flatness = 100,
+	magic = 0,
+	heat = 0,
+	humidity = 0,
+	lat_center = 0,
+
+	fill = {
+		{
+			min = 1, max = 5,
+			nodes = {"default:sand"},
+		},
+	},
+})
+
+default.register_biome({
+	name = "gravel_beach",
+	description = "Gravely Beach",
+
+	y_min = 0,
+	y_max = 1,
+	y_rand = 0,
+	flatness = 100,
+	magic = 0,
+	heat = 0,
+	humidity = 100,
+	lat_center = 0,
+
+	fill = {
+		{
+			min = 1, max = 5,
+			nodes = {"fractal:stub_gravel"},
+		},
+	},
 })
 
 for _, climate in pairs(fractal.climate_zones) do
@@ -37,11 +81,7 @@ for _, climate in pairs(fractal.climate_zones) do
 		humidity = ( climate.water + 0.5 ) * ( 100 / (climate.temp * 5/7 + 3 ) ),
 		lat_center = 50,
 
-		cover = climate.cover,
 		fill = climate.fill,
-		fill_min = 1,
-		fill_max = 5,
 	})
 end
 
-]]

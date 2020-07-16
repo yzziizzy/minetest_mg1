@@ -8,8 +8,8 @@ fractal = {}
 -- Load initial files
 local modpath = minetest.get_modpath("fractal")
 
-dofile(modpath.."/config.lua")
 dofile(modpath.."/functions.lua")
+dofile(modpath.."/stubs.lua")
 dofile(modpath.."/soil.lua")
 dofile(modpath.."/biomes.lua")
 dofile(modpath.."/grass.lua")

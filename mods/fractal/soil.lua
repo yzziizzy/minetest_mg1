@@ -15,8 +15,20 @@ function fractal.register_climate_zone(def)
 			water = zone[2],
 		}
 
-		fractal.climate_zones[zone_name].cover = def.cover or {}
-		fractal.climate_zones[zone_name].fill = def.fill or {}
+		if def.fill then
+			fractal.climate_zones[zone_name].fill = def.fill
+		else
+			fractal.climate_zones[zone_name].fill = {
+				{
+					min = 1, max = 1,
+					nodes = {},
+				},
+				{
+					min = 1, max = 5,
+					nodes = {},
+				}
+			}
+		end
 
 		if def.has_dirt then
 			local suffix = "T"..zone[1].."W"..zone[2]
@@ -25,7 +37,11 @@ function fractal.register_climate_zone(def)
 			minetest.register_node("fractal:dirt_"..suffix, {
 				description = "Dirt",
 				tiles = {"default_dirt.png"},
-				groups = {crumbly = 3, falling_node = 1, soil = 1},
+				groups = {
+					crumbly = 3,
+					falling_node = 1,
+					soil = 1
+				},
 				drop = "default:dirt",
 				sounds = default.node_sound_dirt_defaults(),
 			})
@@ -36,7 +52,12 @@ function fractal.register_climate_zone(def)
 					"default_dirt.png",
 					{name = "default_dirt.png^default_grass_side.png"..colorize_water, tileable_vertical = false}
 				},
-				groups = {crumbly = 3, soil = 1, falling_node = 1, spreading_grass = 1},
+				groups = {
+					crumbly = 3,
+					soil = 1,
+					falling_node = 1,
+					spreading_grass = 1
+				},
 				drop = "default:dirt",
 				sounds = default.node_sound_dirt_defaults({
 					footstep = {name = "default_grass_footstep", gain = 0.25},
@@ -44,13 +65,13 @@ function fractal.register_climate_zone(def)
 
 				walk_speed = 1.2,
 			})
-			table.insert(fractal.climate_zones[zone_name].cover, "fractal:dirt_with_grass_"..suffix)
-			table.insert(fractal.climate_zones[zone_name].fill, "fractal:dirt_"..suffix)
+			table.insert(fractal.climate_zones[zone_name].fill[1].nodes, "fractal:dirt_with_grass_"..suffix)
+			table.insert(fractal.climate_zones[zone_name].fill[2].nodes, "fractal:dirt_"..suffix)
 		end
 
 		if def.has_sand then
-			table.insert(fractal.climate_zones[zone_name].cover, "default:desert_sand")
-			table.insert(fractal.climate_zones[zone_name].fill, "default:desert_sand")
+			table.insert(fractal.climate_zones[zone_name].fill[1].nodes, "default:desert_sand")
+			table.insert(fractal.climate_zones[zone_name].fill[2].nodes, "default:desert_sand")
 		end
 
 		print(dump(fractal.climate_zones[zone_name]))
@@ -76,8 +97,17 @@ fractal.register_climate_zone({
 		{1,0}, {1,1}, {1,2},
 	},
 	has_dirt = false,
-	cover = {"default:snow"},
-	fill = {"default:snowblock"},
+
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:snow"},
+		},
+		{
+			min = 1, max = 5,
+			nodes = {"default:snowblock"},
+		}
+	},
 })
 
 -- subpolar
@@ -87,15 +117,35 @@ fractal.register_climate_zone({
 	zones = {
 		{2,0},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:permafrost"},
+		},
+		{
+			min = 1, max = 3,
+			nodes = {"fractal:stub_gravel"},
+		}
+	},
 })
 fractal.register_climate_zone({
 	name = "moist_tundra",
-	description = "Dry Tundra",
+	description = "Moist Tundra",
 	zones = {
 		{2,1},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:permafrost_with_moss"},
+		},
+		{
+			min = 1, max = 3,
+			nodes = {"default:permafrost"},
+		}
+	},
 })
 fractal.register_climate_zone({
 	name = "wet_tundra",
@@ -103,7 +153,17 @@ fractal.register_climate_zone({
 	zones = {
 		{2,2},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:permafrost_with_moss"},
+		},
+		{
+			min = 1, max = 3,
+			nodes = {"default:permafrost"},
+		}
+	},
 })
 fractal.register_climate_zone({
 	name = "rain_tundra",
@@ -111,7 +171,17 @@ fractal.register_climate_zone({
 	zones = {
 		{2,3},
 	},
-	has_dirt = true,
+	has_dirt = false,
+	fill = {
+		{
+			min = 1, max = 1,
+			nodes = {"default:permafrost_with_moss"},
+		},
+		{
+			min = 1, max = 3,
+			nodes = {"default:permafrost"},
+		}
+	},
 })
 
 -- desert
