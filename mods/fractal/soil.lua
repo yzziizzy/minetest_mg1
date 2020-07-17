@@ -74,7 +74,7 @@ function fractal.register_climate_zone(def)
 			table.insert(fractal.climate_zones[zone_name].fill[2].nodes, "default:desert_sand")
 		end
 
-		print(dump(fractal.climate_zones[zone_name]))
+		-- print(dump(fractal.climate_zones[zone_name]))
 	end
 end
 

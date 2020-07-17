@@ -12,6 +12,10 @@ dofile(modpath.."/functions.lua")
 dofile(modpath.."/stubs.lua")
 dofile(modpath.."/soil.lua")
 dofile(modpath.."/biomes.lua")
-dofile(modpath.."/grass.lua")
+dofile(modpath.."/plantlife.lua")
 dofile(modpath.."/surface_deco.lua")
+
+-- [ Plantlife Definitions] --
+dofile(modpath.."/plantlife/tall_grass.lua")
+dofile(modpath.."/plantlife/sagebrush.lua")
 

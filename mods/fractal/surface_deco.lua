@@ -41,7 +41,7 @@ default.register_surface_deco({
 	noise = fractal.get_plant_noise(),
 	place_on = {"group:spreading_grass"},
 
-	place = {"fractal:grass_1", "fractal:grass_2", "fractal:grass_3", "fractal:grass_4", "fractal:grass_5"}, -- randomly chosen list of nodes to place
+	place = plantlife.stage_names("tall_grass", "live", 1, 5),
 	y_offset = 0, -- directly on top of the soil
 })
 
@@ -71,13 +71,13 @@ default.register_surface_deco({
 	noise = fractal.get_plant_noise(),
 	place_on = {"group:spreading_grass"},
 
-	place = {"fractal:grass_1", "fractal:grass_2",}, -- randomly chosen list of nodes to place
+	place = plantlife.stage_names("tall_grass", "live", 1, 2),
 	y_offset = 0, -- directly on top of the soil
 })
 
 default.register_surface_deco({
-	name = "dry_shrub",
-	description = "Dry Shrubs",
+	name = "dead_sagebrush",
+	description = "Dead Sagebrush",
 
 	y_min = 1,
 	y_max = 200,
@@ -87,7 +87,7 @@ default.register_surface_deco({
 		"cool_scrub",
 		"warm_scrub",
 		"subtropic_scrub",
-		"tropic_scrub",
+		"tropic_scrub"
 	}, -- list of biomes to appear in
 	lat_min = 0,
 	lat_max = 12000,
@@ -99,7 +99,34 @@ default.register_surface_deco({
 	noise = fractal.get_plant_noise(),
 	place_on = {"group:spreading_grass"},
 
-	place = {"fractal:stub_dry_shrub"}, -- randomly chosen list of nodes to place
+	place = plantlife.stage_names("sagebrush", "dead", 4, 5),
+	y_offset = 0, -- directly on top of the soil
+})
+
+default.register_surface_deco({
+	name = "sagebrush",
+	description = "Sagebrush",
+
+	y_min = 1,
+	y_max = 200,
+	y_rand = 1, -- feather the edges of the y limits
+	biomes = {
+		"boreal_scrub",
+		"cool_scrub",
+		"warm_scrub",
+		"subtropic_scrub"
+	}, -- list of biomes to appear in
+	lat_min = 0,
+	lat_max = 12000,
+	lat_rand = 1, -- feather the edges of the lat limits
+	lat_abs = true, -- appears in northern and southern hemicubes
+
+	type = "density",
+	chance = 10,
+	noise = fractal.get_plant_noise(),
+	place_on = {"group:spreading_grass"},
+
+	place = plantlife.stage_names("sagebrush", "live", 1, 5),
 	y_offset = 0, -- directly on top of the soil
 })
 
