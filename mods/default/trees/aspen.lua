@@ -124,6 +124,14 @@ for i = 1,3 do
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,
+		
+		drop = {
+			max_items = 2,
+			{rarity = 3, items = {"default:aspen_stick 3"}},
+			{rarity = 2, items = {"default:aspen_stick 2"}},
+			{            items = {"default:aspen_stick"}},
+		},
+		
 		groups = {snappy = 3, leaf_rot = 1, flammable = 2, leaves = 1, fallen_leaves = 1},
 		sounds = default.node_sound_leaves_defaults(),
 	})

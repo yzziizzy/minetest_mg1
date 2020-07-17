@@ -262,3 +262,95 @@ minetest.register_node("default:glacial_water_flowing", {
 		cools_lava = 1},
 	sounds = default.node_sound_water_defaults(),
 })
+
+
+
+
+
+-- cheap fluid dynamics
+function default.register_flowing_water(source, flowing)
+	minetest.register_abm({
+		nodenames = {source},
+		neighbors = {flowing},
+		interval = 1,
+		chance = 3,
+		action = function(pos)
+			local flow_nodes;
+
+			local node = minetest.get_node(pos)
+			if node.name ~= source then
+				return
+			end
+			
+			-- look below
+			flow_nodes = minetest.find_nodes_in_area(
+				{x=pos.x , y=pos.y - 1, z=pos.z},
+				{x=pos.x , y=pos.y - 1, z=pos.z},
+				flowing
+			)
+			
+			for _,fp in ipairs(flow_nodes) do
+				local n = minetest.get_node(fp);
+				minetest.set_node(fp, {name=node.name})
+				minetest.set_node(pos, {name=n.name})
+				return
+			end	
+			
+			-- look one node out
+			flow_nodes = minetest.find_nodes_in_area(
+				{x=pos.x - 1, y=pos.y - 1, z=pos.z - 1},
+				{x=pos.x + 1, y=pos.y - 1, z=pos.z + 1},
+				flowing
+			)
+			
+			for _,fp in ipairs(flow_nodes) do
+				local n = minetest.get_node(fp);
+				-- check above to make sure it can get here
+				local na = minetest.get_node({x=fp.x, y=fp.y+1, z=fp.z})
+				
+		--		print("name: " .. na.name .. " l: " ..g)
+				if na.name == flowing then
+					minetest.set_node(fp, {name=node.name})
+					minetest.set_node(pos, {name=n.name})
+					return
+				end
+			end
+		
+			
+			-- look two nodes out
+			flow_nodes = minetest.find_nodes_in_area(
+				{x=pos.x - 2, y=pos.y - 1, z=pos.z - 2},
+				{x=pos.x + 2, y=pos.y - 1, z=pos.z + 2},
+				flowing
+			)
+			
+			for _,fp in ipairs(flow_nodes) do
+				local n = minetest.get_node(fp);
+				
+				-- check above
+				local na = minetest.get_node({x=fp.x, y=fp.y+1, z=fp.z})
+				--local ga = minetest.get_item_group(na.name, "molten_ore")
+				
+				if na.name == flowing then
+					-- check between above and node
+					local nb = minetest.get_node({x=(fp.x + pos.x) / 2, y=pos.y, z=(fp.z + pos.z) / 2})
+					--local gb = minetest.get_item_group(nb.name, "molten_ore")
+					
+					if na.name == flowing then
+					--print("name: " .. na.name .. " l: " ..ga .. " bname: " .. nb.name .. " lb: " ..gb)
+						minetest.set_node(fp, {name=node.name})
+						minetest.set_node(pos, {name=n.name})
+						return
+					end
+				end
+			end
+			
+		end,
+	})
+end
+
+
+--[[
+default.register_flowing_water("default:river_water_source", "default:river_water_flowing")
+default.register_flowing_water("default:lake_water_source", "default:lake_water_flowing")
+]]
