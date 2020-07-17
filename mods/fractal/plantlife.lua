@@ -102,7 +102,7 @@ function plantlife.register_plantlife(def)
                 stage = i,
                 form = "ripe",
                 name = plantlife.stage_name(def.name, "ripe", i),
-                texture = plantlife.texture_name(def.name, def.suffix or "", i),
+                texture = plantlife.texture_name(def.name, def.ripening.suffix or "", i),
                 no_self_action = {},
             }
             if def.ripening.colorize then
@@ -128,7 +128,7 @@ function plantlife.register_plantlife(def)
                 stage = i,
                 form = "dead",
                 name = plantlife.stage_name(def.name, "dead", i),
-                texture = plantlife.texture_name(def.name, def.suffix or "", i),
+                texture = plantlife.texture_name(def.name, def.frostkill.suffix or "", i),
                 no_self_action = {},
             }
             if def.frostkill.colorize then
@@ -154,7 +154,7 @@ function plantlife.register_plantlife(def)
                 stage = i,
                 form = "dead",
                 name = plantlife.stage_name(def.name, "dead", i),
-                texture = plantlife.texture_name(def.name, def.suffix or "", i),
+                texture = plantlife.texture_name(def.name, def.heatkill.suffix or "", i),
                 no_self_action = {},
             }
             if def.heatkill.colorize then
@@ -254,8 +254,8 @@ function plantlife.get_action_abm(action, day_start, day_end, daylight_only)
             and def.plantlife.grow_to
             and math.random(1, def.plantlife.grow_chance) == 1
         then
-            if type(def.plantlife.ripen_to) == "table" then
-                for i = 2, #def.plantlife.ripen_to do
+            if type(def.plantlife.grow_to) == "table" then
+                for i = 2, #def.plantlife.grow_to do
                     local p = {x=pos.x, y=pos.y+(i-1), z=pos.z}
                     local n = minetest.get_node(p)
                     if n.name ~= "air" then
@@ -263,13 +263,13 @@ function plantlife.get_action_abm(action, day_start, day_end, daylight_only)
                         return -- cannot grow into other things
                     end
                 end
-                minetest.swap_node(pos, {name=def.plantlife.ripen_to[1]})
-                for i = 2, #def.plantlife.ripen_to do
+                minetest.swap_node(pos, {name=def.plantlife.grow_to[1]})
+                for i = 2, #def.plantlife.grow_to do
                     local p = {x=pos.x, y=pos.y+(i-1), z=pos.z}
-                    minetest.set_node(p, {name=def.plantlife.ripen_to[i]})
+                    minetest.set_node(p, {name=def.plantlife.grow_to[i]})
                 end
             elseif def.stage_next then
-                minetest.swap_node(pos, {name=def.plantlife.ripen_to})
+                minetest.swap_node(pos, {name=def.plantlife.grow_to})
             end
         elseif
             action == "ripen"
@@ -280,9 +280,7 @@ function plantlife.get_action_abm(action, day_start, day_end, daylight_only)
             if def.plantlife.ripen_base_to then
                 local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
                 local node_below = minetest.get_node(pos_below)
-                if plantlife_form.ripe[node_below.name] then
-                    minetest.swap_node(pos_below, {name=def.plantlife.ripen_base_to})
-                end
+                minetest.swap_node(pos_below, {name=def.plantlife.ripen_base_to})
             end
         elseif
             action == "frostkill"
@@ -318,17 +316,17 @@ end
 
 -- debug settings
 -- local abm_interval = 3.0
--- local abm_chance   = 10
+-- local abm_chance   = 1
 
 -- real settings
-local abm_interval = 6.0
-local abm_chance   = 30
+local abm_interval = 12.0
+local abm_chance   = 10
 
 minetest.register_abm({
 	nodenames = {"group:plantlife_grow"},
 	interval = abm_interval, -- Run every 10 seconds
 	chance = abm_chance, -- Select every 1 in 20 nodes
-	action = plantlife.get_action_abm("grow", 1, 3, true)
+	action = plantlife.get_action_abm("grow", 1, 6, true)
 })
 
 minetest.register_abm({
