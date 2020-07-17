@@ -10,20 +10,18 @@ function plantlife.base_groups()
 	}
 end
 
-function plantlife.get_destruct_self_group(plant_self_group)
-    return function(pos, node, offset)
-        fractal.debug("triggering destruct check: " .. offset)
-        local np = {x = pos.x, y = pos.y + offset, z = pos.z}
-        local nn = minetest.get_node(np)
-        if not nn then
-            return
-        end
-        local name = nn.name
-        if not minetest.registered_nodes[name] or not minetest.registered_nodes[name].groups[plant_self_group] then
-            return
-        end
-        minetest.remove_node(np)
+function plantlife.destruct_y(pos, node, offset, self_group)
+    fractal.debug("triggering destruct check: " .. offset)
+    local np = {x = pos.x, y = pos.y + offset, z = pos.z}
+    local nn = minetest.get_node(np)
+    if not nn then
+        return
     end
+    local name = nn.name
+    if not minetest.registered_nodes[name] or not minetest.registered_nodes[name].groups[self_group] then
+        return
+    end
+    minetest.remove_node(np)
 end
 
 function plantlife.stage_name(name, suffix, stage)
@@ -196,7 +194,10 @@ function plantlife.register_plantlife(def)
                     fixed = def.selection_box,
                 },
                 drop = {},
-                after_destruct = plantlife.get_destruct_self_group(def.self_group),
+                after_destruct = function(pos, node)
+                    plantlife.destruct_y(pos, node, -1, def.self_group)
+                    plantlife.destruct_y(pos, node, 1, def.self_group)
+                end,
                 plantlife = form_def,
             }
 
