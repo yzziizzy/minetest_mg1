@@ -377,7 +377,7 @@ dofile(modpath.."/trees/fir.lua")
 dofile(modpath.."/trees/larch.lua")
 -- dofile(modpath.."/trees/redwood.lua")
 -- dofile(modpath.."/trees/rain_tree.lua")
--- dofile(modpath.."/trees/bamboo.lua")
+dofile(modpath.."/trees/bamboo.lua")
 
 dofile(modpath.."/casting.lua")
 
