@@ -209,15 +209,15 @@ function plantlife.register_plantlife(def)
                 registration.groups.plantlife_ripen = 1
             end
 
-            if form_def.frostkill then
+            if form_def.frostkill_to then
                 registration.groups.plantlife_frostkill = 1
             end
 
-            if form_def.heatkill then
+            if form_def.heatkill_to then
                 registration.groups.plantlife_heatkill = 1
             end
 
-            fractal.debug("registering node: "..form_def.name)
+            -- fractal.debug("registering node: "..form_def.name)
             minetest.register_node(form_def.name, registration)
         end
     end
@@ -233,20 +233,22 @@ function plantlife.get_action_abm(action, day_start, day_end, daylight_only)
         end
 
         if def.plantlife.no_self_action and def.plantlife.no_self_action[action] then
+            fractal.debug("abm on base node")
             return
         end
 
 		local time = minetest.get_timeofday()
 
-		local day_of_year = minetest.get_day_count() % 12 -- stub year length
-		-- print("day is: " .. day_of_year)
+        local day_of_year = minetest.get_day_count() % 12 -- stub year length
+		-- fractal.debug("abm day is: " .. day_of_year)
 		if (day_of_year < day_start) or (day_of_year > day_end) then
 			fractal.debug("not in day range [" .. day_start .. ", " .. day_end .. "]")
 			return
 		end
 
 		-- only ripen in the daytime, times are a bit arbitrary 5500 to 19500
-		if daylight_only and (time < 0.2292) or (time > 0.8125) then
+        if daylight_only and ((time < 0.2292) or (time > 0.8125)) then
+            fractal.debug("action only happens in daytime")
 			return
 		end
 
@@ -292,12 +294,10 @@ function plantlife.get_action_abm(action, day_start, day_end, daylight_only)
             if def.plantlife.frostkill_base_to then
                 local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
                 local node_below = minetest.get_node(pos_below)
-                if plantlife_form.dead[node_below.name] then
-                    minetest.swap_node(pos_below, {name=def.plantlife.frostkill_base_to})
-                end
+                minetest.swap_node(pos_below, {name=def.plantlife.frostkill_base_to})
             end
         elseif
-            action == "frostkill"
+            action == "heatkill"
             and def.plantlife.heatkill_to
             and math.random(1, def.plantlife.heatkill_chance) == 1
         then
@@ -305,9 +305,7 @@ function plantlife.get_action_abm(action, day_start, day_end, daylight_only)
             if def.plantlife.heatkill_base_to then
                 local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
                 local node_below = minetest.get_node(pos_below)
-                if plantlife_form.dead[node_below.name] then
-                    minetest.swap_node(pos_below, {name=def.plantlife.heatkill_base_to})
-                end
+                minetest.swap_node(pos_below, {name=def.plantlife.heatkill_base_to})
             end
         end
 
@@ -327,21 +325,21 @@ minetest.register_abm({
 	nodenames = {"group:plantlife_grow"},
 	interval = abm_interval, -- Run every 10 seconds
 	chance = abm_chance, -- Select every 1 in 20 nodes
-	action = plantlife.get_action_abm("grow", 1, 6, true)
+	action = plantlife.get_action_abm("grow", 0, 5, true)
 })
 
 minetest.register_abm({
 	nodenames = {"group:plantlife_ripen"},
 	interval = abm_interval, -- Run every 10 seconds
 	chance = abm_chance, -- Select every 1 in 20 nodes
-	action = plantlife.get_action_abm("ripen", 4, 6, true)
+	action = plantlife.get_action_abm("ripen", 3, 5, true)
 })
 
 minetest.register_abm({
 	nodenames = {"group:plantlife_frostkill"},
 	interval = abm_interval, -- Run every 10 seconds
 	chance = abm_chance, -- Select every 1 in 20 nodes
-	action = plantlife.get_action_abm("frostkill", 10, 12, false)
+	action = plantlife.get_action_abm("frostkill", 9, 11, false)
 })
 
 
@@ -349,5 +347,5 @@ minetest.register_abm({
 	nodenames = {"group:plantlife_heatkill"},
 	interval = abm_interval, -- Run every 10 seconds
 	chance = abm_chance, -- Select every 1 in 20 nodes
-	action = plantlife.get_action_abm("heatkill", 4, 6, true)
+	action = plantlife.get_action_abm("heatkill", 3, 5, true)
 })
