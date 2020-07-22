@@ -498,7 +498,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
 		})
-		rot.register_rot(log_base..sz, {
+		default.register_rot(log_base..sz, {
 			levels = {
 				{chance=5},
 				{chance=5},
@@ -680,7 +680,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
 	})
-	rot.register_rot(plank_base, {
+	default.register_rot(plank_base, {
 		levels = {{},{},{groups={causes_rot=1}},{groups={causes_rot=1}},}
 	})
 	
@@ -713,7 +713,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
 	})
-	rot.register_rot(box_base, {
+	default.register_rot(box_base, {
 		levels = {{},{},{groups={causes_rot=1}},{groups={causes_rot=1}},}
 	})
 	

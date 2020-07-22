@@ -1,9 +1,10 @@
 
 
-rot = {
+default.rot = {
 	downgrades = {},
 	chances = {},
 }
+local rot = default.rot
 
 
 function deepclone(t)
@@ -38,7 +39,7 @@ end
 
 
 -- "old" is the full name of the node
-rot.register_rot = function(old, info) 
+default.register_rot = function(old, info) 
 	local oldmod, oldname = splitname(old)
 	local olddef = minetest.registered_nodes[old]
 	
@@ -51,7 +52,7 @@ rot.register_rot = function(old, info)
 		def.description = "Rotting " .. def.description
 		def.rot_chance = extra.chance
 		
-		local name1 = "rot:"..oldmod.."_"..oldname.."_"..lvl
+		local name1 = "default:rotten_"..oldmod.."_"..oldname.."_"..lvl
 		
 		if extra.tiles then
 			def.tiles = extra.tiles
@@ -85,7 +86,7 @@ rot.register_rot = function(old, info)
 			end
 			rot.downgrades[name1] = final
 		else
-			rot.downgrades[name1] = "rot:"..oldmod.."_"..oldname.."_"..(lvl+1)
+			rot.downgrades[name1] = "default:rotten_"..oldmod.."_"..oldname.."_"..(lvl+1)
 		end
 		
 		minetest.register_node(":"..name1, def)
@@ -97,7 +98,7 @@ rot.register_rot = function(old, info)
 		reg_lvl(#info.levels, lvl, ex)
 	end
 	
-	rot.downgrades[old] = "rot:"..oldmod.."_"..oldname.."_1"
+	rot.downgrades[old] = "default:rotten_"..oldmod.."_"..oldname.."_1"
 	
 end
 
@@ -169,7 +170,7 @@ minetest.register_abm({
 -- keep rotting, alone
 minetest.register_abm({
 	nodenames = {"group:rotten"},
-	interval = 30,
+-- 	interval = 30,
 	chance = 100,
 	catch_up = true,
 	action = function(pos, node)
@@ -184,3 +185,28 @@ minetest.register_abm({
 	end,
 })
 
+
+
+-- warm and humid climates cause notes to randomly rot
+minetest.register_abm({
+	nodenames = {"group:rots"},
+	interval = 45,
+	chance = 200,
+	catch_up = true,
+	action = function(pos, node)
+		
+		if default.get_humidity(pos) + math.random(-5, 5) > 70 then 
+			if default.get_average_temp(pos) + math.random(-5, 5) > 26 then
+			
+				local n = rot.downgrades[node.name]
+				if n then
+					local c = rot.chances[node.name]
+					if not c or 1 == math.random(c) then
+						minetest.set_node(pos, {name = n, param2=node.param2})
+						minetest.check_for_falling(pos)
+					end
+				end
+			end
+		end
+	end,
+})

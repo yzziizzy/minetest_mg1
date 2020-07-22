@@ -361,6 +361,7 @@ minetest.register_abm({
 
 
 
+dofile(modpath.."/rot.lua")
 dofile(modpath.."/functions.lua")
 dofile(modpath.."/environment.lua")
 dofile(modpath.."/water.lua")
