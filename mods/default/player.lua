@@ -24,6 +24,28 @@ if not default.players then
 end
 
 
+function default.player_add_inv(player, items)
+	if not player then
+		return items
+	end
+	
+	local inv = player:get_inventory()
+	if not inv then
+		return items
+	end
+	
+	if type(items) ~= "table" then
+		items = {items}
+	end
+	
+	local remain = {}
+	for _,st in ipairs(items) do
+		table.insert(remain, inv:add_item("main", st))
+	end
+	
+	return remain
+end
+
 
 function default.hide_bar(player, bar_name)
 	local obj = default.player_objs[player:get_player_name()]

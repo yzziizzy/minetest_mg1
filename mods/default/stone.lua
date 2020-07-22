@@ -130,6 +130,9 @@ local stone_types = {
 }
 
 local function mkbox(x,y,z, szx, szy, szz)
+	if szy <= 0 then
+		return {}
+	end
 	return {x, y, z, x+szx, y+szy, z+szz}
 end
 
@@ -139,11 +142,12 @@ for i,def in pairs(stonedefs) do
 		tiles = {"default_"..def.n..".png^default_cobble.png"},
 		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
 		sounds = default.node_sound_stone_defaults(),
-		node_placement_prediction = "default:"..def.n.."_cobble_2",
-		on_dig = function(pos, node, digger)
-			minetest.set_node(pos, {name="default:"..def.n.."_cobble_2"})
-		end
+-- 		node_placement_prediction = "default:"..def.n.."_cobble_2",
+-- 		on_dig = function(pos, node, digger)
+-- 			minetest.set_node(pos, {name="default:"..def.n.."_cobble_2"})
+-- 		end
 	})
+	--[[
 	minetest.register_node("default:"..def.n.."_cobble_2", {
 		description = def.d.." Cobble",
 		tiles = {"default_"..def.n..".png^default_cobble.png"},
@@ -176,6 +180,7 @@ for i,def in pairs(stonedefs) do
 		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
 		sounds = default.node_sound_stone_defaults(),
 	})
+	]]
 	
 	minetest.register_node("default:"..def.n, {
 		description = def.d,
@@ -184,11 +189,14 @@ for i,def in pairs(stonedefs) do
 		cobble = "default:"..def.n.."_cobble",
 		
 		groups = {cracky = 3, stone = 1, stone_type = stone_types[def.t]},
-		drop = "default:"..def.n.."_cobble",
+		drop = "default:"..def.n.."_stones 9",
 		node_placement_prediction = "default:"..def.n.."_2",
 		sounds = default.node_sound_stone_defaults(),
 		on_dig = function(pos, node, digger)
 			local b = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+			
+			default.player_add_inv(digger, "default:"..def.n.."_stones 3")
+			
 			if b.name ~= "air" and 0 == minetest.get_item_group(b.name, "partial_stone") then
 				print("d")
 				minetest.set_node(pos, {name="default:"..def.n.."_2"})
@@ -218,22 +226,23 @@ for i,def in pairs(stonedefs) do
 		},
 		
 		
-		cobble = "default:"..def.n.."_cobble_2",
+		cobble = "default:"..def.n.."_stones_6",
 		
 		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
-		drop = "default:"..def.n.."_cobble_2",
+		drop = "default:"..def.n.."_stones 6",
 		node_placement_prediction = "default:"..def.n.."_3",
 		sounds = default.node_sound_stone_defaults(),
 		on_dig = function(pos, node, digger)
+			
+			default.player_add_inv(digger, "default:"..def.n.."_stones 3")
+			
 			local b = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
 			if b.name ~= "air" and 0 == minetest.get_item_group(b.name, "partial_stone") then
-				print("d")
 				minetest.set_node(pos, {name="default:"..def.n.."_3"})
 				return
 			end
 			local u = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
 			if u.name ~= "air" then
-				print("u")
 				minetest.set_node(pos, {name="default:"..def.n.."_3", param2 = 20})
 				return
 			end
@@ -254,38 +263,70 @@ for i,def in pairs(stonedefs) do
 			fixed = {-0.5, -0.5, -0.5, 0.5, -0.16667, 0.5},
 		},
 		
-		cobble = "default:"..def.n.."_cobble_3",
+		cobble = "default:"..def.n.."_stones_3",
 		
 		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
-		drop = "default:"..def.n.."_cobble_3",
+		drop = "default:"..def.n.."_stones 3",
 		sounds = default.node_sound_stone_defaults(),
 	})
 	
 	-- pile of stones on the ground
-	minetest.register_node("default:"..def.n.."_stones", {
-		description = def.d .. " Stones",
-		tiles = {"default_"..def.n..".png"},
-		paramtype = "light",
-		drawtype = "nodebox",
-		node_box = {
-			type = "fixed",
-			fixed = {
-				mkbox(-0.3, -0.5, -0.3, 0.2, 0.1, 0.2),
-				mkbox(0.05, -0.5, 0.3, 0.1, 0.1, 0.1),
-				mkbox(-0.1, -0.5, -0.1, 0.2, 0.2, 0.2),
-				mkbox(0.2, -0.5, 0.1, 0.1, 0.1, 0.1),
-				mkbox(0.0, -0.5, 0.0, -0.3, 0.07, 0.3),
-				mkbox(0.3, -0.5, -0.3, 0.1, 0.05, 0.1),
+	for i_ = 1,8 do
+		local i = i_
+		local g = ""
+		if i > 1 then
+			g = "_"..i
+		end
+		
+		local h = (i - 1) * 0.105
+		
+		minetest.register_node("default:"..def.n.."_stones"..g, {
+			description = def.d .. " Stones",
+			tiles = {"default_"..def.n..".png", "default_"..def.n..".png^default_cobble.png"},
+			paramtype = "light",
+			drawtype = "nodebox",
+			node_box = {
+				type = "fixed",
+				fixed = {
+					mkbox(-0.3, -0.5+h, -0.3, 0.2, 0.1, 0.2),
+					mkbox(0.05, -0.5+h, 0.3, 0.1, 0.1, 0.1),
+					mkbox(-0.1, -0.5+h, -0.1, 0.2, 0.2, 0.2),
+					mkbox(0.2, -0.5+h,  0.1, 0.1, 0.1,  0.1),
+					mkbox(0.0, -0.5+h,  0.0,-0.3, 0.07, 0.3),
+					mkbox(0.3, -0.5+h, -0.3, 0.1, 0.05, 0.1),
+					
+					mkbox(-0.5, -0.5, -0.5, 1, h, 1),
+				},
 			},
-		},
-		selection_box = {
-			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
-		},
-		sunlight_propagates = true,
-		groups = {stones = 1, stone_type = stone_types[def.t], oddly_breakable_by_hand = 1},
-		sounds = default.node_sound_stone_defaults(),
-	})
+			selection_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, -0.4+h, 0.5},
+			},
+			sunlight_propagates = true,
+			num_stones = i,
+			drop = "default:"..def.n.."_stones "..i,
+			groups = {stones = 1, falling_node = 1, stone_type = stone_types[def.t], oddly_breakable_by_hand = 1},
+			sounds = default.node_sound_stone_defaults(),
+		})
+		
+		if i > 1 then
+			minetest.register_craft({
+				output = "default:"..def.n.."_stones "..i,
+				type = "shapeless",
+				recipe = {"default:"..def.n.."_stones_"..i}
+			})
+			
+			local w = {}
+			for j = 1,i do
+				w[j] = "default:"..def.n.."_stones"
+			end
+			minetest.register_craft({
+				output = "default:"..def.n.."_stones_"..i,
+				type = "shapeless",
+				recipe = w,
+			})
+		end
+	end
 	
 	-- stone/cobble crafts
 	minetest.register_craft({
