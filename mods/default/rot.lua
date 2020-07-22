@@ -170,7 +170,7 @@ minetest.register_abm({
 -- keep rotting, alone
 minetest.register_abm({
 	nodenames = {"group:rotten"},
--- 	interval = 30,
+	interval = 30,
 	chance = 100,
 	catch_up = true,
 	action = function(pos, node)

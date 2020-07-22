@@ -265,7 +265,20 @@ default.register_ore = function(def)
 end
 
 
-
+-- shallow copy
+function default.extend(a, b)
+	b = b or {}
+	local c = {}
+	for k,v in pairs(a) do
+		c[k] = v
+	end
+	
+	for k,v in pairs(b) do
+		c[k] = v
+	end
+	
+	return c
+end
 -- temp
 
 minetest.register_tool("default:axe_steel", {
@@ -352,16 +365,14 @@ minetest.register_abm({
 	end
 })
 
-
-
-
-
-
 -- /temp
 
 
-
+-- files with no deps
+dofile(modpath.."/crumbling.lua")
 dofile(modpath.."/rot.lua")
+
+-- files that are deps
 dofile(modpath.."/functions.lua")
 dofile(modpath.."/environment.lua")
 dofile(modpath.."/water.lua")
@@ -372,6 +383,8 @@ dofile(modpath.."/biomes.lua")
 dofile(modpath.."/surface_deco.lua")
 dofile(modpath.."/ores.lua")
 dofile(modpath.."/trees.lua")
+
+-- files that have deps
 dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
 dofile(modpath.."/trees/fir.lua")
@@ -381,21 +394,6 @@ dofile(modpath.."/trees/larch.lua")
 dofile(modpath.."/trees/bamboo.lua")
 
 dofile(modpath.."/casting.lua")
-
---[[
-dofile(default_path.."/trees.lua")
-dofile(default_path.."/nodes.lua")
-dofile(default_path.."/chests.lua")
-dofile(default_path.."/furnace.lua")
-dofile(default_path.."/torch.lua")
-dofile(default_path.."/tools.lua")
-dofile(default_path.."/item_entity.lua")
-dofile(default_path.."/craftitems.lua")
-dofile(default_path.."/crafting.lua")
-dofile(default_path.."/mapgen.lua")
-dofile(default_path.."/aliases.lua")
-dofile(default_path.."/legacy.lua")
---]]
 
 dofile(modpath.."/soil.lua")
 dofile(modpath.."/stone.lua")

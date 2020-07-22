@@ -201,7 +201,7 @@ for i,def in pairs(stonedefs) do
 				return
 			end
 		
--- 			minetest.set_node(pos, {name="default:"..def.n.."_2"})
+			minetest.set_node(pos, {name="default:"..def.n.."_2"})
 		end
 	})
 	
@@ -221,7 +221,7 @@ for i,def in pairs(stonedefs) do
 		cobble = "default:"..def.n.."_cobble_2",
 		
 		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
-		drop = "default:"..def.n.."_cobbl_2e",
+		drop = "default:"..def.n.."_cobble_2",
 		node_placement_prediction = "default:"..def.n.."_3",
 		sounds = default.node_sound_stone_defaults(),
 		on_dig = function(pos, node, digger)
@@ -237,6 +237,8 @@ for i,def in pairs(stonedefs) do
 				minetest.set_node(pos, {name="default:"..def.n.."_3", param2 = 20})
 				return
 			end
+			
+			minetest.set_node(pos, {name="default:"..def.n.."_3"})
 		end
 	})
 	
@@ -312,9 +314,10 @@ for i,def in pairs(stonedefs) do
 end
 
 
-
-
-
+default.register_crumbling("default:granite", {
+	corner = { drop = "default:granite_stones 7" },
+	edge = { drop = "default:granite_stones 6" },
+})
 
 
 
