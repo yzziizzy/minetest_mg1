@@ -119,8 +119,8 @@ default.register_water({
 	range = 7,
 	post_effect = {a = 103, r = 30, g = 60, b = 90},
 	sounds = default.node_sound_water_defaults(),
-	src_groups = {water = 3, liquid = 3, cools_lava = 1},
-	flow_groups = {water = 3, liquid = 3, cools_lava = 1, not_in_creative_inventory = 1},
+	src_groups = {water = 3, liquid = 3, cools_lava = 1, causes_rot = 1},
+	flow_groups = {water = 3, liquid = 3, cools_lava = 1, causes_rot = 1, not_in_creative_inventory = 1},
 })
 
 
@@ -141,8 +141,8 @@ default.register_water({
 	range = 2,
 	post_effect = {a = 103, r = 30, g = 76, b = 90},
 	sounds = default.node_sound_water_defaults(),
-	src_groups = {water = 3, liquid = 3, cools_lava = 1},
-	flow_groups = {water = 3, liquid = 3, cools_lava = 1, not_in_creative_inventory = 1},
+	src_groups = {water = 3, liquid = 3, cools_lava = 1, causes_rot = 1},
+	flow_groups = {water = 3, liquid = 3, cools_lava = 1, causes_rot = 1, not_in_creative_inventory = 1},
 })
 
 default.register_water({
@@ -161,8 +161,8 @@ default.register_water({
 	range = 2,
 	post_effect = {a = 93, r = 20, g = 86, b = 70},
 	sounds = default.node_sound_water_defaults(),
-	src_groups = {water = 3, liquid = 3, cools_lava = 1},
-	flow_groups = {water = 3, liquid = 3, cools_lava = 1, not_in_creative_inventory = 1},
+	src_groups = {water = 3, liquid = 3, cools_lava = 1, causes_rot = 1},
+	flow_groups = {water = 3, liquid = 3, cools_lava = 1, causes_rot = 1, not_in_creative_inventory = 1},
 })
 
 

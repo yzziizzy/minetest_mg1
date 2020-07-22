@@ -12,7 +12,7 @@ minetest.register_node("default:sand", {
 minetest.register_node("default:wet_sand", {
 	description = S("Sand"),
 	tiles = {"default_sand.png^[colorize:gray:20"},
-	groups = {crumbly = 2, falling_node = 1, wet_sand = 1},
+	groups = {crumbly = 2, falling_node = 1, wet_sand = 1, causes_rot = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
@@ -34,14 +34,21 @@ minetest.register_node("default:silver_sand", {
 minetest.register_node("default:dirt", {
 	description = "Dirt",
 	tiles = {"default_dirt.png"},
-	groups = {crumbly = 3, falling_node = 1, soil = 1},
+	groups = {crumbly = 3, falling_node = 1, soil = 1, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
 minetest.register_node("default:topsoil", {
 	description = "Topsoil",
 	tiles = {"default_dirt.png^[colorize:black:20"},
-	groups = {crumbly = 2, falling_node = 1, soil = 2},
+	groups = {crumbly = 2, falling_node = 1, soil = 2, causes_rot = 1},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:compost", {
+	description = "Topsoil",
+	tiles = {"default_dirt.png^[colorize:brown:40"},
+	groups = {crumbly = 2, falling_node = 1, soil = 2, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -63,15 +70,15 @@ default.register_water({
 	range = 1,
 	post_effect = {a = 255, r = 20, g = 20, b = 0},
 	sounds = default.node_sound_water_defaults(),
-	src_groups = { liquid = 3, falling_node = 1, },
-	flow_groups = { liquid = 3, not_in_creative_inventory = 1},
+	src_groups = { liquid = 3, falling_node = 1, causes_rot = 1},
+	flow_groups = { liquid = 3, causes_rot = 1, not_in_creative_inventory = 1},
 })
 
 
 minetest.register_node("default:wet_clay", {
 	description = S("Wet Clay"),
 	tiles = {"default_clay.png"},
-	groups = {crumbly = 3, falling_node = 1, wet_clay = 1},
+	groups = {crumbly = 3, falling_node = 1, wet_clay = 1, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 minetest.register_node("default:dry_clay", {

@@ -438,7 +438,10 @@ end
 
 local function update_all_manna() 
 	for pname,info in pairs(default.players) do
-		update_player_manna(default.player_objs[pname].player, info, 20) -- HACK manna regenerates quickly for debugging
+		local obj = default.player_objs[pname]
+		if obj then
+			update_player_manna(obj.player, info, 20) -- HACK manna regenerates quickly for debugging
+		end
 	end
 	
 	minetest.after(2, update_all_manna)

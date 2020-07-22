@@ -84,8 +84,8 @@ function default.register_bamboo(def)
 			})
 			
 			
-			minetest.register_node("default:"..name.."_rhisome_"..szi.."_"..cci, {
-				description = def.Name.." Rhisome"),
+			minetest.register_node("default:"..def.name.."_rhisome_"..szi.."_"..cci, {
+				description = def.Name.." Rhisome",
 				tiles = {
 					"default_coniferous_litter.png",
 					"default_dirt.png",

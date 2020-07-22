@@ -498,6 +498,15 @@ function default.register_tree_trunks(mod, growth_data)
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
 		})
+		rot.register_rot(log_base..sz, {
+			levels = {
+				{chance=5},
+				{chance=5},
+				{chance=5},
+				{chance=5, groups={causes_rot=1}},
+			},
+		})
+
 		
 		minetest.register_node(trunk_base..sz, {
 			description = growth_data.Name.." Tree",
@@ -663,13 +672,16 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			choppy = 2, flammable = 3, wood_planks = 1, 
+			choppy = 2, flammable = 3, wood_planks = 1, rots = 1,
 		},
 		
 		tree_type = growth_data.name,
 		
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
+	})
+	rot.register_rot(plank_base, {
+		levels = {{},{},{groups={causes_rot=1}},{groups={causes_rot=1}},}
 	})
 	
 	-- boxes
@@ -686,7 +698,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			choppy = 2, flammable = 3, wood_box = 1,
+			choppy = 2, flammable = 3, wood_box = 1, rots = 1,
 		},
 		
 		tree_type = growth_data.name,
@@ -701,6 +713,10 @@ function default.register_tree_trunks(mod, growth_data)
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
 	})
+	rot.register_rot(box_base, {
+		levels = {{},{},{groups={causes_rot=1}},{groups={causes_rot=1}},}
+	})
+	
 	
 	-- sticks
 	minetest.register_node(stick_base, {
