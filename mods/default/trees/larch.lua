@@ -288,54 +288,87 @@ for sz = 1,6 do
 		},
 		connects_to = {"group:tree_trunk"},
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1},
+		groups = {choppy = 3, oddly_breakable_by_hand = 2, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 	
 	
-	minetest.register_node("default:fallen_larch_leaves_"..sz, {
+	minetest.register_node("default:fallen_larch_leaves_"..sz.."_t", {
 		description = "Dead Larch Needles",
 		tiles = {"default_larch_needles_fall.png"},
 		paramtype = "light",
+		paramtype2 = "facedir",
 		drawtype = "nodebox",
 		
 		node_box = {
-			type = "connected",
-			disconnected = {
-				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
-			},
-			connect_bottom = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
-			connect_top = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "right"), {x=1, z=0}), {x=0, y=sh, z=0}),
-			connect_front = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "front"), {x=1, z=0}), {x=0, y=sh, z=0}),
-			connect_back = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "back"), {x=1, z=0}), {x=0, y=sh, z=0}),
--- 			connect_right = boxrotdim(boxrot(needle_boxen[sz], "right"), {x=1, z=0}),
--- 			connect_front = boxrotdim(boxrot(needle_boxen[sz], "front"), {x=1, z=0}),
--- 			connect_back = boxrotdim(boxrot(needle_boxen[sz], "back"), {x=1, z=0}),
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
 		},
 		collision_box = {
-			type = "connected",
-			disconnected = {
-				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
-			},
-			connect_left = boxrot({box_shell(needle_boxen[sz])}, "left"),
-			connect_right = boxrot({box_shell(needle_boxen[sz])}, "right"),
-			connect_front = boxrot({box_shell(needle_boxen[sz])}, "front"),
-			connect_back = boxrot({box_shell(needle_boxen[sz])}, "back"),
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
 		},
 		selection_box = {
-			type = "connected",
-			disconnected = {
-				{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
-			},
-			connect_left = boxrot({box_shell(needle_boxen[sz])}, "left"),
-			connect_right = boxrot({box_shell(needle_boxen[sz])}, "right"),
-			connect_front = boxrot({box_shell(needle_boxen[sz])}, "front"),
-			connect_back = boxrot({box_shell(needle_boxen[sz])}, "back"),
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
 		},
-		connects_to = {"group:tree_log"},
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 2,  leaves=1, flammable = 2, plant = 1},
+		groups = {choppy = 3, oddly_breakable_by_hand = 1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
+		sounds = default.node_sound_wood_defaults(),
+	})
+	minetest.register_node("default:fallen_larch_leaves_"..sz.."_l", {
+		description = "Dead Larch Needles Side X",
+		tiles = {"default_larch_needles_fall.png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "front"), {x=1, z=0}), {x=0, y=sh, z=0}),
+		},
+		collision_box = {
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "front"), {x=1, z=0}), {x=0, y=sh, z=0}),
+		},
+		selection_box = {
+			type = "fixed",
+			fixed = {-.5, -.5, -.5, .5,.5,.5},
+-- 			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
+		},
+		sunlight_propagates = true,
+		groups = {choppy = 3, oddly_breakable_by_hand = 1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
+		sounds = default.node_sound_wood_defaults(),
+	})
+	minetest.register_node("default:fallen_larch_leaves_"..sz.."_r", {
+		description = "Dead Larch Needles Side Z",
+		tiles = {"default_larch_needles_fall.png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		drawtype = "nodebox",
+		
+		node_box = {
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "back"), {x=1, z=0}), {x=0, y=sh, z=0}),
+		},
+		collision_box = {
+			type = "fixed",
+			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "back"), {x=1, z=0}), {x=0, y=sh, z=0}),
+		},
+		selection_box = {
+			type = "fixed",
+			fixed = {-.5, -.5, -.5, .5,.5,.5},
+-- 			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
+		},
+		sunlight_propagates = true,
+		groups = {choppy = 3, oddly_breakable_by_hand = 1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 end
 
+
+minetest.register_craft({
+	output = "default:larch_stick",
+	type = "shapeless",
+	recipe = {"group:larch_leaves"}
+})

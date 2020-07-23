@@ -329,6 +329,7 @@ local function set_player_speed(player, info)
 		bonus = bonus + bs * v
 	end
 	
+-- 	print(bs.." " ..bonus)
 	player:set_physics_override({
 		speed = bs + bonus,
 	})

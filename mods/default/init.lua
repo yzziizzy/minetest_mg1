@@ -138,14 +138,19 @@ minetest.register_on_mods_loaded(function()
 			deco.cids.place[i] = minetest.get_content_id(v)
 		end
 		
-		
 		-- fill decorations into biomes
-		for _,biome_name in ipairs(deco.biomes) do
-			local bio = default.biomes[biome_name]
-			if not bio then
-				print("Unknown biome '"..biome_name.."' in decoration '"..deco.name.."'.")
-			else
+		if deco.biomes == "*" then
+			for _,bio in pairs(default.biomes) do
 				bio.surface_decos[deco.name] = deco
+			end
+		else
+			for _,biome_name in ipairs(deco.biomes) do
+				local bio = default.biomes[biome_name]
+				if not bio then
+					print("Unknown biome '"..biome_name.."' in decoration '"..deco.name.."'.")
+				else
+					bio.surface_decos[deco.name] = deco
+				end
 			end
 		end
 	end
@@ -377,12 +382,14 @@ dofile(modpath.."/water.lua")
 dofile(modpath.."/seasons.lua")
 dofile(modpath.."/player.lua")
 
+
 dofile(modpath.."/biomes.lua")
 dofile(modpath.."/surface_deco.lua")
 dofile(modpath.."/ores.lua")
 dofile(modpath.."/trees.lua")
 
 -- files that have deps
+dofile(modpath.."/tools.lua")
 dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
 dofile(modpath.."/trees/fir.lua")

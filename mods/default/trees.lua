@@ -197,15 +197,21 @@ end
 
 function default.place_fallen_boughs(pos, updir, name)
 	if updir.x == 1 then
-		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name=name, param2=1})
-		minetest.set_node({x=pos.x, y=pos.y, z=pos.z+1}, {name=name, param2=1})
-		minetest.set_node({x=pos.x, y=pos.y, z=pos.z-1}, {name=name, param2=1})
+		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name=name.."_t", param2=0})
+		minetest.set_node({x=pos.x, y=pos.y, z=pos.z+1}, {name=name.."_l", param2=0})
+		minetest.set_node({x=pos.x, y=pos.y, z=pos.z-1}, {name=name.."_r", param2=0})
 	elseif updir.x == -1 then
-		
+		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name=name.."_t", param2=2})
+		minetest.set_node({x=pos.x, y=pos.y, z=pos.z+1}, {name=name.."_r", param2=2})
+		minetest.set_node({x=pos.x, y=pos.y, z=pos.z-1}, {name=name.."_l", param2=2})
 	elseif updir.z == 1 then
-		
+		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name=name.."_t", param2=3})
+		minetest.set_node({x=pos.x+1, y=pos.y, z=pos.z}, {name=name.."_r", param2=3})
+		minetest.set_node({x=pos.x-1, y=pos.y, z=pos.z}, {name=name.."_l", param2=3})
 	elseif updir.z == -1 then
-		
+		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name=name.."_t", param2=1})
+		minetest.set_node({x=pos.x+1, y=pos.y, z=pos.z}, {name=name.."_l", param2=1})
+		minetest.set_node({x=pos.x-1, y=pos.y, z=pos.z}, {name=name.."_r", param2=1})
 	end
 	
 end
@@ -489,10 +495,12 @@ function default.register_tree_trunks(mod, growth_data)
 			tree_stage = sz,
 			
 			drop = {
-				max_items = 1,
+				max_items = 2,
 				items = {
-					{ tools = {"group:axe"}, items = {plank_base.." "..sz}, },
-					{ items = {log_base}, },
+-- 					{ tools = {"group:axe"}, items = {plank_base.." "..sz}, }, -- groups do not work
+					{ tools = {"default:stone_axe"}, items = {firewood_base.." "..sz}, },
+					{ tools = {"default:stone_axe"}, items = {plank_base.." "..sz}, },
+					{ items = {log_base.."_"..sz}, },
 				},
 			},
 			sounds = default.node_sound_wood_defaults(),
@@ -557,7 +565,7 @@ function default.register_tree_trunks(mod, growth_data)
 						
 						digger:set_wielded_item(wielded)
 					else
-						default.fell_tree(pos, digger)
+						default.fell_tree(pos, digger, default.random_cardinal())
 	-- 					minetest.node_dig(pos, node, digger)
 					end
 				end
@@ -648,7 +656,7 @@ function default.register_tree_trunks(mod, growth_data)
 							
 							digger:set_wielded_item(wielded)
 						else
-							default.fell_tree(pos, digger)
+							default.fell_tree(pos, digger, default.random_cardinal())
 	-- 						minetest.node_dig(pos, node, digger)
 						end
 					end
@@ -672,7 +680,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			choppy = 2, flammable = 3, wood_planks = 1, rots = 1,
+			burnable = 1, choppy = 2, flammable = 3, wood_plank = 1, rots = 1,
 		},
 		
 		tree_type = growth_data.name,
@@ -698,7 +706,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			choppy = 2, flammable = 3, wood_box = 1, rots = 1,
+			burnable = 1, choppy = 2, flammable = 3, wood_box = 1, rots = 1,
 		},
 		
 		tree_type = growth_data.name,
@@ -722,6 +730,7 @@ function default.register_tree_trunks(mod, growth_data)
 	minetest.register_node(stick_base, {
 		description = growth_data.Name.." Stick",
 		tiles = {growth_data.tiles.stick},
+		-- TODO: weilditem rotate
 		paramtype = "light",
 		paramtype2 = "facedir",
 		drawtype = "nodebox",
@@ -732,7 +741,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			choppy = 3, flammable = 3, stick = 1, oddly_breakable_by_hand = 1,
+			burnable = 1, choppy = 3, flammable = 3, stick = 1, oddly_breakable_by_hand = 1,
 		},
 		
 		tree_type = growth_data.name,
@@ -760,7 +769,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			flammable = 3, firewood = 1, oddly_breakable_by_hand = 1,
+			burnable = 1, flammable = 3, firewood = 1, oddly_breakable_by_hand = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -830,6 +839,12 @@ local function rotate_about(list, center, rotdim)
 		local c
 		if rotdim.x == 1 then
 			c = {x=b.y, y=b.x, z=b.z}
+		elseif rotdim.x == -1 then
+			c = {x=-b.y, y=b.x, z=b.z}
+		elseif rotdim.z == 1 then
+			c = {x=b.x, y=b.z, z=b.y}
+		elseif rotdim.z == -1 then
+			c = {x=b.x, y=b.z, z=-b.y}
 		end
 		
 		table.insert(o, vector.add(c, center))
@@ -838,9 +853,35 @@ local function rotate_about(list, center, rotdim)
 	return o
 end
 
+local cardinals = {
+	{x=0, y=0, z=1},
+	{x=1, y=0, z=0},
+	{x=0, y=0, z=-1},
+	{x=-1, y=0, z=0},
+}
 
+function default.random_cardinal()
+	local c = cardinals[math.random(4)]
+-- 	return {x=-1, y=0, z=0}
+	return {x=c.x, y=0, z=c.z}
+end
 
-function default.fell_tree(chopped_pos, player)
+local function logp2(d)
+	if d.x == 1 then
+		return 1
+	elseif d.x == -1 then
+		return 3
+	elseif d.z == 1 then
+		return 2
+	elseif d.z == -1 then
+		return 0
+	else
+		return 0
+	end
+end
+
+function default.fell_tree(chopped_pos, player, fdir)
+	fdir.y = 0
 	local n = minetest.get_node(chopped_pos)
 	local chopped_def = minetest.registered_nodes[n.name]
 	
@@ -859,7 +900,7 @@ function default.fell_tree(chopped_pos, player)
 	local felled_h = root_pos.y + height - chopped_pos.y
 	
 	local leaves = default.felling_clear_old_leaves(root_pos, meta)
-
+	print(dump2(leaves))
 	
 	-- todo: fetch log diameter?
 	
@@ -892,7 +933,8 @@ function default.fell_tree(chopped_pos, player)
 
 	-- place logs
 	local i = 0
-	local x = root_pos.x + 1
+-- 	local x = root_pos.x + 1
+	local lp = vector.add(root_pos, fdir)
 	local max_fall_y = root_pos.y
 	
 	local bn = tree_def.stages[stage_num].boughs and tree_def.stages[stage_num].boughs.num
@@ -900,20 +942,20 @@ function default.fell_tree(chopped_pos, player)
 	local log_pos = {}
 	for li,log in ipairs(logs) do
 		-- find ground level.
-		local lpos = {x=x, y=root_pos.y + 1, z=root_pos.z}
+-- 		local lpos = {x=lp.x, y=lp.y, z=lp.z}
 		for y = root_pos.y+felled_h,max_fall_y,-1 do
-			lpos.y = y
-			local n = minetest.get_node(lpos)
+			lp.y = y
+			local n = minetest.get_node(lp)
 			if n.name ~= "air" then
-				lpos.y = lpos.y + 1
+				lp.y = lp.y + 1
 				break
 			end
 		end
 		
-		max_fall_y = math.max(max_fall_y, lpos.y)
-		lpos.y = max_fall_y
+		max_fall_y = math.max(max_fall_y, lp.y)
+		lp.y = max_fall_y
 		
-		minetest.set_node(lpos, {name=log, param2=1})
+		minetest.set_node(lp, {name=log, param2=logp2(fdir)})
 		--[[
 		if tree_def.type == "conifer" then
 			if i > #logs - bn then
@@ -923,10 +965,11 @@ function default.fell_tree(chopped_pos, player)
 		end
 
 		i = i + 1]]
-		x = x + 1
-		log_pos[li] = lpos
+-- 		x = x + 1
+		lp = vector.add(lp, fdir)
+		log_pos[li] = lp
 	end
-		
+	
 	
 -- 	default.clear_old_leaves(root_pos, meta)
 	
@@ -944,14 +987,13 @@ function default.fell_tree(chopped_pos, player)
 		for li,log in ipairs(logs) do
 			if i > #logs - bn then
 				local sz = minetest.registered_nodes[log].tree_stage
-				default.place_fallen_boughs(log_pos[li], {x=1, z=0}, "default:fallen_larch_leaves_"..sz)
+				default.place_fallen_boughs(log_pos[li], fdir, "default:fallen_larch_leaves_"..sz)
 			end
 		
 			i = i + 1
-			x = x + 1
 		end
 	elseif tree_def.type == "blob" then
-		local place_leaves = rotate_about(leaves, {x=root_pos.x, y=root_pos.y+1, z=root_pos.z}, {x=1, z=0})
+		local place_leaves = rotate_about(leaves, {x=root_pos.x, y=root_pos.y+1, z=root_pos.z}, fdir)
 		
 		for _,p in ipairs(place_leaves) do
 			local n = minetest.get_node(p)

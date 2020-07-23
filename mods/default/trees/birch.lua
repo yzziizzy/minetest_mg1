@@ -109,7 +109,7 @@ for i = 1,3 do
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,
-		groups = {snappy = 3, leaf_rot = 1, flammable = 2, leaves = 1},
+		groups = {snappy = 3, leaf_rot = 1, flammable = 2, birch_leaves = 1, leaves = 1, oddly_breakable_by_hand = 1},
 		drop = "default:birch_leaves_"..i,
 		sounds = default.node_sound_leaves_defaults(),
 	})
@@ -122,7 +122,7 @@ for i = 1,3 do
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,
-		groups = {snappy = 3, leaf_rot = 1, flammable = 2, leaves = 1, fallen_leaves = 1},
+		groups = {snappy = 3, leaf_rot = 1, flammable = 2, birch_leaves = 1, leaves = 1, fallen_leaves = 1, oddly_breakable_by_hand = 1},
 		sounds = default.node_sound_leaves_defaults(),
 	})
 end
@@ -165,3 +165,9 @@ minetest.register_node("default:mg_rand_birch_sapling", {
 	]]
 })
 
+
+minetest.register_craft({
+	output = "default:birch_stick",
+	type = "shapeless",
+	recipe = {"group:birch_leaves"}
+})
