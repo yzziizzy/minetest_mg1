@@ -207,9 +207,7 @@ minetest.register_on_mods_loaded(function()
 		
 		-- fill ores into biomes
 		if ore.stone_biomes == "*" then
-		print("all is all: ".. ore.name)
 			for _,bio in pairs(default.stone_biomes) do
-				print(" sbio: "..bio.name) 
 				bio.ores[ore.name] = ore
 			end
 		else

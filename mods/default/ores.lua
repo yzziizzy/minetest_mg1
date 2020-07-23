@@ -111,6 +111,31 @@ default.register_ore({
 
 })
 
+default.register_ore({
+	name = "malachite_blobs", -- a copper ore
+	type = "blob",
+	
+	y_min = -32000,
+	y_max = 140,
+	lat_min = 0,
+	lat_max = 32000,
+	lat_abs = true,
+	
+	noise = {
+		spread = {x=400, y=400, z=400},
+		seed = 67435,
+		octaves = 3,
+		persist = 0.35,
+	},
+	threshold = 1.12, -- place if the noise is GREATER than this; larger value = smaller blob
+	
+	place_in = {
+		["default:limestone"] = {"default:limestone_with_malachite"},
+	},
+	stone_biomes = {"sedimentary_1"},
+
+})
+
 --[[ not implemented
 default.register_surface_ore({
 	name = "bog_iron",

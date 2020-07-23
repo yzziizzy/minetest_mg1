@@ -156,7 +156,7 @@ minetest.register_playerevent(function(player, event)
 		default.set_bar_pct(player, "breath", br / max)
 		
 	elseif event == "hud_changed" then
-		print("hud changed event")
+-- 		print("hud changed event")
 	end
 
 end)

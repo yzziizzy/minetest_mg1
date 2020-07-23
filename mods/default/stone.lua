@@ -98,6 +98,7 @@ local stonedefs = {
 	{n="pumice", d="Pumice", t="i", h=1}, --
 
 	{n="limestone", d="Limestone", t="s", h=2}, --
+	{n="limestone_with_malachite", d="Limestone with Malachite", t="s", h=2, tile="default_limestone.png^default_malachite.png"}, --
 	{n="sandstone", d="Sandstone", t="s", h=2}, --
 	{n="gypsum", d="Gypsum", t="s", h=1}, --
 	{n="halite", d="Halite", t="s", h=2}, --
@@ -116,10 +117,10 @@ local stonedefs = {
 	-- fossil rocks
 	{n="lignite", d="Lignite", t="f", h=1}, 
 	{n="bituminous_coal", d="Coal", t="f", h=2},
-	{n="anthracite_coal", d="Anthracite Coal", t="f", h=3},
+	{n="anthracite", d="Anthracite Coal", t="f", h=3},
 	{n="graphite", d="Graphite", t="f", h=4}, 
-	{n="oil_shale", d="Oil Shale", t="f", h=2},
-	{n="tar_sand", d="tar_sand", t="f", h=1}, -- remove, not being stone?
+-- 	{n="oil_shale", d="Oil Shale", t="f", h=2},
+-- 	{n="tar_sand", d="tar_sand", t="f", h=1}, -- remove, not being stone?
 }
 
 local stone_types = {
@@ -137,9 +138,11 @@ local function mkbox(x,y,z, szx, szy, szz)
 end
 
 for i,def in pairs(stonedefs) do
+	local tile = def.tile or ("default_"..def.n..".png")
+	
 	minetest.register_node("default:"..def.n.."_cobble", {
 		description = def.d.." Cobble",
-		tiles = {"default_"..def.n..".png^default_cobble.png"},
+		tiles = {tile.."^default_cobble.png"},
 		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
 		sounds = default.node_sound_stone_defaults(),
 -- 		node_placement_prediction = "default:"..def.n.."_cobble_2",
@@ -184,7 +187,7 @@ for i,def in pairs(stonedefs) do
 	
 	minetest.register_node("default:"..def.n, {
 		description = def.d,
-		tiles = {"default_"..def.n..".png"},
+		tiles = {tile},
 		
 		cobble = "default:"..def.n.."_cobble",
 		
@@ -198,13 +201,11 @@ for i,def in pairs(stonedefs) do
 			default.player_add_inv(digger, "default:"..def.n.."_stones 3")
 			
 			if b.name ~= "air" and 0 == minetest.get_item_group(b.name, "partial_stone") then
-				print("d")
 				minetest.set_node(pos, {name="default:"..def.n.."_2"})
 				return
 			end
 			local u = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
 			if u.name ~= "air" then
-				print("u")
 				minetest.set_node(pos, {name="default:"..def.n.."_2", param2 = 20})
 				return
 			end
@@ -215,7 +216,7 @@ for i,def in pairs(stonedefs) do
 	
 	minetest.register_node("default:"..def.n.."_2", {
 		description = def.d,
-		tiles = {"default_"..def.n..".png"},
+		tiles = {tile},
 		paramtype = "light",
 		paramtype2 = "facedir",
 		drawtype = "nodebox",
@@ -253,7 +254,7 @@ for i,def in pairs(stonedefs) do
 	
 	minetest.register_node("default:"..def.n.."_3", {
 		description = def.d,
-		tiles = {"default_"..def.n..".png"},
+		tiles = {tile},
 		paramtype = "light",
 		paramtype2 = "facedir",
 		drawtype = "nodebox",
@@ -282,7 +283,7 @@ for i,def in pairs(stonedefs) do
 		
 		minetest.register_node("default:"..def.n.."_stones"..g, {
 			description = def.d .. " Stones",
-			tiles = {"default_"..def.n..".png", "default_"..def.n..".png^default_cobble.png"},
+			tiles = {tile, tile.."^default_cobble.png"},
 			paramtype = "light",
 			drawtype = "nodebox",
 			node_box = {
@@ -359,6 +360,22 @@ default.register_crumbling("default:granite", {
 	corner = { drop = "default:granite_stones 7" },
 	edge = { drop = "default:granite_stones 6" },
 })
+default.register_crumbling("default:conglomerate", {
+	corner = { drop = "default:conglomerate_stones 7" },
+	edge = { drop = "default:conglomerate_stones 6" },
+})
+default.register_crumbling("default:halite", {
+	corner = { drop = "default:halite_stones 7" },
+	edge = { drop = "default:halite_stones 6" },
+})
+default.register_crumbling("default:chalk", {
+	corner = { drop = "default:chalk_stones 7" },
+	edge = { drop = "default:chalk_stones 6" },
+})
+default.register_crumbling("default:pumice", {
+	corner = { drop = "default:pumice_stones 7" },
+	edge = { drop = "default:pumice_stones 6" },
+})
 
 
 
@@ -407,6 +424,13 @@ minetest.register_node("default:snowblock", {
 			minetest.set_node(pos, {name = "default:dirt_with_snow"})
 		end
 	end,
+})
+
+minetest.register_node("default:sandstone_with_cassiterite", {
+	description = "Sandtone with Cassiterite",
+	tiles = {"default_snow.png"},
+	groups = {crumbly = 3, cools_lava = 1, snowy = 1},
+	sounds = default.node_sound_snow_defaults(),
 })
 
 
@@ -507,7 +531,7 @@ minetest.register_node("default:lava_flowing", {
 minetest.register_abm({
 	nodenames = {"group:stone"},
 	neightbors = {"air"},
-	interval  = 5,
+	interval  = 5000000000,
 	chance = 100,
 	catch_up = true,
 	action = function(pos, node)

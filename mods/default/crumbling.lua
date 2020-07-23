@@ -23,7 +23,7 @@ function default.register_crumbling(name, info)
 		groups = default.extend(def.groups, info.corner.groups),
 		on_place = minetest.rotate_node,
 	})
-	print(dump(info.corner.drop or def.drop))
+	
 	minetest.register_node(name.."_crumbling_edge", {
 		description = "Crumbling "..def.description,
 		tiles = def.tiles,

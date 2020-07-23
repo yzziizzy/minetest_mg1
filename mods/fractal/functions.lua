@@ -1,6 +1,10 @@
 
+local disable_debug = true
+
 function fractal.debug(s)
-	print("[fractal] "..s)
+	if not disable_debug then
+		print("[fractal] "..s)
+	end
 end
 
 function fractal.get_plant_noise()
