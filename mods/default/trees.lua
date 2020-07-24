@@ -900,9 +900,7 @@ function default.fell_tree(chopped_pos, player, fdir)
 	local felled_h = root_pos.y + height - chopped_pos.y
 	
 	local leaves = default.felling_clear_old_leaves(root_pos, meta)
-	print(dump2(leaves))
 	
-	-- todo: fetch log diameter?
 	
 -- 	print("Felled height " .. felled_h .. " of " .. height)
 	
