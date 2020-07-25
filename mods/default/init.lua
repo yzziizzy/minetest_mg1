@@ -371,9 +371,14 @@ minetest.register_abm({
 -- /temp
 
 
+-- monkey patches
+dofile(modpath.."/on_dig.lua")
+
+
 -- files with no deps
 dofile(modpath.."/crumbling.lua")
 dofile(modpath.."/rot.lua")
+
 
 -- files that are deps
 dofile(modpath.."/functions.lua")
@@ -389,6 +394,7 @@ dofile(modpath.."/ores.lua")
 dofile(modpath.."/trees.lua")
 
 -- files that have deps
+dofile(modpath.."/furnace.lua")
 dofile(modpath.."/tools.lua")
 dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")

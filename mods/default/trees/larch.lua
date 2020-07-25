@@ -287,8 +287,9 @@ for sz = 1,6 do
 			connect_back = boxrot({box_shell(needle_boxen[sz])}, "back"),
 		},
 		connects_to = {"group:tree_trunk"},
+		drop = "default:larch_stick "..math.ceil(sz/2),
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 2, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
+		groups = {axed = 3, oddly_breakable_by_hand = 2, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 	
@@ -312,8 +313,9 @@ for sz = 1,6 do
 			type = "fixed",
 			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
 		},
+		drop = "default:larch_stick "..math.ceil(sz/2),
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
+		groups = {axed = 3, oddly_breakable_by_hand = 1, falling_node=1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 	minetest.register_node("default:fallen_larch_leaves_"..sz.."_l", {
@@ -336,8 +338,9 @@ for sz = 1,6 do
 			fixed = {-.5, -.5, -.5, .5,.5,.5},
 -- 			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
 		},
+		drop = "default:larch_stick "..math.ceil(sz/2),
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
+		groups = {axed = 3, oddly_breakable_by_hand = 1, falling_node=1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 	minetest.register_node("default:fallen_larch_leaves_"..sz.."_r", {
@@ -360,8 +363,9 @@ for sz = 1,6 do
 			fixed = {-.5, -.5, -.5, .5,.5,.5},
 -- 			fixed = boxtrans(boxrotdim(boxrot(needle_boxen[sz], "left"), {x=1, z=0}), {x=0, y=sh, z=0}),
 		},
+		drop = "default:larch_stick "..math.ceil(sz/2),
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
+		groups = {axed = 3, oddly_breakable_by_hand = 1, falling_node=1, larch_leaves=1, leaves=1, flammable = 2, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 end

@@ -387,6 +387,7 @@ function default.register_tree_trunks(mod, growth_data)
 	local box_base = base.."wood_box"
 	local stick_base = base.."stick"
 	local firewood_base = base.."firewood"
+	local beam_base = base.."beam_"
 	
 	local thick = growth_data.trunk_thickness or 1
 	
@@ -487,7 +488,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, falling_node=1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
 				tree_log = 1, rotting = 1,
 			},
 			
@@ -495,11 +496,13 @@ function default.register_tree_trunks(mod, growth_data)
 			tree_stage = sz,
 			
 			drop = {
-				max_items = 2,
+				max_items = 1,
 				items = {
 -- 					{ tools = {"group:axe"}, items = {plank_base.." "..sz}, }, -- groups do not work
-					{ tools = {"default:stone_axe"}, items = {firewood_base.." "..sz}, },
-					{ tools = {"default:stone_axe"}, items = {plank_base.." "..sz}, },
+					{ tools = {"group:tree_saw"}, items = {log_base..sz}, },
+					{ tools = {"group:axe"}, items = {firewood_base.." "..sz}, },
+					{ tools = {"group:adz"}, items = {beam_base..sz}, },
+-- 					{ tools = {"default:stone_axe"}, items = {plank_base.." "..sz}, },
 					{ items = {log_base.."_"..sz}, },
 				},
 			},
@@ -507,6 +510,48 @@ function default.register_tree_trunks(mod, growth_data)
 			on_place = minetest.rotate_node,
 		})
 		default.register_rot(log_base..sz, {
+			levels = {
+				{chance=5},
+				{chance=5},
+				{chance=5},
+				{chance=5, groups={causes_rot=1}},
+			},
+		})
+		
+		minetest.register_node(beam_base..sz, {
+			description = growth_data.Name.." Beam",
+			tiles = {
+				growth_data.tiles.wood.."^[transformR90",
+				growth_data.tiles.wood.."^[transformR90",
+				growth_data.tiles.wood.."^[transformR180",
+				growth_data.tiles.wood.."^[transformR180",
+				growth_data.tiles.top, -- todo: re-center textures
+				growth_data.tiles.top, 
+				
+			},
+			paramtype = "light",
+			paramtype2 = "facedir",
+			drawtype = "nodebox",
+			
+			node_box = {
+				type = "fixed",
+				fixed = {-q/16, -0.5, -0.5, q/16, -0.5 + q/8, 0.5},
+			},
+			sunlight_propagates = true,
+			is_ground_content = false,
+			groups = {
+				beam = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree_log = 1, rotting = 1,
+			},
+			
+			tree_type = growth_data.name,
+			tree_stage = sz,
+			
+
+			sounds = default.node_sound_wood_defaults(),
+			on_place = minetest.rotate_node,
+		})
+		default.register_rot(beam_base..sz, {
 			levels = {
 				{chance=5},
 				{chance=5},
@@ -677,13 +722,14 @@ function default.register_tree_trunks(mod, growth_data)
 			type = "fixed",
 			fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
 		},
-		sunlight_propagates = true,
+-- 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
 			burnable = 1, choppy = 2, flammable = 3, wood_plank = 1, rots = 1,
 		},
 		
 		tree_type = growth_data.name,
+		fuel_value = 1,
 		
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -703,13 +749,13 @@ function default.register_tree_trunks(mod, growth_data)
 			type = "fixed",
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		},
-		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
 			burnable = 1, choppy = 2, flammable = 3, wood_box = 1, rots = 1,
 		},
 		
 		tree_type = growth_data.name,
+		fuel_value = 6,
 		
 		drop = {
 			max_items = 1,
@@ -745,6 +791,7 @@ function default.register_tree_trunks(mod, growth_data)
 		},
 		
 		tree_type = growth_data.name,
+		fuel_value = .2,
 		
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -766,10 +813,13 @@ function default.register_tree_trunks(mod, growth_data)
 			type = "fixed",
 			fixed = {-0.1, -0.5, -0.1, 0.1, 0.4, 0.1},
 		},
+		
+		fuel_value = 1,
+		
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			burnable = 1, flammable = 3, firewood = 1, oddly_breakable_by_hand = 1,
+			burnable = 1, flammable = 3, falling_node=1, firewood = 1, oddly_breakable_by_hand = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -786,10 +836,13 @@ function default.register_tree_trunks(mod, growth_data)
 			type = "fixed",
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		},
+		
+		fuel_value = 9,
+		
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			flammable = 3, firewood = 1, oddly_breakable_by_hand = 1,
+			flammable = 3, firewood = 1, falling_node=1, oddly_breakable_by_hand = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -816,7 +869,7 @@ function default.register_tree_trunks(mod, growth_data)
 		output = firewood_base.."_bundle",
 		type = "shapeless",
 		recipe = { 
-			firewood_base, firewood_base, firewood_base, firewood_base, 
+			firewood_base, firewood_base, firewood_base, firewood_base, firewood_base, 
 			firewood_base, firewood_base, firewood_base, firewood_base, 
 		},
 	})

@@ -5,28 +5,28 @@ local S = default.get_translator
 minetest.register_node("default:sand", {
 	description = S("Sand"),
 	tiles = {"default_sand.png"},
-	groups = {crumbly = 3, falling_node = 1, sand = 1},
+	groups = {shoveled = 3, falling_node = 1, sand = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
 minetest.register_node("default:wet_sand", {
 	description = S("Sand"),
 	tiles = {"default_sand.png^[colorize:gray:20"},
-	groups = {crumbly = 2, falling_node = 1, wet_sand = 1, causes_rot = 1},
+	groups = {shoveled = 2, falling_node = 1, wet_sand = 1, causes_rot = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
 minetest.register_node("default:desert_sand", {
 	description = S("Desert Sand"),
 	tiles = {"default_desert_sand.png"},
-	groups = {crumbly = 3, falling_node = 1, sand = 1},
+	groups = {shoveled = 3, falling_node = 1, sand = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
 minetest.register_node("default:silver_sand", {
 	description = S("Silver Sand"),
 	tiles = {"default_silver_sand.png"},
-	groups = {crumbly = 3, falling_node = 1, sand = 1},
+	groups = {shoveled = 3, falling_node = 1, sand = 1},
 	sounds = default.node_sound_sand_defaults(),
 })
 
@@ -34,21 +34,21 @@ minetest.register_node("default:silver_sand", {
 minetest.register_node("default:dirt", {
 	description = "Dirt",
 	tiles = {"default_dirt.png"},
-	groups = {crumbly = 3, falling_node = 1, soil = 1, causes_rot = 1},
+	groups = {shoveled = 3, falling_node = 1, soil = 1, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
 minetest.register_node("default:topsoil", {
 	description = "Topsoil",
 	tiles = {"default_dirt.png^[colorize:black:20"},
-	groups = {crumbly = 2, falling_node = 1, soil = 2, causes_rot = 1},
+	groups = {shoveled = 3, falling_node = 1, soil = 2, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
 minetest.register_node("default:compost", {
 	description = "Topsoil",
 	tiles = {"default_dirt.png^[colorize:brown:40"},
-	groups = {crumbly = 2, falling_node = 1, soil = 2, causes_rot = 1},
+	groups = {shoveled = 3, falling_node = 1, soil = 2, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -120,7 +120,7 @@ minetest.register_node("default:snow", {
 minetest.register_node("default:snowblock", {
 	description = S("Snow Block"),
 	tiles = {"default_snow.png"},
-	groups = {crumbly = 3, cools_lava = 1, snowy = 1},
+	groups = {shoveled = 2, cools_lava = 1, snowy = 1},
 	sounds = default.node_sound_snow_defaults(),
 
 })
@@ -130,7 +130,7 @@ minetest.register_node("default:snowblock", {
 minetest.register_node("default:permafrost", {
 	description = S("Permafrost"),
 	tiles = {"default_permafrost.png"},
-	groups = {cracky = 3},
+	groups = {shoveled = 1, },
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -139,7 +139,7 @@ minetest.register_node("default:permafrost_with_stones", {
 	tiles = {"default_permafrost.png^default_stones.png",
 		"default_permafrost.png",
 		"default_permafrost.png^default_stones_side.png"},
-	groups = {cracky = 3},
+	groups = {shoveled = 1,},
 	sounds = default.node_sound_gravel_defaults(),
 })
 
@@ -148,7 +148,7 @@ minetest.register_node("default:permafrost_with_moss", {
 	tiles = {"default_moss.png", "default_permafrost.png",
 		{name = "default_permafrost.png^default_moss_side.png",
 			tileable_vertical = false}},
-	groups = {cracky = 3},
+	groups = {shoveled = 1, surface_grass=1},
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name = "default_grass_footstep", gain = 0.25},
 	}),
@@ -185,7 +185,7 @@ for i = 0, 9 do
 				{name = "default_dirt.png^default_grass_side_winter.png^[colorize:brown:"..i*4, tileable_vertical = false}
 			},
 		},
-		groups = {crumbly = 3, soil = 1, falling_node = 1, spreading_grass = 1},
+		groups = {shoveled = 2, soil = 1, falling_node = 1, spreading_grass = 1, surface_grass=1},
 		drop = "default:dirt",
 		sounds = default.node_sound_dirt_defaults({
 			footstep = {name = "default_grass_footstep", gain = 0.25},
@@ -204,7 +204,7 @@ minetest.register_node("default:peat", {
 		"default_dirt.png",
 		{name = "default_dirt.png^default_moss_side.png", tileable_vertical = false}
 	},
-	groups = {crumbly = 1, },
+	groups = {shoveled = 2, surface_grass=1},
 })
 
 
@@ -231,7 +231,7 @@ minetest.register_node("default:peat_with_bog_iron", {
 			{items = {"default:iron_ore"}},
 		},
 	},
-	groups = {crumbly = 1, },
+	groups = {shoveled=2, surface_grass=1},
 })
 
 

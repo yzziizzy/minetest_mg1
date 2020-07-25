@@ -38,9 +38,10 @@ function fractal.register_climate_zone(def)
 				description = "Dirt",
 				tiles = {"default_dirt.png"},
 				groups = {
-					crumbly = 3,
+					shoveled = 2,
 					falling_node = 1,
-					soil = 1
+					soil = 1,
+					surface_grass = 1,
 				},
 				drop = "default:dirt",
 				sounds = default.node_sound_dirt_defaults(),
@@ -53,10 +54,11 @@ function fractal.register_climate_zone(def)
 					{name = "default_dirt.png^default_grass_side.png"..colorize_water, tileable_vertical = false}
 				},
 				groups = {
-					crumbly = 3,
+					shoveled = 2,
 					soil = 1,
 					falling_node = 1,
-					spreading_grass = 1
+					spreading_grass = 1,
+					surface_grass = 1,
 				},
 				drop = "default:dirt",
 				sounds = default.node_sound_dirt_defaults({

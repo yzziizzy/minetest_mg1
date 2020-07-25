@@ -617,7 +617,7 @@ function default.register_craft_metadata_copy(ingredient, result)
 	end)
 end
 
-
+]]
 --
 -- NOTICE: This method is not an official part of the API yet.
 -- This method may change in future.
@@ -659,4 +659,4 @@ function default.can_interact_with_node(player, pos)
 
 	return false
 end
-]]
+

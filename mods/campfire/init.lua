@@ -2,7 +2,7 @@ campfire = {}
 
 
 local MAX_FUEL = 6
-local BURN_RATE = .001
+local BURN_RATE = .004
 
 function campfire.add_fuel(pos, amt)
 	local meta = minetest.get_meta(pos)
@@ -201,12 +201,20 @@ for i = 1,6 do
 			local def = minetest.registered_nodes[name]
 			if def and def.groups.burnable then
 				-- add fuel to the fire
-				if campfire.add_fuel(pos, def.fuel_value or 1) then
+				if campfire.add_fuel(pos, def.fuel_value or .1) then
 					itemstack:take_item(1)
 				end
 			end
 			
 			return itemstack
+		end,
+		
+		on_punch = function(pos, node, puncher, pointed_thing)
+			if math.random(15) == 1 then
+				minetest.get_node_timer(pos):start(2)
+				pos.y=pos.y + 1
+				minetest.set_node(pos, {name="campfire:flame_1", param2=4})
+			end
 		end,
 	})
 	
@@ -227,6 +235,8 @@ minetest.register_craft({
 
 
 
+
+
 --[[
 minetest.register_craft({
 	output = firewood_base.."_bundle",
@@ -237,3 +247,17 @@ minetest.register_craft({
 	},
 })
 ]]
+
+
+-- kill grass near fires
+minetest.register_abm({
+	nodenames = {"group:surface_grass"},
+ 	neighbors = {"group:fire"}, -- need better group
+	interval = 10,
+	chance = 10,
+	catch_up = true,
+	action = function(pos, node)
+		minetest.set_node(pos, {name="default:dirt"})
+	end,
+})
+

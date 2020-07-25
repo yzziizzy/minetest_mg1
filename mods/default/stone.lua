@@ -306,7 +306,7 @@ for i,def in pairs(stonedefs) do
 			sunlight_propagates = true,
 			num_stones = i,
 			drop = "default:"..def.n.."_stones "..i,
-			groups = {stones = 1, falling_node = 1, stone_type = stone_types[def.t], oddly_breakable_by_hand = 1},
+			groups = {shoveled = 3, stones = 1, falling_node = 1, stone_type = stone_types[def.t], oddly_breakable_by_hand = 1},
 			sounds = default.node_sound_stone_defaults(),
 		})
 		
