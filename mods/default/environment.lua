@@ -206,8 +206,13 @@ default.register_surface_deco = function(def)
 	
 	-- todo: fill in missing defaults
 	-- TODO: warnings for invalid data
-	
 	if def.noise then
+		if not def.noise.cap then
+			def.noise.cap = 10
+		end
+	end
+	
+	if def.noise and def.type ~= "density" then
 		def.noise.offset = 0.4
 		def.noise.scale = 0.4
 	end
@@ -217,6 +222,39 @@ end
 
 
 
+default.register_ore = function(def)
+-- 	print("registering ore")
+	if def.noise then
+		def.noise.offset = 0
+		def.noise.scale = 1
+	end
+	if def.noise_1 then
+		def.noise_1.offset = 0
+		def.noise_1.scale = 1
+	end
+	if def.noise_2 then
+		def.noise_2.offset = 0
+		def.noise_2.scale = 1
+	end
+
+	default.ores[def.name] = def
+end
+
+
+
+
+default.register_placer = function(def)
+	
+	-- todo: fill in missing defaults
+	-- TODO: warnings for invalid data
+	
+	if def.noise then
+		def.noise.offset = 0.4
+		def.noise.scale = 0.4
+	end
+	
+	default.placer_ores[def.name] = def
+end
 
 
 

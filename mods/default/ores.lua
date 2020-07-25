@@ -157,3 +157,33 @@ default.register_surface_ore({
 })
 --]]
 
+
+
+default.register_surface_deco({
+	name = "malachite_stones",
+	description = "Malachite Stones",
+	
+	y_min = 5,
+	y_max = 20,
+	y_rand = 2, -- feather the edges of the y limits
+	biomes = "*",
+	lat_min = 0,
+	lat_max = 12000,
+	lat_rand = 200, -- feather the edges of the lat limits
+	lat_abs = true, -- appears in northern and southern hemicubes
+	
+	type = "density",
+	chance = 5, -- once every 20 nodes, if it would have been placed otherwise
+	noise = { -- filter with these noise params
+		cap = 10, 
+		offset = -69, -- nodes are placed when the noise is greater than 1
+		scale = 50,     -- according to math.random() == 1 of the noise number
+		spread = {x=300, y=300, z=300},
+		seed = 456,
+		octaves = 6,
+		persist = 0.89,
+	},
+	
+	place = {"default:limestone_with_malachite_stones"}, -- randomly chosen list of nodes to place
+	y_offset = 0, -- directly on top of the soil
+})

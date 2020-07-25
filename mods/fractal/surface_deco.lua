@@ -148,6 +148,7 @@ default.register_surface_deco({
 	type = "density",
 	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
 	noise = { -- filter with these noise params
+		cap = 20,
 		offset = -98, -- nodes are placed when the noise is greater than 1
 		scale = 100,     -- according to math.random() == 1 of the noise number
 		spread = {x=600, y=600, z=600},
@@ -176,10 +177,11 @@ default.register_surface_deco({
 	type = "density",
 	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
 	noise = { -- filter with these noise params
+		cap = 20,
 		offset = -98, -- nodes are placed when the noise is greater than 1
 		scale = 100,     -- according to math.random() == 1 of the noise number
 		spread = {x=600, y=600, z=600},
-		seed = 5685,
+		seed = 6573,
 		octaves = 6,
 		persist = 0.89,
 	},
@@ -204,10 +206,11 @@ default.register_surface_deco({
 	type = "density",
 	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
 	noise = { -- filter with these noise params
-		offset = -98, -- nodes are placed when the noise is greater than 1
+		cap = 90,
+		offset = 20, -- nodes are placed when the noise is greater than 1
 		scale = 100,     -- according to math.random() == 1 of the noise number
 		spread = {x=600, y=600, z=600},
-		seed = 5685,
+		seed = 2335,
 		octaves = 6,
 		persist = 0.89,
 	},
@@ -232,10 +235,11 @@ default.register_surface_deco({
 	type = "density",
 	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
 	noise = { -- filter with these noise params
-		offset = -98, -- nodes are placed when the noise is greater than 1
+		cap = 90,
+		offset = 20, -- nodes are placed when the noise is greater than 1
 		scale = 100,     -- according to math.random() == 1 of the noise number
 		spread = {x=600, y=600, z=600},
-		seed = 5685,
+		seed = 7954,
 		octaves = 6,
 		persist = 0.89,
 	},

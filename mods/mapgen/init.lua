@@ -702,20 +702,29 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								elseif deco.type == "density" then
 									-- deco.noise is required in "density" types
 									if not noise_cache[deco.name] then
-		-- 								print(minposxz.x .. " " ..minposxz.y)
 										noise_cache[deco.name] = minetest.get_perlin_map(deco.noise, chulens):get2dMap_flat(minposxz)
 									end
 									
 									-- sample and place nodes
 									local n = noise_cache[deco.name][nixz]
 		-- 							
+									--if deco.name == "malachite_stones" then
+-- 										print(n)
+									--end
+									
 									if n > 0 then
-										if 1 == math.random(math.abs(math.ceil(n))) then
+										local q = math.max(1, math.min(deco.noise.cap, n))
+										
+										local r = math.random(math.abs(math.ceil(deco.noise.cap - q)))
+										
+										if 1 == r then
 											if not deco.chance or 1 == math.random(deco.chance) then
 												data[area:index(x, py, z)] = deco.cids.place[math.random(#deco.cids.place)]
 												break -- no more decorations in this column
 											end
 										end
+									else
+-- 										print(n)
 									end
 								
 								end

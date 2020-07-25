@@ -17,6 +17,7 @@ default = {
 	ores = {},
 	stone_biomes = {},
 	surface_decorations = {},
+	placer_ores = {},
 	surface_ores = {}, -- NOT IMPLEMENTED
 	
 	cold = { -- all in degrees C
@@ -116,6 +117,25 @@ local function pre_process_biome(def)
 end
 
 
+function default.get_all_group_nodes(group, lvl)
+	if group:sub(1,6) == "group:" then
+		group = group:sub(7)
+	end
+
+	local out = {}
+	for name,def in pairs(minetest.registered_nodes) do
+		if def.groups[group] then
+			if lvl == nil or def.groups[group] == lvl then
+				table.insert(out, name)
+			end
+		end
+	end
+	return out
+end
+
+function default.name_is_group(name)
+	return type(name) == "string" and name:sub(1,6) == "group:"
+end
 
 minetest.register_on_mods_loaded(function()
 -- 	print("mapgen init")
@@ -128,6 +148,7 @@ minetest.register_on_mods_loaded(function()
 	
 	-- pre-process surface decorations
 	for k,deco in pairs(default.surface_decorations) do
+-- 		if deco.name == "malachite_stones" then
 		
 		-- cache content id's
 		deco.cids = {
@@ -135,7 +156,14 @@ minetest.register_on_mods_loaded(function()
 		}
 		
 		for i,v in ipairs(deco.place) do
-			deco.cids.place[i] = minetest.get_content_id(v)
+			if default.name_is_group(v) then
+				local nn = default.get_all_group_nodes(v, 1)
+				for _,vv in ipairs(nn) do
+					table.insert(deco.cids.place, minetest.get_content_id(vv))
+				end
+			else 
+				table.insert(deco.cids.place, minetest.get_content_id(v))
+			end
 		end
 		
 		-- fill decorations into biomes
@@ -153,6 +181,7 @@ minetest.register_on_mods_loaded(function()
 				end
 			end
 		end
+-- 		end
 	end
 	
 	--[[ NOT IMPLEMENTED
@@ -233,6 +262,8 @@ end)
 
 
 
+
+
 -- NOT IMPLEMENTED
 default.register_surface_ore = function(def)
 	
@@ -248,24 +279,6 @@ default.register_surface_ore = function(def)
 end
 
 
-
-default.register_ore = function(def)
--- 	print("registering ore")
-	if def.noise then
-		def.noise.offset = 0
-		def.noise.scale = 1
-	end
-	if def.noise_1 then
-		def.noise_1.offset = 0
-		def.noise_1.scale = 1
-	end
-	if def.noise_2 then
-		def.noise_2.offset = 0
-		def.noise_2.scale = 1
-	end
-
-	default.ores[def.name] = def
-end
 
 
 -- shallow copy

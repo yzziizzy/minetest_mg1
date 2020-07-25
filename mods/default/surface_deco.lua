@@ -104,7 +104,8 @@ default.register_surface_deco({
 	type = "density",
 	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
 	noise = { -- filter with these noise params
-		offset = -98, -- nodes are placed when the noise is greater than 1
+		cap = 100,
+		offset = 28, -- nodes are placed when the noise is greater than 1
 		scale = 100,     -- according to math.random() == 1 of the noise number
 		spread = {x=200, y=200, z=200},
 		seed = 58953,
@@ -112,6 +113,6 @@ default.register_surface_deco({
 		persist = 0.89,
 	},
 	
-	place = {"default:granite_stones"}, -- randomly chosen list of nodes to place
+	place = {"group:stones"}, -- randomly chosen list of nodes to place
 	y_offset = 0, -- directly on top of the soil
 })
