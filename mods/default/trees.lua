@@ -496,15 +496,33 @@ function default.register_tree_trunks(mod, growth_data)
 			tree_stage = sz,
 			
 			drop = {
-				max_items = 1,
-				items = {
--- 					{ tools = {"group:axe"}, items = {plank_base.." "..sz}, }, -- groups do not work
-					{ tools = {"group:saw"}, items = {log_base..sz}, },
-					{ tools = {"group:axe"}, items = {firewood_base.." "..sz}, },
-					{ tools = {"group:adz"}, items = {beam_base..sz}, },
--- 					{ tools = {"default:stone_axe"}, items = {plank_base.." "..sz}, },
-					{ items = {log_base.."_"..sz}, },
+				tools = {
+					{
+						tools = {"group:saw"},
+						max_items = 1,
+						items = {log_base..sz}, 
+					},
+					{
+						tools = {"group:axe"},
+						max_items = 2,
+						items = { 
+							{rarity = 5, items = {plank_base}},
+							{            items = {firewood_base.." "..sz}},
+						},
+					},
+					{
+						tools = {"group:adz"},
+						max_items = 2,
+						items = { 
+							{rarity = 3, items = {plank_base}},
+							{            items = {beam_base..sz}},
+						},
+					},
 				},
+				
+				-- fallback if no tool
+				max_items = 1,
+				items = {log_base.."_"..sz},
 			},
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
@@ -758,9 +776,12 @@ function default.register_tree_trunks(mod, growth_data)
 		fuel_value = 6,
 		
 		drop = {
+			tools = {
+				{ tools = {"group:axe"}, max_items = 1, items = {plank_base .. " 8"}, },
+			},
+			
 			max_items = 1,
 			items = {
-				{ tools = {"group:axe"}, items = {plank_base .. " 8"}, },
 				{ items = {box_base}, },
 			},
 		},
