@@ -12,32 +12,37 @@ function new_get_node_drops(node, toolname)
 		param2 = node.param2
 	end
 	
+	local def = minetest.registered_nodes[nodename]
+	local drop = def and def.drop
+	
+	
 	local tool_def = minetest.registered_items[toolname]
 	local tool_caps = {}
 	if tool_def and tool_def.tool_capabilities then
 		tool_caps = tool_def.tool_capabilities
 	end
 	
+	-- handle silk-touch tools, poorly
+	if tool_caps.silk_touch then
+		drop = {items = {node.name}}
+	end
 	
-	local def = core.registered_nodes[nodename]
-	local drop = def and def.drop
 	local ptype = def and def.paramtype2
 	-- get color, if there is color (otherwise nil)
-	local palette_index = core.strip_param2_color(param2, ptype)
+	local palette_index = minetest.strip_param2_color(param2, ptype)
+	
+	
 	if drop == nil then
 		-- default drop
-		if palette_index then
-			local stack = ItemStack(nodename)
-			stack:get_meta():set_int("palette_index", palette_index)
-			return {stack:to_string()}
-		end
-		return {nodename}
+		drop = {items = {drop}}
+		
 	elseif type(drop) == "string" then
 		-- itemstring drop
-		return drop ~= "" and {drop} or {}
-	elseif drop.items == nil then
-		-- drop = {} to disable default drop
-		return {}
+		if drop == "" then
+			return {}
+		end 
+		
+		drop = {items = {drop}}
 	end
 
 	local got_items = {}
@@ -80,43 +85,64 @@ function new_get_node_drops(node, toolname)
 	local bounty_base = math.floor(tool_caps.bounty or 1) 
 	local bounty_rand = ((tool_caps.bounty or 1) - bounty_base) * 1000 
 	
+	
+	
+	local function add_out_item(item_name, inherit_color)
+		local stack = ItemStack(item_name)
+		
+		-- add color, if necessary
+		if inherit_color and palette_index then
+			stack:get_meta():set_int("palette_index", palette_index)
+		end
+		
+		-- bounty calculation
+		local icnt = stack:get_count()
+		local icnt2 = icnt * bounty_base
+		if math.random(1000) <= bounty_rand then
+			icnt2 = icnt2 + icnt
+		end
+		
+		stack:set_count(icnt2)
+		
+		got_items[#got_items+1] = stack:to_string()
+	end
+	
+	
+	
 	-- calculate actual drops
 	for _, item in ipairs(drop.items) do
-		local good_rarity = true
-		if item.rarity ~= nil then
-			good_rarity = item.rarity < 1 or math.random(item.rarity) == 1
-		end
-
-		if good_rarity then
+		
+		-- simple string definition
+		if type(item) == "string" then
+			add_out_item(item, false)
 			got_count = got_count + 1
 			
-			for _, add_item in ipairs(item.items) do
-				local stack = ItemStack(add_item)
-				
-				-- add color, if necessary
-				if item.inherit_color and palette_index then
-					stack:get_meta():set_int("palette_index", palette_index)
-				end
-				
-				-- bounty calculation
-				local icnt = stack:get_count()
-				local icnt2 = icnt * bounty_base
-				if math.random(1000) <= bounty_rand then
-					icnt2 = icnt2 + icnt
-				end
-				
-				add_item = stack:to_string()
-				
-				got_items[#got_items+1] = add_item
+		else -- full rarity table definition
+			local good_rarity = true
+			if item.rarity ~= nil then
+				good_rarity = item.rarity < 1 or math.random(item.rarity) == 1
 			end
-			
-			
-			
-			if drop.max_items ~= nil and got_count == drop.max_items then
-				break
+
+			if good_rarity then
+				got_count = got_count + 1
+				
+				local ilist = item.items
+				if type(ilist) ~= "table" then
+					ilist = {ilist}
+				end
+				
+				for _, add_item in ipairs(ilist) do
+					add_out_item(add_item, item.inherit_color)
+				end
+				
 			end
 		end
+		
+		if drop.max_items ~= nil and got_count == drop.max_items then
+			break
+		end
 	end
+	
 	return got_items
 end
 

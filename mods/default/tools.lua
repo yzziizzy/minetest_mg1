@@ -106,6 +106,8 @@ for name,def in pairs(metal_list) do
 		description = S(def.Name.." Hammer"),
 		inventory_image = "default_tool_"..name.."_hammer.png",
 		tool_capabilities = {
+-- 			silk_touch = true, -- for testing
+-- 			bounty = 10.5,
 			full_punch_interval = 1.2,
 			max_drop_level=0,
 			groupcaps={

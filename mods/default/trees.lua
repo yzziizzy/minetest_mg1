@@ -496,7 +496,7 @@ function default.register_tree_trunks(mod, growth_data)
 			tree_stage = sz,
 			
 			drop = {
-				tools = {
+				tools = { -- the first table is chosen and used exclusively
 					{
 						tools = {"group:saw"},
 						max_items = 1,
@@ -522,7 +522,7 @@ function default.register_tree_trunks(mod, growth_data)
 				
 				-- fallback if no tool
 				max_items = 1,
-				items = {log_base.."_"..sz},
+				items = {log_base..sz},
 			},
 			sounds = default.node_sound_wood_defaults(),
 			on_place = minetest.rotate_node,
