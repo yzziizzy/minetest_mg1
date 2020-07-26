@@ -112,7 +112,7 @@ for i = 1,3 do
 		waving = 1,
 		paramtype = "light",
 		is_ground_content = false,
-		groups = {snappy = 3, leaf_rot = 1, flammable = 2, aspen_leaves = 1, leaves = 1, oddly_breakable_by_hand = 1},
+		groups = {snappy = 3, leaf_rot = 1, flammable = 2, aspen_leaves = 1, leaves = 1, handed = 1},
 		sounds = default.node_sound_leaves_defaults(),
 	})
 	
@@ -132,7 +132,7 @@ for i = 1,3 do
 			{            items = {"default:aspen_stick"}},
 		},
 		
-		groups = {snappy = 3, leaf_rot = 1, flammable = 2, aspen_leaves = 1, leaves = 1, fallen_leaves = 1, oddly_breakable_by_hand = 1},
+		groups = {snappy = 3, leaf_rot = 1, flammable = 2, aspen_leaves = 1, leaves = 1, fallen_leaves = 1, handed = 1},
 		sounds = default.node_sound_leaves_defaults(),
 	})
 end

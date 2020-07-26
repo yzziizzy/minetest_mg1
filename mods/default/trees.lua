@@ -408,7 +408,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, handed = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, tree_trunk_root_fertile = 1,
 			},
 			sounds = default.node_sound_wood_defaults(),
@@ -450,7 +450,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, handed = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, tree_stump = 1, rotting = 3
 			},
 			sounds = default.node_sound_wood_defaults(),
@@ -488,7 +488,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 1, falling_node=1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, falling_node=1, handed = 1, flammable = 2, plant = 1,
 				tree_log = 1, rotting = 1,
 			},
 			
@@ -499,7 +499,7 @@ function default.register_tree_trunks(mod, growth_data)
 				max_items = 1,
 				items = {
 -- 					{ tools = {"group:axe"}, items = {plank_base.." "..sz}, }, -- groups do not work
-					{ tools = {"group:tree_saw"}, items = {log_base..sz}, },
+					{ tools = {"group:saw"}, items = {log_base..sz}, },
 					{ tools = {"group:axe"}, items = {firewood_base.." "..sz}, },
 					{ tools = {"group:adz"}, items = {beam_base..sz}, },
 -- 					{ tools = {"default:stone_axe"}, items = {plank_base.." "..sz}, },
@@ -540,7 +540,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				beam = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				beam = 1, choppy = 1, handed = 1, flammable = 2, plant = 1,
 				tree_log = 1, rotting = 1,
 			},
 			
@@ -575,7 +575,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, handed = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, 
 			},
 			
@@ -637,7 +637,7 @@ function default.register_tree_trunks(mod, growth_data)
 			sunlight_propagates = true,
 			is_ground_content = false,
 			groups = {
-				tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+				tree = 1, choppy = 1, handed = 1, flammable = 2, plant = 1,
 				tree_trunk = 1, rotting = 1,
 			},
 			
@@ -670,7 +670,7 @@ function default.register_tree_trunks(mod, growth_data)
 				sunlight_propagates = true,
 				is_ground_content = false,
 				groups = {
-					tree = 1, choppy = 1, oddly_breakable_by_hand = 1, flammable = 2, plant = 1,
+					tree = 1, choppy = 1, handed = 1, flammable = 2, plant = 1,
 					tree_trunk = 1, 
 				},
 				
@@ -787,7 +787,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			burnable = 1, choppy = 3, flammable = 3, stick = 1, oddly_breakable_by_hand = 1,
+			burnable = 1, choppy = 3, flammable = 3, stick = 1, handed = 1,
 		},
 		
 		tree_type = growth_data.name,
@@ -819,7 +819,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			burnable = 1, flammable = 3, falling_node=1, firewood = 1, oddly_breakable_by_hand = 1,
+			burnable = 1, flammable = 3, falling_node=1, firewood = 1, handed = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -842,7 +842,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			flammable = 3, firewood = 1, falling_node=1, oddly_breakable_by_hand = 1,
+			flammable = 3, firewood = 1, falling_node=1, handed = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,

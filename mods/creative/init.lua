@@ -57,7 +57,7 @@ if creative_mode_cache then
 				cracky  = caps,
 				snappy  = caps,
 				choppy  = caps,
-				oddly_breakable_by_hand = caps,
+				handed  = caps,
 				-- dig_immediate group doesn't use value 1. Value 3 is instant dig
 				dig_immediate =
 					{times = {[2] = digtime, [3] = 0}, uses = 0, maxlevel = 256},

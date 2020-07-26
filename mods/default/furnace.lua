@@ -4,7 +4,7 @@ local S = default.get_translator
 
 local mold_formspec = "size[8,9]"..
 	"list[context;main;.5,.25;2,2;]"..
-	"list[context;output;2.75,.25;1,1;]"..
+	"list[context;mold;2.75,.25;1,1;]"..
 	"list[context;output;4.0,.25;2,2;]"..
 	"list[current_player;main;0,4.75;8,1;]"..
 	"list[current_player;main;0,6.0;8,3;8]"..
@@ -48,7 +48,7 @@ minetest.register_node("default:furnace", {
 	
 	paramtype1 = "light",
 	
-	groups = {oddly_breakable_by_hand = 2},
+	groups = {handed = 2},
 	sounds = default.node_sound_wood_defaults(),
 
 	can_dig = function(pos, player)
@@ -67,6 +67,7 @@ minetest.register_node("default:furnace", {
 		minetest.get_node_timer(pos):start(2)
 	end,
 
+	--[[
 	on_metadata_inventory_put = function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
@@ -85,7 +86,7 @@ minetest.register_node("default:furnace", {
 		
 	end,
 	
-	
+	--[[
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
@@ -120,7 +121,7 @@ minetest.register_node("default:furnace", {
 			end
 		end
 	end,
-
+--[[
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if minetest.is_protected(pos, player:get_player_name()) then
 			return 0
@@ -152,7 +153,7 @@ minetest.register_node("default:furnace", {
 
 		return stack:get_count()
 	end,
-	
+	]]
 	
 	on_timer = function(pos, elapsed)
 		local fpos = vector.add(pos, {x=0,y=-1,z=0})
@@ -171,18 +172,56 @@ minetest.register_node("default:furnace", {
 		
 		local mold_stack = inv:get_stack("mold", 1)
 		local mold_name = mold_stack:get_name()
+		local mold_def = minetest.registered_nodes[mold_name]
+		if not mold_def then
+			return true
+		end
 		
--- 		print("mold name "..mold_name)
+		print("mold name "..mold_name)
 		
 		local ore_stack = inv:get_stack("main", 1)
 		local ore_name = ore_stack:get_name()
+		local ore_def = minetest.registered_nodes[ore_name]
+		if not ore_def or not ore_def.ore_of then
+			return true
+		end
 		
--- 		print("ore name ".. dump(ore_name))
+		print("ore name ".. dump(ore_name))
 		
+		local ore_cnt = ore_stack:get_count()
+		local ore_cont = ore_def.ore_content
+		local ore_amt = ore_cnt * ore_cont
 		
+		print("ore amt ".. ore_amt)
 		
+		local outname = "default:"..ore_def.ore_of.."_"..mold_def.cast_output
 		
+		if ore_amt < mold_def.cast_cost then
+			print("not enough ore")
+			return true
+		end
 		
+		local ore_used = math.ceil(mold_def.cast_cost / ore_cont)
+		
+		print("output "..outname.. " ("..ore_used..")")
+		
+		ore_stack:take_item(ore_used)
+		inv:set_stack("main", 1, ore_stack)
+		inv:add_item("output", outname)
+		
+		mwear = mold_stack:get_wear() * (mold_def.cast_max / 65535)
+		if mwear == 0 then
+			mwear = mold_def.cast_max
+		end
+		print(mwear)
+		mwear = math.floor(math.max(0, mwear - (1 / mold_def.cast_max)))
+		print(mwear)
+		if mwear <= 0 then
+			inv:set_stack("mold", 1, "")
+		else
+			mold_stack:set_wear(mwear * (65535 / mold_def.cast_max))
+			inv:set_stack("mold", 1, mold_stack)
+		end
 		
 		return true
 	end,

@@ -49,6 +49,7 @@ firedamp in coal mines
 items:
 wood chips
 
+water-beating rock, aquifers, water tables and saturated soil
 
 ]]
 --[[
@@ -84,7 +85,7 @@ minetest.register_node("default:mg_glass", {
 	paramtype2 = "glasslikeliquidlevel",
 	sunlight_propagates = true,
 	is_ground_content = false,
-	groups = {cracky = 3, oddly_breakable_by_hand = 3},
+	groups = {cracky = 3, handed = 3},
 	sounds = default.node_sound_glass_defaults(),
 })
 
@@ -98,7 +99,6 @@ local stonedefs = {
 	{n="pumice", d="Pumice", t="i", h=1}, --
 
 	{n="limestone", d="Limestone", t="s", h=2}, --
-	{n="limestone_with_malachite", d="Limestone with Malachite", t="s", h=2, tile="default_limestone.png^default_malachite.png"}, --
 	{n="sandstone", d="Sandstone", t="s", h=2}, --
 	{n="gypsum", d="Gypsum", t="s", h=1}, --
 	{n="halite", d="Halite", t="s", h=2}, --
@@ -116,11 +116,22 @@ local stonedefs = {
 	
 	-- fossil rocks
 	{n="lignite", d="Lignite", t="f", h=1}, 
-	{n="bituminous_coal", d="Coal", t="f", h=2},
+	{n="bitumenous_coal", d="Coal", t="f", h=2},
 	{n="anthracite", d="Anthracite Coal", t="f", h=3},
 	{n="graphite", d="Graphite", t="f", h=4}, 
 -- 	{n="oil_shale", d="Oil Shale", t="f", h=2},
 -- 	{n="tar_sand", d="tar_sand", t="f", h=1}, -- remove, not being stone?
+
+
+	-- ores
+	{
+		n="limestone_with_malachite", d="Limestone with Malachite", t="s", h=2, 
+		tile="default_limestone.png^default_malachite.png",
+		ore_of = "copper",
+		ore_content = 1,
+		g = {ore = 1, copper_ore = 1},
+	}, --
+	
 }
 
 local stone_types = {
@@ -137,14 +148,24 @@ local function mkbox(x,y,z, szx, szy, szz)
 	return {x, y, z, x+szx, y+szy, z+szz}
 end
 
+local function ct(a, b)
+	local o = {}
+	for k,v in pairs(a or {}) do o[k] = v end
+	for k,v in pairs(b or {}) do o[k] = v end
+	return o
+end
+
 for i,def in pairs(stonedefs) do
 	local tile = def.tile or ("default_"..def.n..".png")
 	
 	minetest.register_node("default:"..def.n.."_cobble", {
 		description = def.d.." Cobble",
 		tiles = {tile.."^default_cobble.png"},
-		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
+		groups = ct({cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]}, def.g),
 		sounds = default.node_sound_stone_defaults(),
+		
+		ore_of = def.ore_of,
+		ore_content = def.ore_content,
 -- 		node_placement_prediction = "default:"..def.n.."_cobble_2",
 -- 		on_dig = function(pos, node, digger)
 -- 			minetest.set_node(pos, {name="default:"..def.n.."_cobble_2"})
@@ -188,10 +209,13 @@ for i,def in pairs(stonedefs) do
 	minetest.register_node("default:"..def.n, {
 		description = def.d,
 		tiles = {tile},
+	
+		ore_of = def.ore_of,
+		ore_content = def.ore_content,
 		
 		cobble = "default:"..def.n.."_cobble",
 		
-		groups = {cracky = 3, stone = 1, stone_type = stone_types[def.t]},
+		groups = ct({cracky = 3, stone = 1, stone_type = stone_types[def.t]}, def.g),
 		drop = "default:"..def.n.."_stones 9",
 		node_placement_prediction = "default:"..def.n.."_2",
 		sounds = default.node_sound_stone_defaults(),
@@ -227,9 +251,12 @@ for i,def in pairs(stonedefs) do
 		},
 		
 		
+		ore_of = def.ore_of,
+		ore_content = (def.ore_content or 0) * (2 / 3),
+		
 		cobble = "default:"..def.n.."_stones_6",
 		
-		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
+		groups = ct({cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]}, def.g),
 		drop = "default:"..def.n.."_stones 6",
 		node_placement_prediction = "default:"..def.n.."_3",
 		sounds = default.node_sound_stone_defaults(),
@@ -266,7 +293,10 @@ for i,def in pairs(stonedefs) do
 		
 		cobble = "default:"..def.n.."_stones_3",
 		
-		groups = {cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]},
+		ore_of = def.ore_of,
+		ore_content = (def.ore_content or 0) / 3,
+		
+		groups = ct({cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]}, def.g),
 		drop = "default:"..def.n.."_stones 3",
 		sounds = default.node_sound_stone_defaults(),
 	})
@@ -306,7 +336,11 @@ for i,def in pairs(stonedefs) do
 			sunlight_propagates = true,
 			num_stones = i,
 			drop = "default:"..def.n.."_stones "..i,
-			groups = {shoveled = 3, stones = i, falling_node = 1, stone_type = stone_types[def.t], oddly_breakable_by_hand = 1},
+			
+			ore_of = def.ore_of,
+			ore_content = (def.ore_content or 0) * (i/9),
+			
+			groups = ct({shoveled = 3, stones = i, falling_node = 1, stone_type = stone_types[def.t], handed = 1}, def.g),
 			sounds = default.node_sound_stone_defaults(),
 		})
 		

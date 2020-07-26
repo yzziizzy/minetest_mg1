@@ -30,17 +30,49 @@ minetest.register_craft({
 
 
 -- molds
-local mold_types = {
-	"ingots",
-	"axehead",
-	"pickhead",
-	"chisel",
-	"hammerhead",
+default.mold_types = {
+	ingot = {
+		Name = "Ingots",
+		cost = 1,
+		max = 12,
+	},
+	chisel = {
+		Name = "Chisel",
+		cost = 2,
+		max = 2,
+	},
+	axe_head = {
+		Name = "Axe Head",
+		cost = 6,
+		max = 1,
+	},
+	adz_head = {
+		Name = "Adz Head",
+		cost = 6,
+		max = 1,
+	},
+	pick_head = {
+		Name = "Pick Head",
+		cost = 9,
+		max = 1,
+	},
+	hammer_head = {
+		Name = "Hammer Head",
+		cost = 12,
+		max = 1,
+	},
+	saw_blade = {
+		Name = "Saw Blade",
+		cost = 1,
+		max = 4,
+	},
 }
 
-for _,v in ipairs(mold_types) do
-	minetest.register_node("default:sandmold_"..v, {
-		description = S(v.." Sand Mold"),
+for n,def in pairs(default.mold_types) do
+	def.name = n
+	
+	minetest.register_node("default:sandmold_"..n, {
+		description = S(def.Name.." Sand Mold"),
 		tiles = {"default_sand.png^[colorize:black:10"},
 		drawtype = "nodebox",
 		node_box = {
@@ -61,6 +93,12 @@ for _,v in ipairs(mold_types) do
 			type = "fixed",
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0.2, 0.5},
 		},
+		stack_max = 1,
+		
+		cast_output = def.name,
+		cast_cost = def.cost,
+		cast_max = def.max,
+		
 	-- 		tiles = {"default_stone.png^[colorize:"..colors[def.t]..":"..i*15},
 		groups = {crumbly = 3, sand = 1, },
 	-- 	sounds = default.node_sound_stone_defaults(),
@@ -119,7 +157,7 @@ minetest.register_node("default:molding_bench", {
 	
 	paramtype1 = "light",
 	
-	groups = {oddly_breakable_by_hand = 2},
+	groups = {handed = 2},
 	sounds = default.node_sound_wood_defaults(),
 
 	can_dig = function(pos, player)

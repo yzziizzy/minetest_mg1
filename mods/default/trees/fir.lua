@@ -271,7 +271,7 @@ for sz = 1,6 do
 		},
 		connects_to = {"group:tree_trunk"},
 		sunlight_propagates = true,
-		groups = {choppy = 3, oddly_breakable_by_hand = 1, flammable = 2, fir_leaves = 1, leaves=1, plant = 1},
+		groups = {choppy = 3, handed = 1, flammable = 2, fir_leaves = 1, leaves=1, plant = 1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 end

@@ -28,6 +28,9 @@ default = {
 		deg_per_meter = 0.1,
 		max_elev = 300,
 	},
+	
+	
+	smelts = {}
 }
 
 default.LIGHT_MAX = 14
@@ -261,6 +264,16 @@ end)
 
 
 
+function default.register_casting(def)
+	if default.smelts[def.name] ~= nil then
+		print("Overwriting casting definition for "..def.name)
+	end
+	default.smelts[def.name] = def
+end
+
+function default.get_smelt(mold_name, metal)
+	
+end
 
 
 
@@ -296,22 +309,6 @@ function default.extend(a, b)
 	return c
 end
 -- temp
-
-minetest.register_tool("default:axe_steel", {
-	description = "Steel Axe",
-	inventory_image = "default_tool_steelaxe.png",
-	tool_capabilities = {
-		full_punch_interval = 1.0,
-		max_drop_level=1,
-		groupcaps={
-			choppy={times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=20, maxlevel=2},
-		},
-		damage_groups = {fleshy=4},
-	},
-	sound = {breaks = "default_tool_breaks"},
-	groups = {axe = 1}
-})
-
 
 
 
