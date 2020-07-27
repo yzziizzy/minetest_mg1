@@ -90,34 +90,34 @@ minetest.register_node("default:mg_glass", {
 })
 
 
-local stonedefs = {
+local stonedefs_ = {
 	-- hardness: higher is harder
-	-- n_ame, d_escription, t_ype, h_ardness 
-	{n="granite", d="Granite", t="i", h=3}, --
-	{n="basalt", d="Basalt", t="i", h=3}, --
-	{n="obsidian", d="Obsidian", t="i", h=4}, --
-	{n="pumice", d="Pumice", t="i", h=1}, --
+	-- n_ame, d_escription, t_ype, h_ardness, cr_umbling
+	{n="granite", d="Granite", t="i", h=3, cr=1, g={tool_grade=1}}, --
+	{n="basalt", d="Basalt", t="i", h=3, cr=1, g={tool_grade=1}}, --
+	{n="obsidian", d="Obsidian", t="i", h=4, g={tool_grade=1}}, --
+	{n="pumice", d="Pumice", t="i", h=1, cr=1}, --
 
-	{n="limestone", d="Limestone", t="s", h=2}, --
-	{n="sandstone", d="Sandstone", t="s", h=2}, --
-	{n="gypsum", d="Gypsum", t="s", h=1}, --
-	{n="halite", d="Halite", t="s", h=2}, --
-	{n="shale", d="Shale", t="s", h=2}, --
-	{n="conglomerate", d="Conglomerate", t="s", h=2}, --
-	{n="chalk", d="Chalk", t="s", h=1}, --
-	{n="breccia", d="Breccia", t="s", h=2}, --
-	{n="mudstone", d="Mudstone", t="s", h=2}, --
+	{n="limestone", d="Limestone", t="s", h=2, cr=1}, --
+	{n="sandstone", d="Sandstone", t="s", h=2, cr=1}, --
+	{n="gypsum", d="Gypsum", t="s", h=1, cr=1}, --
+	{n="halite", d="Halite", t="s", h=2, cr=1}, --
+	{n="shale", d="Shale", t="s", h=2, cr=1}, --
+	{n="conglomerate", d="Conglomerate", t="s", h=2, cr=1}, --
+	{n="chalk", d="Chalk", t="s", h=1, cr=1}, --
+	{n="breccia", d="Breccia", t="s", h=2, cr=1}, --
+	{n="mudstone", d="Mudstone", t="s", h=2, cr=1}, --
 	
 	{n="marble", d="Marble", t="m", h=3}, --
-	{n="gneiss", d="Gneiss", t="m", h=3}, --
+	{n="gneiss", d="Gneiss", t="m", h=3, g={tool_grade=1}}, --
 	{n="slate", d="Slate", t="m", h=4}, --
-	{n="schist", d="Schist", t="m", h=3}, --
+	{n="schist", d="Schist", t="m", h=3, g={tool_grade=1}}, --
 	{n="serpentine", d="Serpentine", t="m", h=3}, --
 	
 	-- fossil rocks
-	{n="lignite", d="Lignite", t="f", h=1}, 
-	{n="bitumenous_coal", d="Coal", t="f", h=2},
-	{n="anthracite", d="Anthracite Coal", t="f", h=3},
+	{n="lignite", d="Lignite", t="f", h=1, cr=1}, 
+	{n="bitumenous_coal", d="Coal", t="f", h=2, cr=1},
+	{n="anthracite", d="Anthracite Coal", t="f", h=3, cr=1},
 	{n="graphite", d="Graphite", t="f", h=4}, 
 -- 	{n="oil_shale", d="Oil Shale", t="f", h=2},
 -- 	{n="tar_sand", d="tar_sand", t="f", h=1}, -- remove, not being stone?
@@ -127,12 +127,32 @@ local stonedefs = {
 	{
 		n="limestone_with_malachite", d="Limestone with Malachite", t="s", h=2, 
 		tile="default_limestone.png^default_malachite.png",
-		ore_of = "copper",
-		ore_content = 1,
+		ex = {
+			ore_of = "copper",
+			ore_content = 1,
+		},
 		g = {ore = 1, copper_ore = 1},
 	}, --
 	
 }
+
+default.stonedefs = {}
+local stonedefs = default.stonedefs
+
+for _,v in ipairs(stonedefs_) do
+	stonedefs[v.n] = {
+		name = v.n,
+		Name = v.d,
+		type = v.t,
+		groups = v.g,
+		hardness = v.h,
+		extra_def = v.ex,
+		crumbling = v.cr,
+	}
+end
+
+
+
 
 local stone_types = {
 	["i"] = 1,
@@ -140,6 +160,30 @@ local stone_types = {
 	["m"] = 3,
 	["f"] = 4,
 }
+local stone_info = {
+	[1] = {
+		name = "igneous",
+		Name = "Igneous",
+		type = 1,
+	},
+	[2] = {
+		name = "sedimentary",
+		Name = "Sedimentary",
+		type = 2,
+	},
+	[3] = {
+		name = "conglomerate",
+		Name = "Conglomerate",
+		type = 3,
+	},
+	[4] = {
+		name = "fossil",
+		Name = "Fossil",
+		type = 4,
+	},
+}
+default.stone_type_info = stone_info
+
 
 local function mkbox(x,y,z, szx, szy, szz)
 	if szy <= 0 then
@@ -148,20 +192,55 @@ local function mkbox(x,y,z, szx, szy, szz)
 	return {x, y, z, x+szx, y+szy, z+szz}
 end
 
-local function ct(a, b)
+local function ct(a, b, c)
 	local o = {}
-	for k,v in pairs(a or {}) do o[k] = v end
-	for k,v in pairs(b or {}) do o[k] = v end
+	          for k,v in pairs(a or {}) do o[k] = v end
+	          for k,v in pairs(b or {}) do o[k] = v end
+	if c then for k,v in pairs(c or {}) do o[k] = v end end
 	return o
 end
 
-for i,def in pairs(stonedefs) do
+local function et(a, b, c)
+	if b then for k,v in pairs(b or {}) do a[k] = v end end
+	if c then for k,v in pairs(c or {}) do a[k] = v end end
+	return a
+end
+
+for i,def in pairs(stonedefs_) do
 	local tile = def.tile or ("default_"..def.n..".png")
+	local sid = stone_types[def.t]
+	local sinfo = stone_info[sid]
 	
-	minetest.register_node("default:"..def.n.."_cobble", {
+	local stone_groups = {
+		stone = 1,
+		stone_type = sid,
+	}
+	stone_groups["stone_"..sinfo.name] = 1
+	
+	local cobble_groups = {
+		cobble = 1,
+		falling_node = 1,
+		stone_type = sid,
+		
+		shoveled = 2,
+		handed = 1,
+	}
+	cobble_groups["cobble_"..sinfo.name] = 1
+	
+	local stones_groups = {
+		--stones = i, -- added lower in loop
+		falling_node = 1,
+		stone_type = sid,
+	}
+	stones_groups["stones_"..sinfo.name] = 1
+	
+	
+	
+	
+	local cobble_def = {
 		description = def.d.." Cobble",
 		tiles = {tile.."^default_cobble.png"},
-		groups = ct({cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]}, def.g),
+		groups = ct(cobble_groups, def.g),
 		sounds = default.node_sound_stone_defaults(),
 		
 		ore_of = def.ore_of,
@@ -170,7 +249,10 @@ for i,def in pairs(stonedefs) do
 -- 		on_dig = function(pos, node, digger)
 -- 			minetest.set_node(pos, {name="default:"..def.n.."_cobble_2"})
 -- 		end
-	})
+	}
+	et(cobble_def, def.ex)
+	minetest.register_node("default:"..def.n.."_cobble", cobble_def)
+	
 	--[[
 	minetest.register_node("default:"..def.n.."_cobble_2", {
 		description = def.d.." Cobble",
@@ -206,7 +288,7 @@ for i,def in pairs(stonedefs) do
 	})
 	]]
 	
-	minetest.register_node("default:"..def.n, {
+	local stone_def = {
 		description = def.d,
 		tiles = {tile},
 	
@@ -215,7 +297,7 @@ for i,def in pairs(stonedefs) do
 		
 		cobble = "default:"..def.n.."_cobble",
 		
-		groups = ct({cracky = 3, stone = 1, stone_type = stone_types[def.t]}, def.g),
+		groups = ct(stone_groups, def.g),
 		drop = "default:"..def.n.."_stones 9",
 		node_placement_prediction = "default:"..def.n.."_2",
 		sounds = default.node_sound_stone_defaults(),
@@ -236,9 +318,12 @@ for i,def in pairs(stonedefs) do
 		
 			minetest.set_node(pos, {name="default:"..def.n.."_2"})
 		end
-	})
+	}
+	et(stone_def, def.ex)
+	minetest.register_node("default:"..def.n, stone_def)
 	
-	minetest.register_node("default:"..def.n.."_2", {
+	
+	local stone_def_2 = {
 		description = def.d,
 		tiles = {tile},
 		paramtype = "light",
@@ -256,7 +341,7 @@ for i,def in pairs(stonedefs) do
 		
 		cobble = "default:"..def.n.."_stones_6",
 		
-		groups = ct({cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]}, def.g),
+		groups = ct(stone_groups, def.g, {partial_stone=2}),
 		drop = "default:"..def.n.."_stones 6",
 		node_placement_prediction = "default:"..def.n.."_3",
 		sounds = default.node_sound_stone_defaults(),
@@ -277,9 +362,12 @@ for i,def in pairs(stonedefs) do
 			
 			minetest.set_node(pos, {name="default:"..def.n.."_3"})
 		end
-	})
+	}
+	et(stone_def_2, def.ex)
+	minetest.register_node("default:"..def.n.."_2", stone_def_2)
 	
-	minetest.register_node("default:"..def.n.."_3", {
+	
+	local stone_def_3 = {
 		description = def.d,
 		tiles = {tile},
 		paramtype = "light",
@@ -296,10 +384,13 @@ for i,def in pairs(stonedefs) do
 		ore_of = def.ore_of,
 		ore_content = (def.ore_content or 0) / 3,
 		
-		groups = ct({cracky = 3, stone = 1, partial_stone = 2, stone_type = stone_types[def.t]}, def.g),
+		groups = ct(stone_groups, def.g, {partial_stone=3}),
 		drop = "default:"..def.n.."_stones 3",
 		sounds = default.node_sound_stone_defaults(),
-	})
+	}
+	et(stone_def_3, def.ex)
+	minetest.register_node("default:"..def.n.."_3", stone_def_3)
+	
 	
 	-- pile of stones on the ground
 	for i_ = 1,8 do
@@ -311,7 +402,7 @@ for i,def in pairs(stonedefs) do
 		
 		local h = (i - 1) * 0.105
 		
-		minetest.register_node("default:"..def.n.."_stones"..g, {
+		local stones_def = {
 			description = def.d .. " Stones",
 			tiles = {tile, tile.."^default_cobble.png"},
 			paramtype = "light",
@@ -337,12 +428,19 @@ for i,def in pairs(stonedefs) do
 			num_stones = i,
 			drop = "default:"..def.n.."_stones "..i,
 			
-			ore_of = def.ore_of,
-			ore_content = (def.ore_content or 0) * (i/9),
+			ore_of = def.ex and def.ex.ore_of,
+			ore_content = def.ex and ((def.ex.ore_content or 0) * (i/9)),
 			
-			groups = ct({shoveled = 3, stones = i, falling_node = 1, stone_type = stone_types[def.t], handed = 1}, def.g),
+			groups = ct(stones_groups, def.g, {stones = i}),
 			sounds = default.node_sound_stone_defaults(),
-		})
+		}
+		et(stones_def, def.ex)
+		if stones_def.ore_content then
+			stones_def.ore_content = stones_def.ore_content * (i/9)
+		end
+		stones_def.groups["stones_"..sinfo.name.."_"..i] = 1
+		minetest.register_node("default:"..def.n.."_stones"..g, stones_def)
+		
 		
 		if i > 1 then
 			minetest.register_craft({
@@ -380,6 +478,14 @@ for i,def in pairs(stonedefs) do
 	})
 	
 	
+	-- crumbling
+	if def.cr then
+		default.register_crumbling("default:"..def.n, {
+			corner = { drop = "default:"..def.n.."_stones 7" },
+			edge = { drop = "default:"..def.n.."_stones 6" },
+		})
+	end
+	
 	-- TODO: native metals in various rocks
 	-- TODO: mossy versions
 	-- TODO: gravels
@@ -388,28 +494,6 @@ for i,def in pairs(stonedefs) do
 	-- TODO: quality glass production
 	-- TODO: stone hardness
 end
-
-
-default.register_crumbling("default:granite", {
-	corner = { drop = "default:granite_stones 7" },
-	edge = { drop = "default:granite_stones 6" },
-})
-default.register_crumbling("default:conglomerate", {
-	corner = { drop = "default:conglomerate_stones 7" },
-	edge = { drop = "default:conglomerate_stones 6" },
-})
-default.register_crumbling("default:halite", {
-	corner = { drop = "default:halite_stones 7" },
-	edge = { drop = "default:halite_stones 6" },
-})
-default.register_crumbling("default:chalk", {
-	corner = { drop = "default:chalk_stones 7" },
-	edge = { drop = "default:chalk_stones 6" },
-})
-default.register_crumbling("default:pumice", {
-	corner = { drop = "default:pumice_stones 7" },
-	edge = { drop = "default:pumice_stones 6" },
-})
 
 
 

@@ -182,8 +182,10 @@ minetest.register_node("default:molding_bench", {
 		local avail = (input and input:get_count()) or 0 
 		
 		if avail > 0 then
-			for i,mn in pairs(mold_types) do
+			local i = 1
+			for mn,def in pairs(default.mold_types) do
 				inv:set_stack('output', i, "default:sandmold_"..mn.." "..avail)
+				i = i + 1
 			end
 		else
 			inv:set_list("main", {})
@@ -211,15 +213,19 @@ minetest.register_node("default:molding_bench", {
 			
 			input:set_count(remain)
 			inv:set_stack("main", 1, input)
-			for i,mn in pairs(mold_types) do
+			local i = 1
+			for mn,def in pairs(default.mold_types) do
 				inv:set_stack('output', i, "default:sandmold_"..mn.." "..remain)
+				i = i + 1
 			end
 			
 		elseif listname == "main" then
 			
 			if remain > 0 then
-				for i,mn in pairs(mold_types) do
+				local i = 1
+				for mn,def in pairs(default.mold_types) do
 					inv:set_stack('output', i, "default:sandmold_"..mn.." "..remain)
+					i = i + 1
 				end
 			else
 				inv:set_list("main", {})

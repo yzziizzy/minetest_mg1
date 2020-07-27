@@ -89,8 +89,8 @@ default.register_surface_deco({
 })
 
 default.register_surface_deco({
-	name = "granite stones",
-	description = "Granite Stones",
+	name = "igneous_stones",
+	description = "Igneous Stones",
 	
 	y_min = 2,
 	y_max = 1200,
@@ -113,6 +113,35 @@ default.register_surface_deco({
 		persist = 0.89,
 	},
 	
-	place = {"group:stones"}, -- randomly chosen list of nodes to place
+	place = {"group:stones_igneous_1"}, -- randomly chosen list of nodes to place
+	y_offset = 0, -- directly on top of the soil
+})
+
+default.register_surface_deco({
+	name = "sedimentary_stones",
+	description = "Sedimentary Stones",
+	
+	y_min = 2,
+	y_max = 1200,
+	y_rand = 2, -- feather the edges of the y limits
+	biomes = "*", -- list of biomes to appear in
+	lat_min = 0,
+	lat_max = 32000,
+	lat_rand = 0, -- feather the edges of the lat limits
+	lat_abs = true, -- appears in northern and southern hemicubes
+	
+	type = "density",
+	chance = 20, -- once every 20 nodes, if it would have been placed otherwise
+	noise = { -- filter with these noise params
+		cap = 100,
+		offset = 28, -- nodes are placed when the noise is greater than 1
+		scale = 100,     -- according to math.random() == 1 of the noise number
+		spread = {x=200, y=200, z=200},
+		seed = 32898,
+		octaves = 2,
+		persist = 0.89,
+	},
+	
+	place = {"group:stones_sedimentary_1"}, -- randomly chosen list of nodes to place
 	y_offset = 0, -- directly on top of the soil
 })

@@ -466,17 +466,6 @@ minetest.register_tool("default:stone_axe", {
 })
 
 
-minetest.register_craft({
-	output = "default:stone_axe",
-	recipe = {
-		{"group:stones", "group:stones", ""},
-		{"group:stones", "group:stick",  ""},
-		{"",             "group:stick",  ""},
-	}
-})
-
-
-
 minetest.register_tool("default:stone_adz", {
 	description = S("Stone Adz"),
 	inventory_image = "default_tool_stone_adz.png",
@@ -493,16 +482,31 @@ minetest.register_tool("default:stone_adz", {
 })
 
 
-minetest.register_craft({
-	output = "default:stone_adz",
-	recipe = {
-		{"group:stones", "group:stones", ""},
-		{"",             "group:stick",  ""},
-		{"",             "group:stick",  ""},
-	}
-})
 
-
+for _,sdef in pairs(default.stonedefs) do
+	if sdef.groups and sdef.groups.tool_grade then
+		local n = "group:stones_"..sdef.name
+		
+		minetest.register_craft({
+			output = "default:stone_axe",
+			recipe = {
+				{n,  n,              ""},
+				{n,  "group:stick",  ""},
+				{"", "group:stick",  ""},
+			}
+		})
+		
+		minetest.register_craft({
+			output = "default:stone_adz",
+			recipe = {
+				{n,  n,              ""},
+				{"", "group:stick",  ""},
+				{"", "group:stick",  ""},
+			}
+		})
+		
+	end
+end
 
 
 

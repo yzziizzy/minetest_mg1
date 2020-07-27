@@ -397,6 +397,8 @@ dofile(modpath.."/environment.lua")
 dofile(modpath.."/water.lua")
 dofile(modpath.."/seasons.lua")
 dofile(modpath.."/player.lua")
+dofile(modpath.."/soil.lua")
+dofile(modpath.."/stone.lua")
 
 
 dofile(modpath.."/biomes.lua")
@@ -417,5 +419,3 @@ dofile(modpath.."/trees/bamboo.lua")
 
 dofile(modpath.."/casting.lua")
 
-dofile(modpath.."/soil.lua")
-dofile(modpath.."/stone.lua")
