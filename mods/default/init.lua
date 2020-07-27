@@ -321,6 +321,7 @@ minetest.register_node("default:lake_magic", {
 	end
 })
 
+
 minetest.register_abm({
 	nodenames = {"default:lake_magic"},
 	neighbors = {"air"},

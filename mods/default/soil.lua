@@ -78,14 +78,25 @@ default.register_water({
 minetest.register_node("default:wet_clay", {
 	description = S("Wet Clay"),
 	tiles = {"default_clay.png"},
-	groups = {crumbly = 3, falling_node = 1, wet_clay = 1, causes_rot = 1},
+	groups = {shoveled = 3, falling_node = 1, wet_clay = 1, causes_rot = 1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 minetest.register_node("default:dry_clay", {
 	description = S("Dry Clay"),
 	tiles = {"default_dry_dirt.png"},
-	groups = {crumbly = 3},
+	groups = {axed = 1, adzed=1, picked = 3, shoveled = 2, dry_clay = 1},
 	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_abm({
+	nodenames = {"default:dry_clay"},
+	neighbors = {"group:water"},
+	interval = 20,
+	chance = 20,
+	catch_up = true,
+	action = function(pos, node)
+		minetest.set_node(pos, {name = "default:wet_clay"})
+	end,
 })
 
 

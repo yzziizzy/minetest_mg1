@@ -34,7 +34,7 @@ function new_get_node_drops(node, toolname)
 	
 	if drop == nil then
 		-- default drop
-		drop = {items = {drop}}
+		drop = {items = {node.name}}
 		
 	elseif type(drop) == "string" then
 		-- itemstring drop

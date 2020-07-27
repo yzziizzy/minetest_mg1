@@ -126,7 +126,7 @@ local mold_formspec = "size[8,9]"..
 		"listring[current_player;main]"..
 		default.get_hotbar_bg(0, 4.75)
 
-
+	
 minetest.register_node("default:molding_bench", {
 	description = S("Molding Bench"),
 	tiles = {"default_pine_wood.png"},
@@ -264,3 +264,11 @@ minetest.register_node("default:molding_bench", {
 
 
 
+minetest.register_craft({
+	output = "default:molding_bench",
+	recipe = {
+		{"group:wood_plank", "",                 "group:wood_plank"},
+		{"group:wood_plank", "group:wood_plank", "group:wood_plank"},
+		{"group:stick",      "",                 "group:stick"},
+	}
+})
