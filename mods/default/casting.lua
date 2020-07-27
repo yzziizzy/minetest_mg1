@@ -256,7 +256,7 @@ minetest.register_node("default:molding_bench", {
 		if minetest.is_protected(pos, player:get_player_name()) then
 			return 0
 		end
-
+		
 		return stack:get_count()
 	end,
 })

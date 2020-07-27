@@ -515,7 +515,7 @@ function default.register_tree_trunks(mod, growth_data)
 						max_items = 2,
 						items = { 
 							{rarity = 3, items = {plank_base}},
-							{            items = {beam_base..sz}},
+							{            items = {beam_base.. math.max(1, sz-1)}},
 						},
 					},
 				},
@@ -840,7 +840,7 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			burnable = 1, flammable = 3, falling_node=1, firewood = 1, handed = 1,
+			burnable = 1, green_firewood = 1, flammable = 3, falling_node=1, firewood = 1, handed = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -863,7 +863,55 @@ function default.register_tree_trunks(mod, growth_data)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		groups = {
-			flammable = 3, firewood = 1, falling_node=1, handed = 1,
+			flammable = 3, green_firewood=1, firewood = 1, falling_node=1, handed = 1,
+		},
+		sounds = default.node_sound_wood_defaults(),
+		on_place = minetest.rotate_node,
+	})
+	
+	-- seasoned firewood
+	minetest.register_node(firewood_base.."_seasoned", {
+		description = "Seasoned "..growth_data.Name .. " Firewood",
+		tiles = {growth_data.tiles.side.."^[lowpart:50:"..growth_data.tiles.wood.."^[colorize:brown:40"},
+		drawtype = "mesh",
+		visual = "mesh",
+		mesh = "fire_wood.obj",
+		paramtype = "light",
+		paramtype2 = "facedir",
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.1, -0.5, -0.1, 0.1, 0.4, 0.1},
+		},
+		
+		fuel_value = 2,
+		
+		sunlight_propagates = true,
+		is_ground_content = false,
+		groups = {
+			burnable = 1, flammable = 3, falling_node=1, firewood = 1, seasoned_firewood = 1, handed = 1,
+		},
+		sounds = default.node_sound_wood_defaults(),
+		on_place = minetest.rotate_node,
+	})
+	minetest.register_node(firewood_base.."_bundle_seasoned", {
+		description = "Seasoned "..growth_data.Name .. " Firewood",
+		tiles = {growth_data.tiles.side.."^[lowpart:50:"..growth_data.tiles.wood.."^[colorize:brown:40"},
+		drawtype = "mesh",
+		visual = "mesh",
+		mesh = "fire_wood_bundle.obj",
+		paramtype = "light",
+		paramtype2 = "facedir",
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		},
+		
+		fuel_value = 18,
+		
+		sunlight_propagates = true,
+		is_ground_content = false,
+		groups = {
+			flammable = 3, firewood = 1, seasoned_firewood = 1, falling_node=1, handed = 1,
 		},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
@@ -902,6 +950,18 @@ function default.register_tree_trunks(mod, growth_data)
 	
 	
 end -- default.register_tree_trunks()
+
+
+-- firewood seasoning
+minetest.register_abm({
+	nodenames = {"group:green_firewood"},
+	interval  = 2,
+	chance = 2,
+	catch_up = true,
+	action = function(pos, node)
+		minetest.set_node(pos, {name = node.name.."_seasoned", param2 = node.param2})
+	end,
+})
 
 
 local function rotate_about(list, center, rotdim)

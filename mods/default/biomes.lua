@@ -127,6 +127,7 @@ default.register_stone_biome({
 		{0.210, "default:sandstone"}, 
 		{0.211, "default:sandstone_with_cassiterite"}, 
 		{0.220, "default:limestone"}, 
+		{0.39, "default:clay"}, 
 		{0.4, "default:sandstone"}, 
 		{0.420, "default:mudstone"}, 
 		{0.440, "default:sandstone"}, 
@@ -193,11 +194,12 @@ default.register_stone_biome({
 	},
 	
 	layers = { -- this list MUST be sorted ascending
-		{0.2, "default:slate"}, 
-		{0.4, "default:shale"}, 
-		{0.6, "default:gypsum"}, 
-		{0.8, "default:halite"}, 
-		{1.0, "default:chalk"}, 
+		{0.2,  "default:slate"}, 
+		{0.4,  "default:shale"}, 
+		{0.6,  "default:gypsum"}, 
+		{0.65, "default:clay"}, 
+		{0.8,  "default:halite"}, 
+		{1.0,  "default:chalk"}, 
 	},
 	
 })

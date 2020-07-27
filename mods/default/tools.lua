@@ -50,6 +50,29 @@ for name,def in pairs(metal_list) do
 	-- Ingots
 	
 	--    TODO
+	minetest.register_node("default:"..name.."_ingot", {
+		description = def.Name.." Ingot",
+		tiles = {"default_"..name.."_block.png"},
+		inventory_image = "default_tool_"..name.."_chisel.png",
+		paramtype = "light",
+		drawtype = "nodebox",
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.2, -0.5, -0.02, 0.2, -0.5+0.04, 0.02},
+			},
+		},
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.3, -0.5, -0.3, 0.3, -0.4, 0.3},
+		},
+		
+		ore_of = name,
+		ore_content = "1"
+		
+		sunlight_propagates = true,
+		groups = {falling_node = 1, handed = 3, ore=1},
+	})
 	
 	
 	

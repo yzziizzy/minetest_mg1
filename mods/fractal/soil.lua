@@ -103,7 +103,7 @@ fractal.register_climate_zone({
 	fill = {
 		{
 			min = 1, max = 1,
-			nodes = {"default:snow"},
+			nodes = {"default:snowblock"},
 		},
 		{
 			min = 1, max = 5,
