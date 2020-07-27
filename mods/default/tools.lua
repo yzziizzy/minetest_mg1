@@ -68,7 +68,7 @@ for name,def in pairs(metal_list) do
 		},
 		
 		ore_of = name,
-		ore_content = "1"
+		ore_content = "1",
 		
 		sunlight_propagates = true,
 		groups = {falling_node = 1, handed = 3, ore=1},
