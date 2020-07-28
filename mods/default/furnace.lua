@@ -119,7 +119,7 @@ minetest.register_node("default:furnace", {
 		local outname = "default:"..ore_def.ore_of.."_"..mold_def.cast_output
 		
 		if ore_amt < mold_def.cast_cost then
--- 			print("not enough ore")
+			print("not enough ore: "..ore_amt.." of "..mold_def.cast_cost)
 			return true
 		end
 		
@@ -153,7 +153,7 @@ minetest.register_abm({
 	nodenames = {"default:furnace"},
 	neighbors = {"group:fire"},
 	interval  = 10,
-	chance = 2,
+	chance = 1,
 	catch_up = true,
 	action = function(pos, node)
 		local timer = minetest.get_node_timer(pos)

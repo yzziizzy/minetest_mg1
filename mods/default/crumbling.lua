@@ -42,12 +42,14 @@ function default.register_crumbling(name, info)
 		on_place = minetest.rotate_node,
 	})
 	
+	local gr = def.groups
+	gr.crumbling = 1
 	minetest.override_item(name, {
 		crumbling = {
 			corner = name.."_crumbling_corner",
 			edge = name.."_crumbling_edge",
 		},
-		groups = {crumbling = 1},
+		groups = gr,
 	})
 end
 

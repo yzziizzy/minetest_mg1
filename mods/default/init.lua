@@ -322,6 +322,27 @@ minetest.register_node("default:lake_magic", {
 })
 
 
+local function check_node(pos, dir, cnt)
+	local n = minetest.get_node(pos)
+	if n.name == "default:lake_magic" then
+		minetest.set_node(pos, {name="air"})
+		
+		return check_node(vector.add(pos, dir), dir, cnt + 1)
+	end
+	
+	return cnt
+end
+
+
+local function check_node_1(pos, dir, cnt)
+	local n = minetest.get_node(vector.add(pos, dir))
+	if n.name == "air" then
+		return check_node(pos, vector.multiply(dir, -1), cnt)
+	end
+	
+	return cnt
+end
+
 minetest.register_abm({
 	nodenames = {"default:lake_magic"},
 	neighbors = {"air"},
@@ -330,20 +351,11 @@ minetest.register_abm({
 	catch_up = true,
 	action = function(pos, node)
 		
-		local n
-		
 		while 1==1 do
-			n = minetest.get_node({x=pos.x+1, y=pos.y, z=pos.z})
-			if n.name == "air" then break end
-			
-			n = minetest.get_node({x=pos.x-1, y=pos.y, z=pos.z})
-			if n.name == "air" then break end
-			
-			n = minetest.get_node({x=pos.x, y=pos.y, z=pos.z+1})
-			if n.name == "air" then break end
-			
-			n = minetest.get_node({x=pos.x, y=pos.y, z=pos.z-1})
-			if n.name == "air" then break end
+			if 0 ~= check_node_1(pos, {x=1, y=0, z=0}, 0) then break end
+			if 0 ~= check_node_1(pos, {x=0, y=0, z=1}, 0) then break end
+			if 0 ~= check_node_1(pos, {x=-1, y=0, z=0}, 0) then break end
+			if 0 ~= check_node_1(pos, {x=0, y=0, z=-1}, 0) then break end
 			
 			local timer = minetest.get_node_timer(pos)
 			if not timer:is_started() then
@@ -353,7 +365,6 @@ minetest.register_abm({
 			return
 		end
 		
-		minetest.set_node(pos, {name="air"})
 	end,
 })
 
@@ -366,18 +377,9 @@ minetest.register_abm({
 	catch_up = true,
 	action = function(pos, node)
 		minetest.set_node(pos, {name="default:lake_water_source"})
-		
-		pos.y = pos.y - 1
-		local n = minetest.get_node(pos)
-		if n.name ~= "air" 
-			and n.name ~= "default:lake_water_source" 
-			and n.name ~= "default:lake_magic" 
-		then
-			minetest.set_node(pos, {name="default:wet_sand"})
-		end
-		
 	end
 })
+
 
 -- /temp
 
@@ -413,6 +415,7 @@ dofile(modpath.."/trees/aspen.lua")
 dofile(modpath.."/trees/birch.lua")
 dofile(modpath.."/trees/fir.lua")
 dofile(modpath.."/trees/larch.lua")
+-- dofile(modpath.."/trees/red_oak.lua")
 -- dofile(modpath.."/trees/redwood.lua")
 -- dofile(modpath.."/trees/rain_tree.lua")
 dofile(modpath.."/trees/bamboo.lua")

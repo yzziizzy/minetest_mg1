@@ -282,8 +282,20 @@ function default.install_blob_tree(pos, stage, meta, tree_def)
 	
 	minetest.swap_node({x=pos.x, y=pos.y, z=pos.z}, {name=m.root_list[math.random(#m.root_list)]})
 	
-	default.install_straight_trunk(pos, stage, m.trunk_list, meta)
 	
+	
+	--[[
+	local tree_height = m.trunk.min
+	if m.trunk.max > m.trunk.min then
+		tree_height = tree_height + math.random(m.trunk.max - m.trunk.min)
+	end
+	
+	local trange = m.trunk.taper_max - m.trunk.taper_min
+	]]
+	
+	default.install_straight_trunk(pos, stage, m.trunk_list, meta)
+-- 	default.install_tapered_trunk(pos, tree_height, m, meta)
+
 	meta:set_string("leaves", minetest.serialize(leaves))
 	meta:set_int("stage", stage + 1)
 	meta:set_int("height", stage)
@@ -362,6 +374,23 @@ minetest.register_abm({
 		local sd = def.tree_def
 		pos.y = pos.y - 1
 		default.install_mapgen_random_tree(pos, sd)
+	end,
+})
+minetest.register_abm({
+	nodenames = {"group:mg_sapling_lvl"},
+	interval  = 1,
+	chance = 1,
+	catch_up = true,
+	action = function(pos, node)
+		local def = minetest.registered_nodes[node.name]
+		local sd = def.tree_def
+		pos.y = pos.y - 1
+		
+		local meta = minetest.get_meta(pos)
+		local lvl = minetest.get_item_group(node.name, "mg_sapling_lvl")
+		
+		
+		default.install_tree(pos, lvl, meta, sd)
 	end,
 })
 

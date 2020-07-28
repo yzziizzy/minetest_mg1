@@ -106,7 +106,7 @@ local stonedefs_ = {
 	{n="conglomerate", d="Conglomerate", t="s", h=2, cr=1}, --
 	{n="chalk", d="Chalk", t="s", h=1, cr=1}, --
 	{n="breccia", d="Breccia", t="s", h=2, cr=1}, --
-	{n="mudstone", d="Mudstone", t="s", h=2, cr=1}, --
+	{n="mudstone", d="Mudstone", t="s", h=3, cr=1}, --
 	
 	{n="marble", d="Marble", t="m", h=3}, --
 	{n="gneiss", d="Gneiss", t="m", h=3, g={tool_grade=1}}, --
@@ -150,7 +150,7 @@ for _,v in ipairs(stonedefs_) do
 		crumbling = v.cr,
 	}
 end
-
+-- print(dump(stonedefs))
 
 
 
@@ -214,6 +214,8 @@ for i,def in pairs(stonedefs_) do
 	local stone_groups = {
 		stone = 1,
 		stone_type = sid,
+		
+		picked = def.h,
 	}
 	stone_groups["stone_"..sinfo.name] = 1
 	
@@ -231,6 +233,9 @@ for i,def in pairs(stonedefs_) do
 		--stones = i, -- added lower in loop
 		falling_node = 1,
 		stone_type = sid,
+		
+		shoveled = 2,
+		handed = 1,
 	}
 	stones_groups["stones_"..sinfo.name] = 1
 	
@@ -253,40 +258,8 @@ for i,def in pairs(stonedefs_) do
 	et(cobble_def, def.ex)
 	minetest.register_node("default:"..def.n.."_cobble", cobble_def)
 	
-	--[[
-	minetest.register_node("default:"..def.n.."_cobble_2", {
-		description = def.d.." Cobble",
-		tiles = {"default_"..def.n..".png^default_cobble.png"},
-		paramtype = "light",
-		paramtype2 = "facedir",
-		drawtype = "nodebox",
-		
-		node_box = {
-			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, .16667, 0.5},
-		},
-		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
-		sounds = default.node_sound_stone_defaults(),
-		node_placement_prediction = "default:"..def.n.."_cobble_3",
-		on_dig = function(pos, node, digger)
-			minetest.set_node(pos, {name="default:"..def.n.."_cobble_3"})
-		end
-	})
-	minetest.register_node("default:"..def.n.."_cobble_3", {
-		description = def.d.." Cobble",
-		tiles = {"default_"..def.n..".png^default_cobble.png"},
-		paramtype = "light",
-		paramtype2 = "facedir",
-		drawtype = "nodebox",
-		
-		node_box = {
-			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, -.16667, 0.5},
-		},
-		groups = {cracky = 1, cobble = 1, falling_node = 1, stone_type = stone_types[def.t]},
-		sounds = default.node_sound_stone_defaults(),
-	})
-	]]
+	
+	
 	
 	local stone_def = {
 		description = def.d,
@@ -315,13 +288,12 @@ for i,def in pairs(stonedefs_) do
 				minetest.set_node(pos, {name="default:"..def.n.."_2", param2 = 20})
 				return
 			end
-		
+			
 			minetest.set_node(pos, {name="default:"..def.n.."_2"})
 		end
 	}
 	et(stone_def, def.ex)
 	minetest.register_node("default:"..def.n, stone_def)
-	
 	
 	local stone_def_2 = {
 		description = def.d,
@@ -479,12 +451,14 @@ for i,def in pairs(stonedefs_) do
 	
 	
 	-- crumbling
+	
 	if def.cr then
 		default.register_crumbling("default:"..def.n, {
 			corner = { drop = "default:"..def.n.."_stones 7" },
 			edge = { drop = "default:"..def.n.."_stones 6" },
 		})
 	end
+	
 	
 	-- TODO: native metals in various rocks
 	-- TODO: mossy versions

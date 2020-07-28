@@ -286,8 +286,8 @@ for name,def in pairs(metal_list) do
 		tool_capabilities = {
 			full_punch_interval = 1.2,
 			max_drop_level=0,
-			groupcaps={
-				picked={times={[2]=3.00, [3]=1.70}, uses=20, maxlevel=1},
+			groupcaps = {
+				picked = {times={[1]=6.0, [2]=3.00, [3]=1.70, [4]=.70}, uses=20, maxlevel=1},
 			},
 			damage_groups = {fleshy=3},
 		},
@@ -485,7 +485,8 @@ minetest.register_tool("default:stone_adz", {
 
 for _,sdef in pairs(default.stonedefs) do
 	if sdef.groups and sdef.groups.tool_grade then
-		local n = "group:stones_"..sdef.name
+		
+		local n = "default:"..sdef.name.."_stones"
 		
 		minetest.register_craft({
 			output = "default:stone_axe",
