@@ -50,7 +50,7 @@ for sz_ = 1,4 do
 		inventory_image = "fire_basic_flame.png",
 		paramtype = "light",
 		light_source = 2 + sz*3,
-		groups = {igniter = 2, fire = sz},
+		groups = {igniter = 2, fire = sz, hot = 1,},
 		drop = "",
 		walkable = false,
 		damage_per_second = sz,
@@ -252,7 +252,7 @@ minetest.register_craft({
 -- kill grass near fires
 minetest.register_abm({
 	nodenames = {"group:surface_grass"},
- 	neighbors = {"group:fire"}, -- need better group
+ 	neighbors = {"group:hot"},
 	interval = 10,
 	chance = 10,
 	catch_up = true,

@@ -41,7 +41,6 @@ function fractal.register_climate_zone(def)
 					shoveled = 2,
 					falling_node = 1,
 					soil = 1,
-					surface_grass = 1,
 				},
 				drop = "default:dirt",
 				sounds = default.node_sound_dirt_defaults(),
@@ -59,7 +58,30 @@ function fractal.register_climate_zone(def)
 					falling_node = 1,
 					spreading_grass = 1,
 					surface_grass = 1,
+					smolderable_surface_grass = 1,
 				},
+				charred_node = "fractal:burnt_dirt_with_grass_"..suffix,
+				drop = "default:dirt",
+				sounds = default.node_sound_dirt_defaults({
+					footstep = {name = "default_grass_footstep", gain = 0.25},
+				}),
+
+				walk_speed = 1.2,
+			})
+			minetest.register_node("fractal:burnt_dirt_with_grass_"..suffix, {
+				description = "Dirt with Charred Grass",
+				tiles = {
+					"fire_burnt_grass.png",
+					"default_dirt.png",
+					{name = "default_dirt.png^fire_burnt_grass_side.png", tileable_vertical = false}
+				},
+				groups = {
+					shoveled = 2,
+					soil = 1,
+					falling_node = 1,
+					burnt = 1,
+				},
+				uncharred_node = "fractal:dirt_with_grass_"..suffix,
 				drop = "default:dirt",
 				sounds = default.node_sound_dirt_defaults({
 					footstep = {name = "default_grass_footstep", gain = 0.25},
